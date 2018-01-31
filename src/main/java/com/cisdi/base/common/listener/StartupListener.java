@@ -1,0 +1,33 @@
+package com.cisdi.base.common.listener;
+
+import java.io.IOException;
+
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+
+import com.cisdi.base.common.GlobalConfigHolder;
+import com.cisdi.base.common.enums.SystemResourceUtil;
+
+public class StartupListener implements ServletContextListener
+{
+    
+    public void contextDestroyed(ServletContextEvent event){
+    }
+    
+    public void contextInitialized(ServletContextEvent event){
+        try{
+            initSys();
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+    
+    private void initSys() throws IOException
+    {
+    	// 加载配置文件sysConfig.properties
+        GlobalConfigHolder.init();
+        //加载业务字典
+        SystemResourceUtil.getInstance().loadCodeDictionary();
+    }
+}

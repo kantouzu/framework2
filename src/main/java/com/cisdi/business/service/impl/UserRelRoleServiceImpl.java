@@ -1,0 +1,122 @@
+package com.cisdi.business.service.impl;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.cisdi.base.common.enums.CommonEnumType;
+import com.cisdi.base.common.json.AjaxJson;
+import com.cisdi.base.common.responseBean.LayGridReturn;
+import com.cisdi.base.service.impl.BaseServiceImpl;
+import com.cisdi.base.util.BaseUtil;
+import com.cisdi.business.dao.UserRelRoleDao;
+import com.cisdi.business.entity.UserRelRole;
+import com.cisdi.business.example.UserRelRoleExample;
+import com.cisdi.business.service.UserRelRoleService;
+
+@Service
+public class UserRelRoleServiceImpl extends BaseServiceImpl implements UserRelRoleService {
+
+    @Autowired
+    private UserRelRoleDao userRelRoleDao;
+    
+    @Override
+    public UserRelRole selectByPrimaryKey(Integer id) {
+        UserRelRole result = userRelRoleDao.selectByPrimaryKey(id);
+        return result;
+    }
+    
+    @Override
+    public List<Map<String, Object>> selectByExample(UserRelRoleExample  record) {
+        List<Map<String, Object>> result = userRelRoleDao.selectByExample(record);
+        return result;
+    }    
+
+    @Override
+    @Transactional
+    public AjaxJson insertSelective(UserRelRole record) {
+         int resultKey = userRelRoleDao.insertSelective(record);
+         return AjaxJson.returnJsonObj(resultKey != 0?true:false);
+    }   
+    
+    @Override
+    @Transactional
+    public AjaxJson deleteByExample(UserRelRoleExample  record) {
+        int resultKey = userRelRoleDao.deleteByExample(record);
+        return AjaxJson.returnJsonObj(resultKey != 0?true:false);
+    }
+    
+    @Override
+    @Transactional
+    public AjaxJson deleteByExampleInLogic(UserRelRoleExample  record) {
+        int resultKey = userRelRoleDao.deleteByExampleInLogic(record);
+        return AjaxJson.returnJsonObj(resultKey != 0?true:false);
+    }
+
+    @Override
+    @Transactional
+    public AjaxJson deleteByPrimaryKey(Integer id) {
+        int resultKey = userRelRoleDao.deleteByPrimaryKey(id);
+        return AjaxJson.returnJsonObj(resultKey != 0?true:false);
+    }
+    
+    @Override
+    public AjaxJson countByExample(UserRelRoleExample example){
+        Integer count = userRelRoleDao.countByExample(example);
+        return AjaxJson.returnJsonObj(true, count);
+    }
+    
+    @Override
+    @Transactional
+    public AjaxJson updateByPrimaryKeySelective(UserRelRole entity){
+        int resultKey = userRelRoleDao.updateByPrimaryKeySelective(entity);
+        return AjaxJson.returnJsonObj(resultKey != 0?true:false);
+    }
+    
+    @Override
+	public LayGridReturn selectDataGridByExample(UserRelRoleExample record) {
+		return new LayGridReturn(0, "", userRelRoleDao.selectByExample(record), userRelRoleDao.countByExample(record));
+	}
+	
+	@Override
+    @Transactional
+    public AjaxJson saveOrUpdate(UserRelRole entity){
+		Integer id = entity.getId();
+		if(BaseUtil.isEmpty(id)){
+			userRelRoleDao.insertSelective(entity);
+		}else{
+			userRelRoleDao.updateByPrimaryKeySelective(entity);
+		}
+        return AjaxJson.returnJsonObj(true);
+    }
+
+	@Override
+	@Transactional
+	public AjaxJson flushUserRelRoles(Map<String, Object> businessMap) {
+		try {
+			Integer userId = Integer.parseInt(BaseUtil.retStr(businessMap.get("userId")));
+			List<Integer> roleIds = (List<Integer>) businessMap.get("roleId");
+			if(!BaseUtil.isEmpty(roleIds)){
+				//先删除关联角色数据
+				UserRelRoleExample userRelRoleExample = new UserRelRoleExample();
+				userRelRoleExample.or().andUserIdEqualTo(userId);
+				userRelRoleDao.deleteByExample(userRelRoleExample);
+				//再重新添加角色
+				for (Integer roleId : roleIds) {
+					UserRelRole userRelRole = new UserRelRole();
+					userRelRole.setUserId(userId);
+					userRelRole.setRoleId(roleId);
+					userRelRoleDao.insertSelective(userRelRole);
+				}
+			}
+			return AjaxJson.returnJsonObj(true);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return AjaxJson.returnJsonObj(false);
+		}
+	}
+    
+}

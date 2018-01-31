@@ -1,0 +1,38 @@
+#parse("layout/resource.vm")
+<script src="${rc.contextPath}/resources/js/RoleInfo/RoleInfoEdit.js" type="text/javascript"></script>
+<script>
+	var isCheckOnly = $!isCheckOnly;
+</script>
+<!-- BEGIN CONTAINER -->
+<!-- BEGIN PAGE CONTAINER-->
+<div class="panel-body" >
+  <form class="animated fadeIn validate" id="formSubmit" action="${rc.contextPath}/roleInfoController/doSaveOrUpdate" METHOD="POST" enctype="application/x-www-form-urlencoded" >
+	        <input id="id" name="id" type="hidden" value="$!{roleInfo.id}">
+	        <div class="row form-row m-l-20 m-r-20 xs-m-l-10 xs-m-r-10">
+              <div class="col-md-12">
+    			<label class="form-label">角色编码</label>
+                <select class="wb" id="roleCode" name="roleCode" enumType="UserTypeCode" enumValue="$!{roleInfo.roleCode}" placeholder="选择角色编码" type="text" value="$!{roleInfo.roleCode}"></select>
+              </div>
+            </div>
+	        <div class="row form-row m-l-20 m-r-20 xs-m-l-10 xs-m-r-10">
+              <div class="col-md-12">
+    			<label class="form-label">角色名称</label>
+                <input class="form-control" id="roleName" name="roleName" placeholder="填写角色名称" type="text" value="$!{roleInfo.roleName}"/>
+              </div>
+            </div>
+			<div class="row form-row m-l-20 m-r-20 xs-m-l-10 xs-m-r-10">
+              <div class="col-md-12">
+    			<label class="form-label">角色类型</label>
+                <select class="wb" id="roleType" name="roleType" enumType="RoleType" enumValue="$!{roleInfo.roleType}" placeholder="选择角色类型" type="text" value="$!{roleInfo.roleType}"></select>
+              </div>
+            </div>
+	        <div class="row form-row m-l-20 m-r-20 xs-m-l-10 xs-m-r-10">
+              <div class="col-md-12">
+    			<label class="form-label">备注</label>
+                <input class="form-control" id="remark" name="remark" placeholder="填写备注" type="text" value="$!{roleInfo.remark}"/>
+              </div>
+            </div>
+  </form>
+</div>
+<!-- END TAG INPUTS / FILE UPLOADER CONTROLS-->
+<!-- END PAGE -->

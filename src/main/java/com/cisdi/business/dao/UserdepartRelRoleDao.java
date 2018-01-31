@@ -1,0 +1,28 @@
+package com.cisdi.business.dao;
+
+import java.util.List;
+import java.util.Map;
+import com.cisdi.business.entity.UserdepartRelRole;
+import com.cisdi.business.example.UserdepartRelRoleExample;
+
+public interface UserdepartRelRoleDao {
+
+    UserdepartRelRole selectByPrimaryKey(Integer id);
+    
+    List<Map<String, Object>> selectByExample(UserdepartRelRoleExample example);
+
+    int insertSelective(UserdepartRelRole entity);
+  
+    int deleteByPrimaryKey(Integer id);
+    
+    int deleteByExample(UserdepartRelRoleExample example);
+    
+    int deleteByExampleInLogic(UserdepartRelRoleExample example);
+    
+    Integer countByExample(UserdepartRelRoleExample example);
+    
+    int updateByPrimaryKeySelective(UserdepartRelRole entity);
+    
+    Integer countRoleByExample(Map<String, Object> param);
+    
+}

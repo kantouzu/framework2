@@ -1,0 +1,35 @@
+DOCTYPE html>
+<html>
+<head>
+	<title>读取表结构信息</title>
+</head>
+<body>
+<div class="container">
+	<h4>读取表结构信息</h4>
+	<div class="card">
+		<div id="data-table-selection-header" class="bootgrid-header container-fluid">
+			<div class="row">
+				<div class="col-sm-12 actionBar">
+					<button type="button" id="addButton" class="btn btn-default">
+						<i class="zmdi zmdi-plus"></i> 添加
+					</button>
+					<button type="button" id="queryButton" class="btn btn-default">
+						<i class="zmdi zmdi-plus"></i> 查询
+					</button>	
+					
+				</div>
+			</div>
+		</div>
+		<div class="table-responsive">
+			<table id="sessionTokenTable" class="table table-striped bootgrid-table">
+				<tr>
+					<th data-column-id="id" data-type="numeric" data-identifier="true" data-visible="true">自增主键</th>
+					<th data-column-id="commands" data-formatter="commands" data-sortable="false">操作</th>
+				</tr>
+			</table>
+		</div>
+	</div>
+	
+</div>
+</body>
+</html>
