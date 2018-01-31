@@ -1,0 +1,50 @@
+package com.cisdi.business.entity;
+
+import com.cisdi.base.entity.BaseEntity;
+import java.util.Date;
+
+/* 读取表结构信息 */
+public class Dictionary extends BaseEntity {
+    
+    private static final long serialVersionUID = 1L;
+    
+    public Dictionary() {
+
+    }
+    
+    /* 字典code  */
+    private String code;
+    /* 字典父级code  */
+    private String parentCode;
+    /* DicType  */
+    private String dicType;
+    /* 备注  */
+    private String remark;
+    
+    public String getCode() {
+        return this.code;
+    }
+    public String getParentCode() {
+        return this.parentCode;
+    }
+    public String getDicType() {
+        return this.dicType;
+    }
+    public String getRemark() {
+        return this.remark;
+    }
+   
+    public void setCode(String code) {
+        this.code = code;
+    }
+    public void setParentCode(String parentCode) {
+        this.parentCode = parentCode;
+    }
+    public void setDicType(String dicType) {
+        this.dicType = dicType;
+    }
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+  
+}

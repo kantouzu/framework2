@@ -1,0 +1,269 @@
+package com.cisdi.business.common.annotation;
+
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.After;
+import org.aspectj.lang.annotation.AfterReturning;
+import org.aspectj.lang.annotation.AfterThrowing;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
+import org.aspectj.lang.annotation.Pointcut;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+import com.cisdi.base.common.enums.CommonEnumType;
+import com.cisdi.base.common.enums.CommonEnumType.ClientType;
+import com.cisdi.base.common.json.AjaxJson;
+import com.cisdi.base.controller.BaseController;
+import com.cisdi.base.util.BaseUtil;
+import com.cisdi.base.util.DateUtil;
+import com.cisdi.base.util.NetworkUtil;
+import com.cisdi.business.entity.LogInfo;
+import com.cisdi.business.entity.UserInfo;
+import com.cisdi.business.service.LogInfoService;
+import com.cisdi.business.service.UserInfoService;
+
+/**
+ * aop实现类中处理记录日志的逻辑
+ * @author chenj.
+ * @date 2017/11/2.
+ */
+@Component
+@Aspect
+public class LogAopService extends BaseController{
+
+    @Autowired
+    private LogInfoService logInfoService;
+    @Autowired
+    private UserInfoService userInfoService;
+
+    private LogInfo log;
+
+    //配置日志切入点
+    @Pointcut("@annotation(com.cisdi.business.common.annotation.SystemLog)")
+    private void logAspect(){
+    }
+
+    //配置异常日志切入点
+    @Pointcut("@annotation(com.cisdi.business.common.annotation.LogService)")
+    private void serviceAspect(){
+    }
+
+    /**
+     * 前置通知 用于拦截Controller层记录用户的操作
+     *
+     * @param joinPoint 切点
+     */
+    @Before("logAspect()")
+    public  void doBefore(JoinPoint joinPoint) {
+        log = new LogInfo();
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        //*========数据库日志=========*//
+        try {
+        	Map<String,String> info = getControllerMethodDescription(joinPoint);
+        	String clientType = info.get("clientType");
+        	UserInfo user = null;
+        	if(ClientType.pc.getValue().equals(clientType))
+        		user = (UserInfo) getSessionUser(request).getObj();
+        	else
+        		user = (UserInfo) getTokenUser(request).getObj();
+            //请求参数列表
+//            Map<String ,String[]> paramMap = request.getParameterMap();
+            //请求的IP
+            String ip = NetworkUtil.getIpAddress(request);
+            log.setIpAddress(ip);
+            log.setUserId(user.getId());
+            log.setCreateTime(DateUtil.getCurrentDate());
+//            log.setRequestParam(JSON.toJSONString(paramMap));
+            //获取日志注解信息
+            log.setModuleType(info.get("module"));
+            log.setOperation(info.get("description"));
+        }  catch (Exception e) {
+           e.printStackTrace();
+        }
+    }
+
+
+    /**
+     * 方法结束执行
+     */
+    @After("logAspect()")
+    public void after(){
+    }
+
+    /**
+     * 方法结束执行后的操作
+     * @param returnValue
+     *      返回值
+     */
+    @AfterReturning(pointcut = "logAspect()",returning = "returnValue")
+    public void doAfter(Object returnValue){
+        if(!BaseUtil.isEmpty(returnValue)){
+            if(returnValue instanceof AjaxJson){
+                AjaxJson aj = (AjaxJson)returnValue;
+                log.setResponseResult(aj.getMsg());
+                if(BaseUtil.isEmpty(log.getIsSuccess())){
+                    if(aj.isSuccess()){
+                        log.setIsSuccess(CommonEnumType.YesOrNo.是.getValue());
+                    }else{
+                        log.setIsSuccess(CommonEnumType.YesOrNo.否.getValue());
+                    }
+                    logInfoService.insertSelective(log);
+                }
+            }
+
+        }else {
+            if (BaseUtil.isEmpty(log.getIsSuccess())) {
+                log.setIsSuccess(CommonEnumType.YesOrNo.是.getValue());
+                logInfoService.insertSelective(log);
+            }
+        }
+    }
+
+
+    /**
+     * 异常通知 用于拦截异常日志
+     *
+     * @param joinPoint
+     * @param e
+     */
+    @AfterThrowing(pointcut = "logAspect()", throwing = "e")
+    public  void doAfterThrowing(JoinPoint joinPoint, Throwable e) {
+        //保存异常信息
+        log.setErrMsg("第"+e.getStackTrace()[0].getLineNumber()+"行代码报错：'" + e.getMessage()+"'");
+        log.setIsSuccess(CommonEnumType.YesOrNo.否.getValue());
+        logInfoService.insertSelective(log);
+    }
+
+
+    /**
+     * 方法执行
+     * @param pjp
+     * @return
+     * @throws Throwable
+     */
+    @Around("logAspect()")
+    public Object around(ProceedingJoinPoint pjp) throws Throwable{
+        return pjp.proceed();
+    }
+
+    /**
+     * 异常通知 用于拦截异常日志
+     *
+     * @param joinPoint
+     * @param e
+     */
+    @AfterThrowing(pointcut = "serviceAspect()", throwing = "e")
+    public  void doAfterThrowingService(JoinPoint joinPoint, Throwable e) {
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        //读取session中的用户
+        UserInfo user = (UserInfo) getSessionUser(request).getObj();
+        //*========数据库日志=========*//
+        try {
+            String ip = NetworkUtil.getIpAddress(request);
+            log.setIpAddress(ip);
+            log.setUserId(user.getId());
+            log.setCreateTime(DateUtil.getCurrentDate());
+            //获取日志注解信息
+            Map<String,String> info = getServiceMethodDescription(joinPoint);
+            if(!BaseUtil.isEmpty(info.get("module"))){
+                log.setModuleType(info.get("module"));
+            }
+            if(!BaseUtil.isEmpty(info.get("module"))){
+                log.setOperation(info.get("description"));
+            }
+            if(!BaseUtil.isEmpty(info.get("clientType"))){
+            	log.setClientType(info.get("clientType"));
+            }
+            //保存异常信息
+            log.setErrMsg("第"+e.getStackTrace()[0].getLineNumber()+"行代码报错：'" + e.getMessage()+"'");
+            log.setIsSuccess(CommonEnumType.YesOrNo.是.getValue());
+            logInfoService.insertSelective(log);
+        }  catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    /**
+     * 获取注解中对方法的描述信息 用于Controller层注解
+     *
+     * @param joinPoint 切点
+     * @return 方法描述
+     * @throws Exception
+     */
+    public  static Map<String,String> getControllerMethodDescription(JoinPoint joinPoint)  throws Exception {
+        String targetName = joinPoint.getTarget().getClass().getName();
+        String methodName = joinPoint.getSignature().getName();
+        Object[] arguments = joinPoint.getArgs();
+        Class targetClass = Class.forName(targetName);
+        Method[] methods = targetClass.getMethods();
+        Map<String,String> info = new HashMap<>();
+        //模块
+        String module = "";
+        //描述
+        String description = "";
+        //客户端种类
+        String clientType = "";
+        for (Method method : methods) {
+            if (method.getName().equals(methodName)) {
+                Class[] clazz = method.getParameterTypes();
+                if (clazz.length == arguments.length) {
+                    module = method.getAnnotation(SystemLog.class).module();
+                    description = method.getAnnotation(SystemLog.class).description();
+                    clientType = method.getAnnotation(SystemLog.class).clientType();
+                    break;
+                }
+            }
+        }
+        info.put("module",module);
+        info.put("description",description);
+        info.put("clientType",clientType);
+        return info;
+    }
+
+    /**
+     * 获取注解中对方法的描述信息 用于Controller层注解
+     *
+     * @param joinPoint 切点
+     * @return 方法描述
+     * @throws Exception
+     */
+    public  static Map<String,String> getServiceMethodDescription(JoinPoint joinPoint)  throws Exception {
+        String targetName = joinPoint.getTarget().getClass().getName();
+        String methodName = joinPoint.getSignature().getName();
+        Object[] arguments = joinPoint.getArgs();
+        Class targetClass = Class.forName(targetName);
+        Method[] methods = targetClass.getMethods();
+        Map<String,String> info = new HashMap<>();
+        //模块
+        String module = "";
+        //描述
+        String description = "";
+        //客户端种类
+        String clientType = "";
+        for (Method method : methods) {
+            if (method.getName().equals(methodName)) {
+                Class[] clazz = method.getParameterTypes();
+                if (clazz.length == arguments.length) {
+                    module = method.getAnnotation(LogService.class).module();
+                    description = method.getAnnotation(LogService.class).description();
+                    clientType = method.getAnnotation(LogService.class).clientType();
+                    break;
+                }
+            }
+        }
+        info.put("module",module);
+        info.put("description",description);
+        info.put("clientType",clientType);
+        return info;
+    }
+}

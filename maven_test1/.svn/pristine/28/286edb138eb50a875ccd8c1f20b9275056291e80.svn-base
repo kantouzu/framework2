@@ -1,0 +1,71 @@
+package com.cisdi.business.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.cisdi.base.common.enums.CommonEnumType.DeleteFlag;
+import com.cisdi.base.common.json.AjaxJson;
+import com.cisdi.base.controller.BaseController;
+import com.cisdi.base.util.BaseUtil;
+import com.cisdi.base.util.StringTools;
+import com.cisdi.business.entity.SessionToken;
+import com.cisdi.business.entity.UserInfo;
+import com.cisdi.business.example.SessionTokenExample;
+import com.cisdi.business.example.UserInfoExample;
+import com.cisdi.business.service.SessionTokenService;
+import com.cisdi.business.service.UserInfoService;
+import com.cisdi.business.util.BusinessUtil;
+
+@Controller
+@RequestMapping(value="userInfoController")
+public class LoginController extends BaseController {
+
+    @Autowired
+    private UserInfoService userInfoService;
+    @Autowired
+    private SessionTokenService sessionTokenService;
+    
+    @RequestMapping(value = "mobileLogin")
+    @ResponseBody
+    public AjaxJson mobileLogin(String userName, String pwd) {
+    	//移动端登录
+    	//登录之后，查询session_token表中是否有该用户的token值，如果没有或者已过期，则删除后重新录入
+    	String md5Pwd = StringTools.encodePassword(pwd, "MD5");
+    	UserInfoExample userInfoExample = new UserInfoExample();
+    	//先验证用户是否存在
+    	userInfoExample.or().andUserNameEqualTo(userName);
+    	List<UserInfo> userList = userInfoService.selectByExample(userInfoExample);
+    	if(BaseUtil.isListEmpty(userList))
+    		return AjaxJson.returnJsonObj(false, "尚未注册该用户");
+    	//验证用户名密码匹配
+    	userInfoExample = new UserInfoExample();
+    	userInfoExample.or().andUserNameEqualTo(userName)
+    									.andPwdEqualTo(md5Pwd)
+    									.andDeleteflagEqualTo(DeleteFlag.未删除.getValue());
+    	userList = userInfoService.selectByExample(userInfoExample);
+    	if(BaseUtil.isListEmpty(userList))
+    		return AjaxJson.returnJsonObj(false, "密码错误");
+    	//登录成功之后，查询是否存在未失效的token
+    	Integer userId = userList.get(0).getId();
+    	SessionTokenExample sessionTokenExample = new SessionTokenExample(DeleteFlag.未删除.getValue());
+    	sessionTokenExample.or().andUserIdEqualTo(userId);
+    	List<SessionToken> tokenList = sessionTokenService.selectByExample(sessionTokenExample);
+    	if(BaseUtil.isListEmpty(tokenList) || BusinessUtil.isTokenInvalid(tokenList.get(0))){
+    		//代表从未登录或者token已失效，需要删除对应token数据并重新塞一条，之后将token放入内存
+    		AjaxJson reloadTokenResult = 
+    				sessionTokenService.reloadTokenByUser(userList.get(0));
+    		if(!reloadTokenResult.isSuccess())
+    			return AjaxJson.returnJsonObj(false, "会话注册失败");
+    	}
+    	return AjaxJson.returnJsonObj(true);
+    }    
+    
+    public static void main(String[] args) {
+		System.out.println(StringTools.encodePassword("666666", "MD5"));
+	}
+}

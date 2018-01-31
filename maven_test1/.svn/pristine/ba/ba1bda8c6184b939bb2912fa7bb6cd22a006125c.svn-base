@@ -1,0 +1,1335 @@
+package com.cisdi.base.common.enums;
+
+import com.cisdi.base.common.enums.CommonEnumType.*;
+import com.cisdi.base.common.responseBean.BaseDataBean;
+import com.cisdi.base.util.BaseUtil;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+
+
+/**
+ * 
+ * @功能说明：枚举 转换
+ * @作者：xiangjz
+ * @创建日期： 2016-11-20
+ */
+public  class CommonEnumTypeToList {
+
+	private static CommonEnumTypeToList instance;
+	
+	public static synchronized CommonEnumTypeToList getInstance() {
+		if (BaseUtil.isEmpty(instance))
+			instance = new CommonEnumTypeToList();
+		return instance;
+	}
+	
+	//系统可模块状态写如内存
+	public static Map<Object, Object> writeMemoryTempleStatus(){
+		Map<Object, Object> dictionaryParams= new HashMap<Object, Object>();
+		//用户类型代码
+		dictionaryParams.put("comEnum_UserTypeCode_list", UserTypeCode(dictionaryParams));
+		//审核状态
+		dictionaryParams.put("comEnum_CheckStatue_list", CheckStatue(dictionaryParams));
+		//审核结果
+		dictionaryParams.put("comEnum_AuditResult_list", AuditResult(dictionaryParams));
+		//附件类型
+		dictionaryParams.put("comEnum_AttachType_list", AttachType(dictionaryParams));
+		//缴费状态
+		dictionaryParams.put("comEnum_PaymentStatue_list", PaymentStatue(dictionaryParams));
+		//未删除/已删除
+		dictionaryParams.put("comEnum_DeleteFlag_list", DeleteFlag(dictionaryParams));
+		//性别
+		dictionaryParams.put("comEnum_GenderFlag_list", GenderFlag(dictionaryParams));
+		//是或否
+		dictionaryParams.put("comEnum_YesOrNo_list", YesOrNo(dictionaryParams));
+		//大型/中型/小型/微型
+		dictionaryParams.put("comEnum_EntpScale_list", EntpScale(dictionaryParams));
+		//营业状态：营业、停业（歇业）、筹建、当年关闭、当年破产、其他	
+		dictionaryParams.put("comEnum_BusinessStatus_list", BusinessStatus(dictionaryParams));
+		//送审对象类型
+		dictionaryParams.put("comEnum_ObjectType_list", ObjectType(dictionaryParams));
+		//审核登记
+		dictionaryParams.put("comEnum_AuditLevel_list", AuditLevel(dictionaryParams));
+		//国民经济行业分类代码:c-门类，b-大类，m-中类，s-小类
+		dictionaryParams.put("comEnum_CatoryType_list", CatoryType(dictionaryParams));
+
+		 //商品房资质等级:1-一级，2-二级，3-三级，4-四级，5-暂定级，6-申请中，7-无资质
+		dictionaryParams.put("comEnum_QualificationType_list", QualificationType(dictionaryParams));
+		 //商品房项目性质:1-普通住宅，2-商业营业住房，3-办公楼，4-别墅，5-高档公寓
+		dictionaryParams.put("comEnum_ProjectType_list", ProjectType(dictionaryParams));
+		 //商品房项目状态:1-前期，2-在线，3-转让，4-竣工，5-售罄
+		dictionaryParams.put("comEnum_ProjectStatusType_list",ProjectStatusType(dictionaryParams));
+
+		//城市类别
+		dictionaryParams.put("comEnum_CityType_list", CityType(dictionaryParams));
+		//入库进展情况
+		dictionaryParams.put("comEnum_WarehouseSituation_list", WarehouseSituation(dictionaryParams));
+		//基金类型
+		dictionaryParams.put("comEnum_FundType_list", FundType(dictionaryParams));
+		//付费机制
+		dictionaryParams.put("comEnum_PayType_list", PayType(dictionaryParams));
+		//执行状态:未开工("0"),执行中("1"),停缓建("2"),已完工已结算("3"),已撤销("4"),已完工未结算("5")
+		dictionaryParams.put("comEnum_ExecuteStatue_list", ExecuteStatue(dictionaryParams));
+		//基金认购等级
+		dictionaryParams.put("comEnum_FundPurchaseLevel_list", FundPurchaseLevel(dictionaryParams));
+		//纳入地方政府中长期财政预算进展情况
+		dictionaryParams.put("comEnum_InFinancialBudget_list", InFinancialBudget(dictionaryParams));
+		//合同签订后未开工时间:签订3个月后未开工("0"),签订6个月后未开工("1")
+		dictionaryParams.put("comEnum_UnStartCycle_list", UnStartCycle(dictionaryParams));
+		//金额单位:元("0")
+		dictionaryParams.put("comEnum_MoneyUnit_list", MoneyUnit(dictionaryParams));
+		//合同撤销类型:填错("0"),项目撤销("1")
+		dictionaryParams.put("comEnum_ContractCancelType_list", ContractCancelType(dictionaryParams));
+		//工期单位:月("0"),年("1")
+		dictionaryParams.put("comEnum_TimeUnit_list", TimeUnit(dictionaryParams));
+		//增减量单位:增加("0"),减少("1")
+		dictionaryParams.put("comEnum_IncrementType_list", IncrementType(dictionaryParams));
+		//合同完成情况明细记录类型:月报("0"),半年报("1"),年报("2")
+		dictionaryParams.put("comEnum_FinishSituationRecordType_list", FinishSituationRecordType(dictionaryParams));
+		//商品房投资类型：建安工程投资("0"),土地开发投资("1"),土地购置费("2"),其他投资("3")
+		dictionaryParams.put("comEnum_InvestmentType_list", InvestmentType(dictionaryParams));
+
+		//一级土地投资类型：土地开发投资("0"),土地购置费("1"),其他投资("2")
+		dictionaryParams.put("comEnum_OneLevelInvestmentType_list", OneLevelInvestmentType(dictionaryParams));
+		//一级土地房项目性质:1-一级土地开发
+		dictionaryParams.put("comEnum_oneProjectType_list", oneProjectType(dictionaryParams));
+		//其他地房项目性质:
+		dictionaryParams.put("comEnum_otherProjectType_list", otherProjectType(dictionaryParams));
+		//其他房项目状态:1-前期，2-在建，3-竣工，4-交付
+		dictionaryParams.put("comEnum_OtherProjectStatusType_list", OtherProjectStatusType(dictionaryParams));
+
+		//发起审核企业等级3-三级，2-二级，1-集团
+		dictionaryParams.put("comEnum_EnterpLevel_list", EnterpLevel(dictionaryParams));
+		//商品房("1"),保障性安居工程建设("2"),一级土地开发("3"),城市基础设施投资建设("4"),其他房地产经营业务("5");
+		dictionaryParams.put("comEnum_HouseType_list", HouseType(dictionaryParams));
+		//分包项目送审之前，总包方确认状态
+		dictionaryParams.put("comEnum_EngInfomationStatue_list", EngInfomationStatue(dictionaryParams));
+
+		//保障性安居工程项目性质：保障性住房("1"),棚户区改造("2"),农村保障性安居工程("3")
+		dictionaryParams.put("comEnum_HomeProjectType_list", HomeProjectType(dictionaryParams));
+		//保障性安居工程模式：委托开发("1"),委托代建("2")
+		dictionaryParams.put("comEnum_ModeType_list", ModeType(dictionaryParams));
+		//保障性安居工程项目状态：前期("0"),在建("1"),竣工("2"),交付("3")
+		dictionaryParams.put("comEnum_HomeProjectStatus_list", HomeProjectStatus(dictionaryParams));
+		//城市基础设施建设：城市基础设施投资建设("0")
+		dictionaryParams.put("comEnum_cityProjectType_list", cityProjectType(dictionaryParams));
+		//商品房业务类型：商品房开发（“0”）
+		dictionaryParams.put("comEnum_serviceType_list", serviceType(dictionaryParams));
+		//保障性安居工程建设业务类型：保障性安居工程建设（“0”）
+		dictionaryParams.put("comEnum_HomeServiceType_list", HomeServiceType(dictionaryParams));
+		//城市基础设施投资建设业务类型：城市基础设施投资建设（“0”）
+		dictionaryParams.put("comEnum_CityServiceType_list", CityServiceType(dictionaryParams));
+		//房地产土地购置类型：生地/熟地
+		dictionaryParams.put("comEnum_LandBuyType_list", LandBuyType(dictionaryParams));
+		//制造基地设立方式:子公司/分支结构
+		dictionaryParams.put("comEnum_ManuBase_list", ManuBase(dictionaryParams));
+		//其他项目业务类型
+		dictionaryParams.put("comEnum_OtherServiceType_list", OtherServiceType(dictionaryParams));
+		//水处理项目类型
+		dictionaryParams.put("comEnum_WaterProjectType_list", WaterProjectType(dictionaryParams));
+		//一级土地房业务类型
+		dictionaryParams.put("comEnum_oneType_list", oneType(dictionaryParams));
+		//其他房产业务类型
+		dictionaryParams.put("comEnum_otherType_list", otherType(dictionaryParams));
+		//其他经营状态
+		dictionaryParams.put("comEnum_OtherProjectStatus_list", OtherProjectStatus(dictionaryParams));
+		//报表类型
+		dictionaryParams.put("comEnum_ExcelReportType_list", ExcelReportType(dictionaryParams));
+		//房地产加入方式:新设("0"),收购("1")
+		dictionaryParams.put("comEnum_JoinWay_list", JoinWay(dictionaryParams));
+		//审核记录操作状态:新增记录("0"),修改记录("1")
+		dictionaryParams.put("comEnum_AuditOperateStatue_list", AuditOperateStatue(dictionaryParams));
+		//报表类型：仅自己("0"),下级_含自己("1"),下级_不含自己("2");
+		dictionaryParams.put("comEnum_ExcelType_list", ExcelType(dictionaryParams));
+		//报表类型名称
+		dictionaryParams.put("comEnum_ExcelNameType_list", ExcelNameType(dictionaryParams));
+		//经营状态:正在经营("0"),暂停经营("1"),转让("2"),撤销("2")
+		dictionaryParams.put("comEnum_RunStatue_list", RunStatue(dictionaryParams));
+		//基地类型
+		dictionaryParams.put("comEnum_BaseType_list", BaseType(dictionaryParams));
+		//合同状态
+		dictionaryParams.put("comEnum_ContractStatue_list", ContractStatue(dictionaryParams));
+        //日志记录模块名称
+		dictionaryParams.put("comEnum_LogModuleType_list", LogModuleType(dictionaryParams));
+		//接口专用，业务编码   共6位数字组成，1开头为数据字典，2开头为枚举，3开头为其它基础数据
+		dictionaryParams.put("comEnum_DicBsnCode_list", DicBsnCode(dictionaryParams));
+		return dictionaryParams;
+	}
+	
+	/**
+	 * 用户类型代码
+	 */
+	public static List<BaseDataBean> UserTypeCode(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.UserTypeCode[] arr = CommonEnumType.UserTypeCode.values();
+		for (UserTypeCode p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_UserTypeCode_map", dictionary);
+		return data;
+	}
+	
+	/**
+	 * 审核状态
+	 */
+	public static List<BaseDataBean> CheckStatue(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.CheckStatue[] arr = CommonEnumType.CheckStatue.values();
+		for (CheckStatue p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_CheckStatue_map", dictionary);
+		return data;
+	}
+	
+	/**
+	 * 审核结果
+	 */
+	public static List<BaseDataBean> AuditResult(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.AuditResult[] arr = CommonEnumType.AuditResult.values();
+		for (AuditResult p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_AuditResult_map", dictionary);
+		return data;
+	}
+	
+	
+	/**
+	 * 附件类型
+	 */
+	public static List<BaseDataBean> AttachType(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.AttachType[] arr = CommonEnumType.AttachType.values();
+		for (AttachType p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_AttachType_map", dictionary);
+		return data;
+	}
+	
+	/**
+	 * 缴费状态
+	 */
+	public static List<BaseDataBean> PaymentStatue(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.PaymentStatue[] arr = CommonEnumType.PaymentStatue.values();
+		for (PaymentStatue p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_PaymentStatue_map", dictionary);
+		return data;
+	}
+	
+	
+	/**
+	 * 未删除/已删除
+	 */
+	public static List<BaseDataBean> DeleteFlag(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.DeleteFlag[] arr = CommonEnumType.DeleteFlag.values();
+		for (DeleteFlag p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_DeleteFlag_map", dictionary);
+		return data;
+	}
+	
+	/**
+	 * 性别
+	 */
+	public static List<BaseDataBean> GenderFlag(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.GenderFlag[] arr = CommonEnumType.GenderFlag.values();
+		for (GenderFlag p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_GenderFlag_map", dictionary);
+		return data;
+	}
+	
+	/**
+	 * 是或否
+	 */
+	public static List<BaseDataBean> YesOrNo(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.YesOrNo[] arr = CommonEnumType.YesOrNo.values();
+		for (YesOrNo p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_YesOrNo_map", dictionary);
+		return data;
+	}
+	/**
+	 * 大型/中型/小型/微型
+	 */
+	public static List<BaseDataBean> EntpScale(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.EntpScale[] arr = CommonEnumType.EntpScale.values();
+		for (EntpScale p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_EntpScale_map", dictionary);
+		return data;
+	}
+	
+	/**
+	 * 营业状态：营业、停业（歇业）、筹建、当年关闭、当年破产、其他	
+	 */
+	public static List<BaseDataBean> BusinessStatus(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.BusinessStatus[] arr = CommonEnumType.BusinessStatus.values();
+		for (BusinessStatus p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_BusinessStatus_map", dictionary);
+		return data;
+	}
+	/**
+	 * 送审对象类型
+	 * @param dictionaryParams
+	 * @return
+	 */
+	public static List<BaseDataBean> ObjectType(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.ObjectType[] arr = CommonEnumType.ObjectType.values();
+		for (ObjectType p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_ObjectType_map", dictionary);
+		return data;
+	}
+	
+	/**
+	 * 审核等级
+	 * @param dictionaryParams
+	 * @return
+	 */
+	public static List<BaseDataBean> AuditLevel(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.AuditLevel[] arr = CommonEnumType.AuditLevel.values();
+		for (AuditLevel p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_AuditLevel_map", dictionary);
+		return data;
+	}
+	
+	/**
+	 * 国民经济行业分类代码:c-门类，b-大类，m-中类，s-小类
+	 * @param dictionaryParams
+	 * @return
+	 */
+	public static List<BaseDataBean> CatoryType(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.CatoryType[] arr = CommonEnumType.CatoryType.values();
+		for (CatoryType p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_CatoryType_map", dictionary);
+		return data;
+	}
+	
+
+	/**
+	 * 商品房资质等级:1-一级，2-二级，3-三级，4-四级，5-暂定级，6-申请中，7-无资质
+	 * @param dictionaryParams
+	 * @return
+	 */
+	public static List<BaseDataBean> QualificationType(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.QualificationType[] arr = CommonEnumType.QualificationType.values();
+		for (com.cisdi.base.common.enums.CommonEnumType.QualificationType p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_QualificationType_map", dictionary);
+		return data;
+	}
+	/**
+	 * 商品房项目性质:1-普通住宅，2-商业营业住房，3-办公楼，4-别墅，5-高档公寓
+	 * @param dictionaryParams
+	 * @return
+	 */
+	public static List<BaseDataBean> ProjectType(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.ProjectType[] arr = CommonEnumType.ProjectType.values();
+		for (com.cisdi.base.common.enums.CommonEnumType.ProjectType p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_ProjectType_map", dictionary);
+		return data;
+	}
+	/**
+	 * 商品房项目状态:1-前期，2-在线，3-转让，4-竣工，5-售罄
+	 * @param dictionaryParams
+	 * @return
+	 */
+	public static List<BaseDataBean> ProjectStatusType(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.ProjectStatusType[] arr = CommonEnumType.ProjectStatusType.values();
+		for (com.cisdi.base.common.enums.CommonEnumType.ProjectStatusType p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_ProjectStatusType_map", dictionary);
+		return data;
+	}
+
+	/**
+	 * 城市类别
+	 * @param dictionaryParams
+	 * @return
+	 */
+	public static List<BaseDataBean> CityType(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.CityType[] arr = CommonEnumType.CityType.values();
+		for (CityType p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_CityType_map", dictionary);
+		return data;
+	}
+	
+	/**
+	 * 入库进展情况
+	 * @param dictionaryParams
+	 * @return
+	 */
+	public static List<BaseDataBean> WarehouseSituation(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.WarehouseSituation[] arr = CommonEnumType.WarehouseSituation.values();
+		for (WarehouseSituation p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_WarehouseSituation_map", dictionary);
+		return data;
+	}
+	/**
+	 * 纳入地方政府中长期财政预算进展情况
+	 * @param dictionaryParams
+	 * @return
+	 */
+	public static List<BaseDataBean> InFinancialBudget(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.InFinancialBudget[] arr = CommonEnumType.InFinancialBudget.values();
+		for (InFinancialBudget p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_InFinancialBudget_map", dictionary);
+		return data;
+	}
+	/**
+	 * 基金类型
+	 * @param dictionaryParams
+	 * @return
+	 */
+	public static List<BaseDataBean> FundType(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.FundType[] arr = CommonEnumType.FundType.values();
+		for (FundType p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_FundType_map", dictionary);
+		return data;
+	}
+	/**
+	 * 付费机制
+	 * @param dictionaryParams
+	 * @return
+	 */
+	public static List<BaseDataBean> PayType(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.PayType[] arr = CommonEnumType.PayType.values();
+		for (PayType p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_PayType_map", dictionary);
+		return data;
+	}
+	
+	/**
+	 * 执行状态:未开工("0"),执行中("1"),停缓建("2"),已完工已结算("3"),已撤销("4"),已完工未结算("5")
+	 * @param dictionaryParams
+	 * @return
+	 */
+	public static List<BaseDataBean> ExecuteStatue(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.ExecuteStatue[] arr = CommonEnumType.ExecuteStatue.values();
+		for (ExecuteStatue p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_ExecuteStatue_map", dictionary);
+		return data;
+	}
+	/**
+	 * 基金认购等级
+	 * @param dictionaryParams
+	 * @return
+	 */
+	public static List<BaseDataBean> FundPurchaseLevel(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.FundPurchaseLevel[] arr = CommonEnumType.FundPurchaseLevel.values();
+		for (FundPurchaseLevel p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_FundPurchaseLevel_map", dictionary);
+		return data;
+	}
+	
+	/**
+	 * 合同签订后未开工时间:签订3个月后未开工("0"),签订6个月后未开工("1")
+	 * @param dictionaryParams
+	 * @return
+	 */
+	public static List<BaseDataBean> UnStartCycle(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.UnStartCycle[] arr = CommonEnumType.UnStartCycle.values();
+		for (UnStartCycle p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_UnStartCycle_map", dictionary);
+		return data;
+	}
+	
+	/**
+	 * 金额单位:元("0")
+	 * @param dictionaryParams
+	 * @return
+	 */
+	public static List<BaseDataBean> MoneyUnit(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.MoneyUnit[] arr = CommonEnumType.MoneyUnit.values();
+		for (MoneyUnit p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_MoneyUnit_map", dictionary);
+		return data;
+	}
+	
+	/**
+	 * 合同撤销类型:填错("0"),项目撤销("1")
+	 * @param dictionaryParams
+	 * @return
+	 */
+	public static List<BaseDataBean> ContractCancelType(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.ContractCancelType[] arr = CommonEnumType.ContractCancelType.values();
+		for (ContractCancelType p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_ContractCancelType_map", dictionary);
+		return data;
+	}
+	
+	/**
+	 * 工期单位:月("0"),年("1")
+	 * @param dictionaryParams
+	 * @return
+	 */
+	public static List<BaseDataBean> TimeUnit(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.TimeUnit[] arr = CommonEnumType.TimeUnit.values();
+		for (TimeUnit p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_TimeUnit_map", dictionary);
+		return data;
+	}
+	
+	/**
+	 * 增减量单位:增加("0"),减少("1")
+	 * @param dictionaryParams
+	 * @return
+	 */
+	public static List<BaseDataBean> IncrementType(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.IncrementType[] arr = CommonEnumType.IncrementType.values();
+		for (IncrementType p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_IncrementType_map", dictionary);
+		return data;
+	}
+	
+	/**
+	 * 合同完成情况明细记录类型:月报("0"),半年报("1"),年报("2")
+	 * @param dictionaryParams
+	 * @return
+	 */
+	public static List<BaseDataBean> FinishSituationRecordType(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.FinishSituationRecordType[] arr = CommonEnumType.FinishSituationRecordType.values();
+		for (FinishSituationRecordType p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_FinishSituationRecordType_map", dictionary);
+		return data;
+	}
+	
+	/**
+	 * 投资类型：建安工程投资("0"),土地开发投资("1"),土地购置费("2"),其他投资("3")
+	 * @param dictionaryParams
+	 * @return
+	 */
+	public static List<BaseDataBean> InvestmentType(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.InvestmentType[] arr = CommonEnumType.InvestmentType.values();
+		for (com.cisdi.base.common.enums.CommonEnumType.InvestmentType p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_InvestmentType_map", dictionary);
+		return data;
+	}
+
+	/**
+	 * 一级土地房投资类型：土地开发投资("0"),土地购置费("1"),其他投资("2")
+	 * @param dictionaryParams
+	 * @return
+	 */
+	public static List<BaseDataBean> OneLevelInvestmentType(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.OneLevelInvestmentType[] arr = CommonEnumType.OneLevelInvestmentType.values();
+		for (com.cisdi.base.common.enums.CommonEnumType.OneLevelInvestmentType p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_OneLevelInvestmentType_map", dictionary);
+		return data;
+	}
+	/**
+	 * 一级土地房项目性质:1-一级土地开发
+	 * @param dictionaryParams
+	 * @return
+	 */
+	public static List<BaseDataBean> oneProjectType(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.oneProjectType[] arr = CommonEnumType.oneProjectType.values();
+		for (com.cisdi.base.common.enums.CommonEnumType.oneProjectType p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_oneProjectType_map", dictionary);
+		return data;
+	}
+	/**
+	 * 其他地房项目性质:
+	 * @param dictionaryParams
+	 * @return
+	 */
+	public static List<BaseDataBean> otherProjectType(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.otherProjectType[] arr = CommonEnumType.otherProjectType.values();
+		for (com.cisdi.base.common.enums.CommonEnumType.otherProjectType p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_otherProjectType_map", dictionary);
+		return data;
+	}
+	/**
+	 * 其他房地产项目状态:
+	 * @param dictionaryParams
+	 * @return
+	 */
+	public static List<BaseDataBean> OtherProjectStatusType(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.OtherProjectStatusType[] arr = CommonEnumType.OtherProjectStatusType.values();
+		for (com.cisdi.base.common.enums.CommonEnumType.OtherProjectStatusType p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_OtherProjectStatusType_map", dictionary);
+		return data;
+	}
+
+	/**
+	 * 投资类型：建安工程投资("0"),土地开发投资("1"),土地购置费("2"),其他投资("3")
+	 * @param dictionaryParams
+	 * @return
+	 */
+	public static List<BaseDataBean> EnterpLevel(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.EnterpLevel[] arr = CommonEnumType.EnterpLevel.values();
+		for (EnterpLevel p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_EnterpLevel_map", dictionary);
+		return data;
+	}
+
+	/**
+	 * //商品房("1"),保障性安居工程建设("2"),一级土地开发("3"),城市基础设施投资建设("4"),其他房地产经营业务("5")
+	 * @param dictionaryParams
+	 * @return
+	 */
+	public static List<BaseDataBean> HouseType(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.HouseType[] arr = CommonEnumType.HouseType.values();
+		for (com.cisdi.base.common.enums.CommonEnumType.HouseType p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_HouseType_map", dictionary);
+		return data;
+	}
+	
+	/**
+	 * 分包项目送审之前，总包方确认状态
+	 * @param dictionaryParams
+	 * @return
+	 */
+	public static List<BaseDataBean> EngInfomationStatue(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.EngInfomationStatue[] arr = CommonEnumType.EngInfomationStatue.values();
+		for (EngInfomationStatue p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_EngInfomationStatue_map", dictionary);
+		return data;
+	}
+	/**
+	 * 保障性安居工程项目性质：保障性住房("1"),棚户区改造("2"),农村保障性安居工程("3")
+	 * @param dictionaryParams
+	 * @return
+	 */
+	public static List<BaseDataBean> HomeProjectType(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.HomeProjectType[] arr = CommonEnumType.HomeProjectType.values();
+		for (com.cisdi.base.common.enums.CommonEnumType.HomeProjectType p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_HomeProjectType_map", dictionary);
+		return data;
+	}
+	/**
+	 * 保障性安居工程模式：委托开发("1"),委托代建("2")
+	 * @param dictionaryParams
+	 * @return
+	 */
+	public static List<BaseDataBean> ModeType(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.ModeType[] arr = CommonEnumType.ModeType.values();
+		for (com.cisdi.base.common.enums.CommonEnumType.ModeType p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_ModeType_map", dictionary);
+		return data;
+	}
+	/**
+	 * 保障性安居工程项目状态：前期("0"),在建("1"),竣工("2"),交付("3")
+	 * @param dictionaryParams
+	 * @return
+	 */
+	public static List<BaseDataBean> HomeProjectStatus(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.HomeProjectStatus[] arr = CommonEnumType.HomeProjectStatus.values();
+		for (com.cisdi.base.common.enums.CommonEnumType.HomeProjectStatus p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_HomeProjectStatus_map", dictionary);
+		return data;
+	}
+	/**
+	 * 城市基础设施建设：城市基础设施投资建设("0")
+	 * @param dictionaryParams
+	 * @return
+	 */
+	public static List<BaseDataBean> cityProjectType(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.cityProjectType[] arr = CommonEnumType.cityProjectType.values();
+		for (com.cisdi.base.common.enums.CommonEnumType.cityProjectType p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_cityProjectType_map", dictionary);
+		return data;
+	}
+	/**
+	 * 商品房业务类型：商品房开发（“0”）
+	 * @param dictionaryParams
+	 * @return
+	 */
+	public static List<BaseDataBean> serviceType(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.serviceType[] arr = CommonEnumType.serviceType.values();
+		for (com.cisdi.base.common.enums.CommonEnumType.serviceType p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_serviceType_map", dictionary);
+		return data;
+	}
+	/**
+	 * 保障性安居工程业务类型：保障性安居工程（“0”）
+	 * @param dictionaryParams
+	 * @return
+	 */
+	public static List<BaseDataBean> HomeServiceType(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.HomeServiceType[] arr = CommonEnumType.HomeServiceType.values();
+		for (com.cisdi.base.common.enums.CommonEnumType.HomeServiceType p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_HomeServiceType_map", dictionary);
+		return data;
+	}
+	/**
+	 * 城市基础设施投资建设业务类型：城市基础设施投资建设（“0”）
+	 * @param dictionaryParams
+	 * @return
+	 */
+	public static List<BaseDataBean> CityServiceType(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.CityServiceType[] arr = CommonEnumType.CityServiceType.values();
+		for (com.cisdi.base.common.enums.CommonEnumType.CityServiceType p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_CityServiceType_map", dictionary);
+		return data;
+	}
+	/**
+	 * 房地产土地购置类型：生地/熟地
+	 * @param dictionaryParams
+	 * @return
+	 */
+	public static List<BaseDataBean> LandBuyType(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.LandBuyType[] arr = CommonEnumType.LandBuyType.values();
+		for (com.cisdi.base.common.enums.CommonEnumType.LandBuyType p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_LandBuyType_map", dictionary);
+		return data;
+	}
+	
+	/**
+	 * //制造基地设立方式:子公司/分支结构
+	 * @param dictionaryParams
+	 * @return
+	 */
+	public static List<BaseDataBean> ManuBase(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.ManuBase[] arr = CommonEnumType.ManuBase.values();
+		for (com.cisdi.base.common.enums.CommonEnumType.ManuBase p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_ManuBase_map", dictionary);
+		return data;
+	}
+
+	/**
+	 * 其他项目业务类型
+	 * @param dictionaryParams
+	 * @return
+	 */
+	public static List<BaseDataBean> OtherServiceType(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.OtherServiceType[] arr = CommonEnumType.OtherServiceType.values();
+		for (com.cisdi.base.common.enums.CommonEnumType.OtherServiceType p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_OtherServiceType_map", dictionary);
+		return data;
+	}
+
+	/**
+	 * 水处理项目类型
+	 * @param dictionaryParams
+	 * @return
+	 */
+	public static List<BaseDataBean> WaterProjectType(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.WaterProjectType[] arr = CommonEnumType.WaterProjectType.values();
+		for (com.cisdi.base.common.enums.CommonEnumType.WaterProjectType p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_WaterProjectType_map", dictionary);
+		return data;
+	}
+	/**
+	 * 一级土地房业务类型
+	 * @param dictionaryParams
+	 * @return
+	 */
+	public static List<BaseDataBean> oneType(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.oneType[] arr = CommonEnumType.oneType.values();
+		for (com.cisdi.base.common.enums.CommonEnumType.oneType p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_oneType_map", dictionary);
+		return data;
+	}
+	/**
+	 * 其他房地产业务类型
+	 * @param dictionaryParams
+	 * @return
+	 */
+	public static List<BaseDataBean> otherType(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.otherType[] arr = CommonEnumType.otherType.values();
+		for (com.cisdi.base.common.enums.CommonEnumType.otherType p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_otherType_map", dictionary);
+		return data;
+	}
+	
+	/**
+	 * 报表类型
+	 * @param dictionaryParams
+	 * @return
+	 */
+	public static List<BaseDataBean> ExcelReportType(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.ExcelReportType[] arr = CommonEnumType.ExcelReportType.values();
+		for (ExcelReportType p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_ExcelReportType_map", dictionary);
+		return data;
+	}
+
+	/**
+	 * 房地产加入方式:新设("0"),收购("1")
+	 * @param dictionaryParams
+	 * @return
+	 */
+	public static List<BaseDataBean> JoinWay(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.JoinWay[] arr = CommonEnumType.JoinWay.values();
+		for (com.cisdi.base.common.enums.CommonEnumType.JoinWay p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_JoinWay_map", dictionary);
+		return data;
+	}
+	
+	/**
+	 * 审核记录操作状态:新增记录("0"),修改记录("1")
+	 * @param dictionaryParams
+	 * @return
+	 */
+	public static List<BaseDataBean> AuditOperateStatue(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.AuditOperateStatue[] arr = CommonEnumType.AuditOperateStatue.values();
+		for (com.cisdi.base.common.enums.CommonEnumType.AuditOperateStatue p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_AuditOperateStatue_map", dictionary);
+		return data;
+	}
+	/**
+	 * 报表类型：仅自己("0"),下级_含自己("1"),下级_不含自己("2");
+	 * @param dictionaryParams
+	 * @return
+	 */
+	public static List<BaseDataBean> ExcelType(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.ExcelType[] arr = CommonEnumType.ExcelType.values();
+		for (com.cisdi.base.common.enums.CommonEnumType.ExcelType p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_ExcelType_map", dictionary);
+		return data;
+	}
+	/**
+	 * 报表类型名称
+	 * @param dictionaryParams
+	 * @return
+	 */
+	public static List<BaseDataBean> ExcelNameType(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.ExcelNameType[] arr = CommonEnumType.ExcelNameType.values();
+		for (com.cisdi.base.common.enums.CommonEnumType.ExcelNameType p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_ExcelNameType_map", dictionary);
+		return data;
+	}
+	/**
+	 * 经营状态:正在经营("0"),暂停经营("1"),转让("2"),撤销("2")
+	 * @param dictionaryParams
+	 * @return
+	 */
+	public static List<BaseDataBean> RunStatue(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.RunStatue[] arr = CommonEnumType.RunStatue.values();
+		for (com.cisdi.base.common.enums.CommonEnumType.RunStatue p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_RunStatue_map", dictionary);
+		return data;
+	}
+
+	/**
+	 * 其他--项目状态
+	 * @param dictionaryParams
+	 * @return
+	 */
+	public static List<BaseDataBean> OtherProjectStatus(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.OtherProjectStatus[] arr = CommonEnumType.OtherProjectStatus.values();
+		for (CommonEnumType.OtherProjectStatus p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_OtherProjectStatus_map", dictionary);
+		return data;
+	}
+	/**
+	 * 基地类型
+	 * @param dictionaryParams
+	 * @return
+	 */
+	public static List<BaseDataBean> BaseType(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.BaseType[] arr = CommonEnumType.BaseType.values();
+		for (CommonEnumType.BaseType p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_BaseType_map", dictionary);
+		return data;
+	}
+	/**
+	 * 合同状态
+	 * @param dictionaryParams
+	 * @return
+	 */
+	public static List<BaseDataBean> ContractStatue(Map<Object, Object> dictionaryParams) {
+		List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+		Map<Object, Object> dictionary=new HashMap<Object, Object>();
+		CommonEnumType.ContractStatue[] arr = CommonEnumType.ContractStatue.values();
+		for (CommonEnumType.ContractStatue p : arr) {
+			BaseDataBean bd=new BaseDataBean();
+			bd.setValue(p.getValue());
+			bd.setName(p.name());
+			dictionary.put(p.getValue(), p.name());
+			data.add(bd);
+		}
+		dictionaryParams.put("comEnum_ContractStatue_map", dictionary);
+		return data;
+	}
+
+    /**
+     * 日志记录模块名称
+     */
+    public static List<BaseDataBean> LogModuleType(Map<Object, Object> dictionaryParams) {
+        List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+        Map<Object, Object> dictionary=new HashMap<Object, Object>();
+        CommonEnumType.LogModuleType[] arr = CommonEnumType.LogModuleType.values();
+        for (LogModuleType p : arr) {
+            BaseDataBean bd=new BaseDataBean();
+            bd.setValue(p.getValue());
+            bd.setName(p.name());
+            dictionary.put(p.getValue(), p.name());
+            data.add(bd);
+        }
+        dictionaryParams.put("comEnum_LogModuleType_map", dictionary);
+        return data;
+    }
+    
+    /**
+     * 接口专用，业务编码   共6位数字组成，1开头为数据字典，2开头为枚举，3开头为其它基础数据
+     */
+    public static List<BaseDataBean> DicBsnCode(Map<Object, Object> dictionaryParams) {
+    	List<BaseDataBean> data=new ArrayList<BaseDataBean>();
+    	Map<Object, Object> dictionary=new HashMap<Object, Object>();
+    	CommonEnumType.DicBsnCode[] arr = CommonEnumType.DicBsnCode.values();
+    	for (DicBsnCode p : arr) {
+    		BaseDataBean bd=new BaseDataBean();
+    		bd.setValue(p.getValue());
+    		bd.setName(p.name());
+    		dictionary.put(p.getValue(), p.name());
+    		data.add(bd);
+    	}
+    	dictionaryParams.put("comEnum_DicBsnCode_map", dictionary);
+    	return data;
+    }
+}

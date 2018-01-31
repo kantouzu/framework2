@@ -1,0 +1,44 @@
+#parse("layout/resource.vm")
+<script src="${rc.contextPath}/resources/js/DepartInfo/DepartInfoEdit.js" type="text/javascript"></script>
+#parse("layout/tree_resource.vm")
+<script>
+	var isCheckOnly = $!isCheckOnly;
+</script>
+<!-- BEGIN CONTAINER -->
+<!-- BEGIN PAGE CONTAINER-->
+<div class="panel-body" >
+  <form class="animated fadeIn validate" id="formSubmit" action="${rc.contextPath}/departInfoController/doSaveOrUpdate" METHOD="POST" enctype="application/x-www-form-urlencoded" >
+	        <input id="id" name="id" type="hidden" value="$!{departInfo.id}">
+			#if(!$!parentId)
+	        <input id="parentId" name="parentId" type="hidden" value="$!{departInfo.parentId}">
+			#else
+			<input id="parentId" name="parentId" type="hidden" value="$!{parentId}">
+			#end
+            <div class="row form-row m-l-20 m-r-20 xs-m-l-10 xs-m-r-10">
+              <div class="col-md-12">
+    			<label class="form-label">组织名称</label>
+                <input class="form-control" id="name" name="name" placeholder="填写组织名称" type="text" value="$!{departInfo.name}"/>
+              </div>
+            </div>
+            <div class="row form-row m-l-20 m-r-20 xs-m-l-10 xs-m-r-10">
+              <div class="col-md-12">
+    			<label class="form-label">逻辑级次</label>
+                <input class="form-control" id="level" name="level" placeholder="填写逻辑级次" type="text" value="$!{departInfo.level}"/>
+              </div>
+            </div>
+            <div class="row form-row m-l-20 m-r-20 xs-m-l-10 xs-m-r-10">
+			  <div class="col-md-6 col-sm-6">
+        			<label class="form-label">选择根地区</label>
+					<input id="rootId" type="hidden" value="$!{rootLocId}">
+                    <select class="wb" id="rootIdLoc"></select>
+				</div>
+              <div class="col-md-6 col-sm-6">
+    			<label class="form-label">所属地区</label>
+				<input id="locId" name="locId" type="hidden" value="$!{departInfo.locId}">
+                <input id="combotree" class="form-control" placeholder="选择地区" type="text" value="$!{departInfo.locId}">
+              </div>
+            </div>
+  </form>
+</div>
+<!-- END TAG INPUTS / FILE UPLOADER CONTROLS-->
+<!-- END PAGE -->

@@ -1,0 +1,139 @@
+package com.cisdi.business.service.impl;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.cisdi.base.common.enums.CommonEnumType.DeleteFlag;
+import com.cisdi.base.common.json.AjaxJson;
+import com.cisdi.base.common.responseBean.LayGridReturn;
+import com.cisdi.base.util.BaseUtil;
+import com.cisdi.base.util.MenuUtils;
+import com.cisdi.business.dao.MenuDao;
+import com.cisdi.business.entity.Menu;
+import com.cisdi.business.example.MenuExample;
+import com.cisdi.business.responseBean.LayerTree;
+import com.cisdi.business.responseBean.MenuModule;
+import com.cisdi.business.service.MenuService;
+
+@Service
+public class MenuServiceImpl implements MenuService {
+
+    @Autowired
+    private MenuDao menuDao;
+    
+    @Override
+    public Menu selectByPrimaryKey(Integer id) {
+        Menu result = menuDao.selectByPrimaryKey(id);
+        return result;
+    }
+    
+    @Override
+    public List<Map<String, Object>> selectByExample(MenuExample  record) {
+        List<Map<String, Object>> result = menuDao.selectByExample(record);
+        return result;
+    }    
+
+    @Override
+    @Transactional
+    public AjaxJson insertSelective(Menu record) {
+         int resultKey = menuDao.insertSelective(record);
+         return AjaxJson.returnJsonObj(resultKey != 0?true:false);
+    }   
+    
+    @Override
+    @Transactional
+    public AjaxJson deleteByExample(MenuExample  record) {
+        int resultKey = menuDao.deleteByExample(record);
+        return AjaxJson.returnJsonObj(resultKey != 0?true:false);
+    }
+    
+    @Override
+    @Transactional
+    public AjaxJson deleteByExampleInLogic(MenuExample  record, List<Integer> ids) {
+        int resultKey = menuDao.deleteByExampleInLogic(record);
+        //然后把节点下所有菜单都删掉
+        if(resultKey != 0){
+        	for (Integer id : ids) {
+        		Map<String, Object> param = new HashMap<String, Object>();
+        		param.put("rootId", id);
+        		List<MenuModule> menuModuleList = menuDao.selectTreeMenuByCondition(param);
+        		if(!BaseUtil.isListEmpty(menuModuleList)){
+        			for (MenuModule menuModule : menuModuleList) {
+        				MenuExample subRecord = new MenuExample();
+        				subRecord.or().andIdEqualTo(menuModule.getId());
+        				menuDao.deleteByExampleInLogic(subRecord);
+        			}
+        		}
+        	}
+        }
+        return AjaxJson.returnJsonObj(resultKey != 0?true:false);
+    }
+
+    @Override
+    @Transactional
+    public AjaxJson deleteByPrimaryKey(Integer id) {
+        int resultKey = menuDao.deleteByPrimaryKey(id);
+        return AjaxJson.returnJsonObj(resultKey != 0?true:false);
+    }
+    
+    @Override
+    public AjaxJson countByExample(MenuExample example){
+        Integer count = menuDao.countByExample(example);
+        return AjaxJson.returnJsonObj(true, count);
+    }
+    
+    @Override
+    @Transactional
+    public AjaxJson updateByPrimaryKeySelective(Menu entity){
+        int resultKey = menuDao.updateByPrimaryKeySelective(entity);
+        return AjaxJson.returnJsonObj(resultKey != 0?true:false);
+    }
+    
+    @Override
+	public LayGridReturn selectDataGridByExample(MenuExample record) {
+		return new LayGridReturn(0, "", menuDao.selectByExample(record), menuDao.countByExample(record));
+	}
+	
+	@Override
+    @Transactional
+    public AjaxJson saveOrUpdate(Menu entity){
+		Integer id = entity.getId();
+		if(BaseUtil.isEmpty(id)){
+			//由于mysql递归局限性，暂时没有找到合适的办法，故设置一个根节点，所有一级菜单默认在根节点（最小的id）下
+			if(BaseUtil.isEmpty(entity.getParentId())){
+				MenuExample menuExample = new MenuExample();
+				menuExample.or().andParentIdIsNull()
+								.andDeleteflagEqualTo(DeleteFlag.未删除.getValue());
+				List<Map<String, Object>> menuList = menuDao.selectByExample(menuExample);
+				if(!BaseUtil.isListEmpty(menuList)){
+					Integer rootId = Integer.parseInt(BaseUtil.retStr(menuList.get(0).get("id")));
+					entity.setParentId(rootId);
+				}
+			}
+			menuDao.insertSelective(entity);
+		}else{
+			menuDao.updateByPrimaryKeySelective(entity);
+		}
+        return AjaxJson.returnJsonObj(true);
+    }
+
+	@Override
+	public List<LayerTree> getMenuList(String parentId, String checkedIds) {
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("parentId", parentId);
+		param.put("checkedIds", checkedIds);
+		List<MenuModule> menuData = menuDao.selectTreeMenuByCondition(param);
+		List<LayerTree> menus = MenuUtils.drawMenuLayerTree(menuData, checkedIds);
+		if(menus == null){
+			menus = new ArrayList<LayerTree>();
+		}
+		return menus;
+	}
+
+}

@@ -1,0 +1,6 @@
+<link rel="stylesheet" href="${rc.contextPath}/resources/plugins/jquery-easyui-1.4.2/themes/default/easyui.css" type="text/css" />
+<link rel="stylesheet" href="${rc.contextPath}/resources/plugins/jquery-easyui-1.4.2/themes/icon.css" type="text/css" />
+<link rel="stylesheet" href="${rc.contextPath}/resources/css/style.css" type="text/css" />
+<script type="text/javascript" src="${rc.contextPath}/resources/plugins/jquery-easyui-1.4.2/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="${rc.contextPath}/resources/plugins/jquery-easyui-1.4.2/extend/expand.js"></script>
+<script type="text/javascript" src="${rc.contextPath}/resources/plugins/jquery-easyui-1.4.2/treegrid-dnd/treegrid-dnd.js"></script>

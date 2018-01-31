@@ -1,0 +1,18 @@
+package com.cisdi.business.service;
+
+import java.util.List;
+import com.cisdi.base.common.json.AjaxJson;
+import com.cisdi.business.entity.McgHelperUser;
+import com.cisdi.business.example.McgHelperUserExample;
+
+public interface McgHelperUserService {
+
+    List<McgHelperUser> selectByExample(McgHelperUserExample record);
+
+    AjaxJson insertSelective(McgHelperUser record);
+    
+    AjaxJson deleteByPrimaryKey(Integer id);
+    
+    AjaxJson updateByPrimaryKeySelective(McgHelperUser record);
+    
+}

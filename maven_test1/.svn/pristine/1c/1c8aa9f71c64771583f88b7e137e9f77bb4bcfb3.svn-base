@@ -1,0 +1,33 @@
+$(function(){
+})
+
+function userLogin(){
+	
+//	var pathHref = window.location.href;
+//	var projectUrl = '';
+//	
+//	var pathName = window.document.location.pathname;
+//	var projectName = pathName
+//			.substring(0, pathName.substr(1).indexOf('/') + 1);
+//	
+//	projectUrl = pathHref.substring(0, pathHref.indexOf(projectName) + projectName.length);
+	var result = $("#loginForm").valid();
+	if(result){
+		$.ajax({
+			url: Utils.getRootPath() + "/loginController/pcLogin",
+			type : 'post',
+			dataType: 'json',
+			data: {
+				userName:$('#login_username').val(),
+				pwd:$('#login_pass').val(),
+			},
+			success: function(d){
+				if(d.success){
+					window.location.href = Utils.getRootPath()+"/home";
+				}else{
+					showErrorMessage(d.msg);
+				}
+			}
+		});
+	}
+}

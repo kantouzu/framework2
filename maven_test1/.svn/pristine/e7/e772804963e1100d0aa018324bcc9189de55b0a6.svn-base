@@ -1,0 +1,27 @@
+package com.cisdi.business.util;
+
+import java.util.Date;
+
+import com.cisdi.base.util.BaseUtil;
+import com.cisdi.base.util.DateUtil;
+import com.cisdi.business.entity.SessionToken;
+
+/**
+ * 业务工具
+ *
+ * @author xiangjz
+ */
+public class BusinessUtil {
+	
+	//验证token是否失效
+	public static boolean isTokenInvalid(SessionToken sessionToken){
+		boolean result = false;
+		if(BaseUtil.isEmpty(sessionToken) || BaseUtil.isEmpty(sessionToken.getExpireTime()))
+			return true;
+		Date expireTime = sessionToken.getExpireTime();
+		if(expireTime.getTime() < DateUtil.getCurrentDate().getTime())
+			return true;
+		return result;
+	}
+	
+}

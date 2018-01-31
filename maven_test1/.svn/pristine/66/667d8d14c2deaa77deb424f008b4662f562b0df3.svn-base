@@ -1,0 +1,133 @@
+package com.cisdi.business.controller;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.cisdi.base.common.constant.CommonConstant;
+import com.cisdi.base.common.enums.CommonEnumType.YesOrNo;
+import com.cisdi.base.common.json.AjaxJson;
+import com.cisdi.base.common.responseBean.LayGridReturn;
+import com.cisdi.base.controller.BaseController;
+import com.cisdi.base.util.BaseUtil;
+import com.cisdi.base.util.SqlUtil;
+import com.cisdi.business.common.annotation.SystemLog;
+import com.cisdi.business.entity.UserInfo;
+import com.cisdi.business.example.UserInfoExample;
+import com.cisdi.business.requestBean.DataGrid;
+import com.cisdi.business.service.UserInfoService;
+import com.cisdi.business.util.BusinessUtil;
+
+@Controller
+@RequestMapping(value="userInfoController")
+public class UserInfoController extends BaseController {
+
+    @Autowired
+    private UserInfoService userInfoService;
+    
+    @RequestMapping(value = "pageList")
+    public ModelAndView list(HttpServletRequest req, UserInfo userInfo, UserInfoExample userInfoExample) {
+        
+        ModelAndView mv = new ModelAndView();
+        mv.addObject("roleMap", req.getSession().getAttribute("roleMap"));
+        mv.addObject("isSuperAdmin", isSuperAdmin(BusinessUtil.convertSessionUser(getSessionUser(req))));
+        mv.setViewName("UserInfo/UserInfoList");
+        return mv;
+    }
+    
+    @RequestMapping(value = "dataList")
+    @ResponseBody
+    public LayGridReturn dataList(HttpServletRequest req, UserInfo userInfo, UserInfoExample userInfoExample, DataGrid datagrid) {
+    	userInfoExample.setLimitStart(datagrid.getStartRow());
+    	userInfoExample.setLimitEnd(datagrid.getLimit());
+    	userInfoExample.setOrderByClause("order by id desc");
+    	userInfoExample.or().andDeleteflagEqualTo(YesOrNo.否.getValue())
+    						.andUserNameLike("%"+userInfo.getUserName()+"%")
+    						.andUsableEqualTo(userInfo.getUsable());
+    	UserInfo user = BusinessUtil.convertSessionUser(getSessionUser(req));
+    	/*List<TableJoinBean> tableJoins = new ArrayList<TableJoinBean>();
+    	//这里需要连用户权限关联表，所以只需要new一个tablejoinbean
+    	TableJoinBean urrTableJoin = new TableJoinBean(JoinType.LEFT_OUTER_JOIN.getValue(), "user_rel_role", "userRelRole");
+    	//这个关联表跟主表需要关联userId，故这里需要一个fieldjoinbean
+    	List<FieldJoinBean> urrFields = new ArrayList<FieldJoinBean>();
+    	urrFields.add(new FieldJoinBean("userInfo.id", "userRelRole.user_id"));
+    	urrTableJoin.setFieldJoin(urrFields);
+    	tableJoins.add(urrTableJoin);
+    	userInfoExample.setTableJoin(tableJoins);*/
+    	if(!BaseUtil.isEmpty(userInfo.getDepartId())){
+    		//如果不为空，则根据搜索条件来
+    		Integer departId = userInfo.getDepartId();
+			//塞入数据权限条件
+			userInfoExample.setOtherCondition(
+				SqlUtil.addUserDepartRestrain("userInfo.id", departId)
+			);
+    	}else{
+    		//如果首次加载则按照数据权限加载
+    		if(!YesOrNo.是.getValue().equals(user.getIsSuperAdmin())){
+    			Integer departId = user.getDepartId();
+    			//塞入数据权限条件
+    			userInfoExample.setOtherCondition(
+    					SqlUtil.addUserDepartRestrain("userInfo.id", departId)
+    					);
+    		}
+    	}
+    	return userInfoService.selectDataGridByExample(userInfoExample);
+    	
+    }
+    
+    @RequestMapping(value = "goAddOrEdit")
+    public ModelAndView goAddOrEdit(UserInfo userInfo, UserInfoExample userInfoExample, boolean isCheckOnly) {
+        
+        ModelAndView mv = new ModelAndView();
+        UserInfo entity = userInfoService.selectByPrimaryKey(userInfo.getId());
+        mv.setViewName("UserInfo/UserInfoEdit");
+        mv.addObject("userInfo", entity);
+        mv.addObject("isCheckOnly", isCheckOnly);
+        return mv;
+    }
+    
+    @RequestMapping(value = "doSaveOrUpdate", method=RequestMethod.POST)
+    @ResponseBody
+    @SystemLog(module = CommonConstant.LOG_USER_INFO,description = "user_info",businessType=CommonConstant.BUSINESS_ADDOREDIT)
+    public AjaxJson doSaveOrUpdate(HttpServletRequest req, UserInfo userInfo) {
+    	AjaxJson j = null;
+        try {
+        	Map<String, Object> param = new HashMap<String, Object>();
+        	param.put("userInfo", userInfo);
+        	param.put("sessionUser", BusinessUtil.convertSessionUser(getSessionUser(req)));
+        	j = userInfoService.saveOrUpdate(param);
+        	return j;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return AjaxJson.returnJsonObj(false);
+		}
+    }    
+    
+    @RequestMapping(value = "batchDelete", method=RequestMethod.POST)
+    @ResponseBody
+    @SystemLog(module = CommonConstant.LOG_USER_INFO,description = "user_info",businessType=CommonConstant.BUSINESS_DEL)
+    public AjaxJson batchDelete(@RequestParam List<Integer> ids) {
+    	UserInfoExample userInfoExample = new UserInfoExample();
+    	userInfoExample.or().andIdIn(ids);
+        return userInfoService.deleteByExample(userInfoExample);
+    }   
+    
+    @RequestMapping(value = "batchDeleteInLogic", method=RequestMethod.POST)
+    @ResponseBody
+    @SystemLog(module = CommonConstant.LOG_USER_INFO,description = "user_info",businessType=CommonConstant.BUSINESS_DELINLOGIC)
+    public AjaxJson batchDeleteInLogic(@RequestParam List<Integer> ids) {
+    	UserInfoExample userInfoExample = new UserInfoExample();
+    	userInfoExample.or().andIdIn(ids);
+        return userInfoService.deleteByExampleInLogic(userInfoExample);
+    }    
+}

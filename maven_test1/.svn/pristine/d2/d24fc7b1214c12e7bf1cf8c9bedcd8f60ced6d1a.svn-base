@@ -1,0 +1,63 @@
+$(function() {
+	//加载数据网格
+	loadDateGrid();
+})
+
+function loadDateGrid(){
+	Utils.layerDatagrid({
+		//这里是datagrid参数
+		url : Utils.getRootPath() + "/userInfoController/dataList", 
+		fields : [{field : 'id',title : 'ID',width : '5%',sort : true,fixed : 'left'}
+				,{field : 'userName',title : '用户名',width : '20%'}
+				,{field : 'name',title : '性名',width : '10%',sort : true}
+				,{field : 'phone',title : '手机号',width : '20%'}
+				,{field : 'email',title : '邮箱',width : '25%'}
+				,{field : 'usableName',title : '是否可用',width : '20%'}
+				,{fixed : 'right',width : 150,align : 'center',toolbar : '#toolbar'} // 这里的toolbar值是模板元素的选择器
+				]
+	}, 
+	//这里是tool工具栏方法
+	{
+		edit : edit, 
+		del : delInLogic,
+		detail : detail
+	});
+}
+
+//新增页面
+function add() {
+	Utils.createCommonWindow({
+		title : '新增用户', 
+		url : Utils.getRootPath() + "/userInfoController/goAddOrEdit"
+	});
+}
+
+//编辑页面
+function edit(id) {
+	Utils.createCommonWindow({
+		title : '编辑用户', 
+		url : Utils.getRootPath() + "/userInfoController/goAddOrEdit?id=" + id
+	});
+}
+
+//查询页面
+function detail(id) {
+	Utils.createWindowWithoutBtn({
+		title : '用户查询', 
+		url : Utils.getRootPath() + "/userInfoController/goAddOrEdit?id=" + id + "&isCheckOnly=true"
+	});
+}
+
+//提交真删除
+function del(ids) {
+	Utils.commonAjaxHandler(Utils.getRootPath() + "/userInfoController/batchDelete", {
+		ids : JSON.stringify(ids)
+	});
+}
+
+//提交逻辑删除
+function delInLogic(ids) {
+	Utils.commonAjaxHandler(Utils.getRootPath() + "/userInfoController/batchDeleteInLogic", {
+		ids : JSON.stringify(ids)
+	});
+}

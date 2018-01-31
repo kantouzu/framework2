@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cisdi.business.dao.LocationInfoDao">
+
+  <resultMap id="treeDic" type="com.cisdi.business.responseBean.MenuModule">
+  		<id column="id" property="id" />
+		<result column="name" property="menuName" />
+		<result column="parent_id" property="parentId" />
+		<result column="create_time" property="createTime" />
+		<result column="update_time" property="updateTime" />
+		<result column="deleteflag" property="deleteflag" />
+  </resultMap>
+
+  <resultMap id="BaseResultMap" type="com.cisdi.business.entity.LocationInfo">
+		<id column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="parent_id" property="parentId" />
+		<result column="create_time" property="createTime" />
+		<result column="update_time" property="updateTime" />
+		<result column="deleteflag" property="deleteflag" />
+  </resultMap>
+  
+  <resultMap id="mapResultMap" type="java.util.HashMap">
+		<id column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="parent_id" property="parentId" />
+		<result column="create_time" property="createTime" />
+		<result column="update_time" property="updateTime" />
+		<result column="deleteflag" property="deleteflag" />
+  </resultMap>
+  
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+#{listItem}                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+      <if test="otherCondition != null">
+	      ${otherCondition}
+	    </if>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+#{listItem}                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+      <if test="otherCondition != null">
+	      ${otherCondition}
+	    </if>
+    </where>
+  </sql>
+  
+  <sql id="Table_Join_Clause" >
+      <if test="tableJoin != null" >
+      	<trim prefix="" suffix="" prefixOverrides="" >
+      		<foreach collection="tableJoin" item="tableJoin" separator=" " >
+              	${tableJoin.joinType} ${tableJoin.tableName} ${tableJoin.alias}
+              	<if test="tableJoin.fieldJoin != null" >
+              		on 
+              		<trim prefix="(" suffix=")" prefixOverrides="" >
+              			<foreach collection="tableJoin.fieldJoin" item="fieldJoin" separator=" || " >
+${fieldJoin.baseField}              			</foreach>
+              		</trim>
+              		=
+              		<trim prefix="(" suffix=")" prefixOverrides="" >
+              			<foreach collection="tableJoin.fieldJoin" item="fieldJoin" separator=" || " >
+${fieldJoin.dependField}              			</foreach>
+              		</trim>
+              	</if>
+      		</foreach>
+      	</trim>
+      </if>
+  </sql>
+  
+  <sql id="Base_Column_List">
+		locationInfo.id,
+		locationInfo.name,
+		locationInfo.parent_id,
+		locationInfo.create_time,
+		locationInfo.update_time,
+		locationInfo.deleteflag
+  </sql>  
+  
+  <select id="selectByExample" parameterType="com.cisdi.business.example.LocationInfoExample" resultMap="mapResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    'true' as QUERYID,
+	${@com.cisdi.base.util.BaseUtil@transEnumValueToName("locationInfo.deleteflag", "DeleteFlag")} deleteflagName,
+    <include refid="Base_Column_List" />
+    from location_info locationInfo
+    <include refid="Table_Join_Clause" />
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+${orderByClause}    </if>
+    <if test="limitStart != null">
+      limit ${limitStart} , ${limitEnd}
+    </if>
+  </select>    
+  
+  <select id="selectTreeLocByCondition" parameterType="java.util.HashMap" resultMap="treeDic">
+    select
+    <include refid="Base_Column_List" />,
+    (select count(id) from location_info d where d.parent_id = locationInfo.id) childrenNum
+    from location_info locationInfo where locationInfo.deleteflag = 0
+    and FIND_IN_SET(locationInfo.id, getChildLstLoc(
+    		<if test="rootId != null">
+    			#{rootId}
+    		</if>
+    		<if test="rootId == null">
+	    		(select min(id) from location_info where deleteflag = 0)
+    		</if>
+    	)
+   	)
+   	<if test="name != null">
+    and locationInfo.name like #{name}
+    </if>
+    <!-- and (m.is_root is null or m.is_root = '0') -->
+    order by locationInfo.id 
+  </select>
+  
+  <select id="selectParentTreeLocByCondition" parameterType="java.util.HashMap" resultMap="treeDic">
+    select
+    <include refid="Base_Column_List" />,
+    (select count(id) from location_info d where d.parent_id = locationInfo.id) childrenNum
+    from location_info locationInfo where locationInfo.deleteflag = 0
+    and FIND_IN_SET(id,getParentListLoc(
+    	<if test="id != null">
+   			#{id}
+   		</if>
+   		<if test="id == null">
+    		(select min(id) from location_info where deleteflag = 0)
+   		</if>
+   	))  
+  </select>
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from location_info locationInfo
+    where locationInfo.id = #{id}
+  </select>
+  
+ <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete locationInfo from location_info locationInfo
+    where locationInfo.id = #{id}
+  </delete>   
+  
+  <delete id="deleteByExample" parameterType="com.cisdi.business.example.LocationInfoExample" >
+    delete locationInfo from location_info locationInfo
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  
+  <delete id="deleteByExampleInLogic" parameterType="com.cisdi.business.example.LocationInfoExample" >
+    update location_info locationInfo set locationInfo.deleteflag = '1'
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  
+  <insert id="insertSelective" useGeneratedKeys="true" keyProperty="id" parameterType="com.cisdi.business.entity.LocationInfo">
+    insert into location_info
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+		      <if test="id != null">
+    			id,
+    		  </if>	
+		      <if test="name != null">
+    			name,
+    		  </if>	
+		      <if test="parentId != null">
+    			parent_id,
+    		  </if>	
+		      <if test="updateTime != null">
+    			update_time,
+    		  </if>	
+		        deleteflag,
+    		    create_time,
+    </trim>  
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+			     #{id}, 
+			</if>
+			<if test="name != null">
+			     #{name}, 
+			</if>
+			<if test="parentId != null">
+			     #{parentId}, 
+			</if>
+			<if test="updateTime != null">
+			     #{updateTime}, 
+			</if>
+		    <if test="deleteflag != null">
+    			#{deleteflag}, 
+    		</if>
+    		<if test="deleteflag == null">
+    			'0',
+    		</if>
+		    <if test="createTime != null">
+    			#{createTime}, 
+    		</if>
+    		<if test="createTime == null">
+    			sysdate(),
+    		</if>
+    </trim>
+  </insert>
+  
+  <select id="countByExample" parameterType="com.cisdi.business.example.LocationInfoExample" resultType="java.lang.Integer" >
+    select count(1) from location_info locationInfo
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  
+  <update id="updateByPrimaryKeySelective" parameterType="com.cisdi.business.entity.LocationInfo">
+    update location_info 
+    <set>
+			<if test="id != null">
+				id = #{id},
+			</if>
+			<if test="name != null">
+				name = #{name},
+			</if>
+			<if test="parentId != null">
+				parent_id = #{parentId},
+			</if>
+			<if test="createTime != null">
+				create_time = #{createTime},
+			</if>
+			<if test="updateTime != null">
+				update_time = #{updateTime},
+			</if>
+			<if test="deleteflag != null">
+				deleteflag = #{deleteflag},
+			</if>
+    		<if test="updateTime == null">
+    			update_time = sysdate(),
+    		</if>
+   
+    </set>
+    where id = #{id}
+  </update>   
+  
+</mapper>

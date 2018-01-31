@@ -1,0 +1,118 @@
+##登录成功的左侧left
+<script>
+var userName = '$!user.userName';
+var userEntrpCode = '$!user.entrpCode';
+var userEntrpLevel = '$!user.entrpLevel';
+var checkUserTypeCode = '$!checkUserTypeCode';
+
+	$(function(){
+		var path = '$!{pathInfo}';
+		var name = path.substring(1);
+		var windowHref = window.location.href;
+		name=windowHref.substring(windowHref.indexOf(name));
+		var activeEle = $("a[name='"+name+"']");
+		activeEle.addClass('active').css('display', 'block');
+		var parent = activeEle.parents(".nav-sub");
+		if(parent && parent.length > 0){
+			parent.addClass('open');
+			parent.css('display', 'block')
+		}
+		
+	})
+	
+	function intoReportServer(){
+		var loading = layer.load(1);
+		jQuery.ajax({    
+           url:"http://mccreport.cisdi.com.cn/ReportServer?op=fs_load&cmd=sso",//单点登录的报表服务器    
+           dataType:"jsonp",//跨域采用jsonp方式    
+           data:{"fr_username":userName,"fr_password":123456},    
+           jsonp:"callback",    
+           timeout:5000,//超时时间（单位：毫秒）    
+           success:function(data) {    
+		   		layer.close(loading);
+              if (data.status === "success") {    
+         //         alert("success"); //登录成功    
+        //        document.getElementById("login").submit(); //登录成功提交表单，跳转到index.jsp这个登录成功页面    
+                  window.location=data.url;//登录成功，直接跳转到平台系统页面   
+              } else if (data.status === "fail"){    
+              	  Utils.showToastFail("登录失败");//登录失败（用户名或密码错误）    
+              }    
+           },    
+           error:function(){   
+		   		layer.close(loading);
+                Utils.showToastFail("网络错误"); // 登录失败（超时或服务器其他错误）    
+           }    
+          });    
+	}
+	
+	function showIframeReport(url){
+		url += '&userEntrpCode='+userEntrpCode+'&userName='+userName+'&userEntrpLevel='+userEntrpLevel+'&checkUserTypeCode='+checkUserTypeCode;
+		var iframe;
+      iframe = document.createElement('iframe');
+      iframe.setAttribute('src',url);
+      iframe.setAttribute('width','100%');
+      iframe.setAttribute('height','700');
+	  $('#searchListId').html(iframe);
+	}
+</script>
+<link rel="stylesheet" href="${rc.contextPath}/resources/css/userLeft.css" />
+<style>
+	/*.sidebar .nav li a:hover{*/
+		/*background: #dfdfdf;*/
+		/*border-radius: none;*/
+	/*}*/
+</style>
+<aside class="sidebar sidebar-default" style="background-color:#f5f5f5;width:160px;font-size:12px">
+    <nav>
+        <ul class="nav nav-pills nav-stacked" style="margin:0px;width:100%"> 
+             <li >
+                <a style="border-radius: 0;" href="${rc.contextPath}/home" title="首页" >
+                    <i class="fa fa-lg fa-fw fa-home"></i> 首页
+					##<i class="layui-icon" style="font-size: 20px;">&#xe631;</i>  首页
+                </a>
+            </li>
+			<li class="nav-dropdown">
+                <a style="border-radius: 0;" href="javascript:intoReportServer()" title="首页" >
+                    <i class="fa fa-lg fa-fw fa-suitcase" ></i> 进入报表系统
+					##<i class="layui-icon" style="font-size: 20px;">&#xe631;</i>  首页
+                </a>
+            </li>
+            #foreach($lev1 in $!menus)
+			    <li class="nav-dropdown" > 
+				    <a style="border-radius: 0" id="$lev1.id" #if(!$!{lev1.url}) href="#" #elseif(!$!lev1.isIgnorePre || $!lev1.isIgnorePre == '0') href="${rc.contextPath}/$!{lev1.url}" #else href="$!{lev1.url}" name="$!{lev1.url.substring(0)}" #end" >
+                        <i class="fa fa-lg fa-fw fa-suitcase" ></i>
+						##<i class="layui-icon" style="font-size: 20px;">&#xe631;</i>
+						<span >$!{lev1.text}</span>
+						##<i class="glyphicon glyphicon-chevron-down" ></i>
+                    </a>
+					#if($!{lev1.children})
+    					<ul class="nav-sub">
+						#foreach($lev2 in $!{lev1.children} )
+							<li class="nav-dropdown children">
+								<a style="border-radius: 0" #if(!$!{lev2.url}) href="#" #elseif(!$!lev2.isIgnorePre || $!lev2.isIgnorePre == '0') href="${rc.contextPath}/$!{lev2.url}" #else href="$!{lev2.url}" name="$!{lev2.url.substring(0)}" #end>
+									#*<i class="fa fa-fw fa-caret-right"></i>*#
+									<i class="glyphicon glyphicon-exclamation-sign" ></i>
+									<span>$!{lev2.text}</span>
+								</a>
+								#if($!{lev2.children})
+									<ul class="nav-sub">
+									#foreach($lev3 in $!{lev2.children} )
+            							<li class="nav-dropdown children2">
+            								<a style="border-radius: 0" #if(!$!{lev3.url}) href="#" #elseif (!$!lev3.isIgnorePre || $!lev3.isIgnorePre == '0') href="${rc.contextPath}/$!{lev3.url}" #else href="javascript:showIframeReport('$!lev3.url')" name="$!{lev3.url.substring(0)}" #end>
+            									#*<i class="fa fa-fw fa-caret-right"></i>*#
+            									<span>$!{lev3.text}</span>
+            								</a>
+            							</li>
+									#end
+									</ul>
+								#end
+							</li>
+						#end
+    					</ul>
+					#end
+				</li>
+			#end
+        </ul>
+    </nav>
+
+</aside>

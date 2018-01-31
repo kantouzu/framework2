@@ -1,0 +1,615 @@
+/**
+ * @author 张潇鹤
+ * 
+ * @requires jQuery,EasyUI
+ * 
+ * panel关闭时回收内存，主要用于layout使用iframe嵌入网页时的内存泄漏问题
+ */
+$.fn.panel.defaults.onBeforeDestroy = function() {
+	var frame = $('iframe', this);
+	try {
+		if (frame.length > 0) {
+			for ( var i = 0; i < frame.length; i++) {
+				frame[i].contentWindow.document.write('');
+				frame[i].contentWindow.close();
+			}
+			frame.remove();
+			if ($.browser.msie) {
+				CollectGarbage();
+			}
+		}
+	} catch (e) {
+	}
+};
+
+/**
+ * 使panel和datagrid在加载时提示
+ * 
+ * @author 孙宇
+ * 
+ * @requires jQuery,EasyUI
+ * 
+ */
+$.fn.panel.defaults.loadingMessage = '加载中....';
+$.fn.datagrid.defaults.loadMsg = '加载中....';
+
+/**
+ * @author 孙宇
+ * 
+ * @requires jQuery,EasyUI
+ * 
+ * 通用错误提示
+ * 
+ * 用于datagrid/treegrid/tree/combogrid/combobox/form加载数据出错时的操作
+ */
+var easyuiErrorFunction = function(XMLHttpRequest) {
+	$.messager.progress('close');
+	try{
+		var emsg = XMLHttpRequest.responseText.substring(XMLHttpRequest.responseText.indexOf('错误描述'),XMLHttpRequest.responseText.indexOf('错误信息'));
+		 $.messager.alert('错误',emsg);
+	}catch(ex){
+		 $.messager.alert('错误',XMLHttpRequest.responseText+'');
+	}
+};
+$.fn.datagrid.defaults.onLoadError = easyuiErrorFunction;
+$.fn.treegrid.defaults.onLoadError = easyuiErrorFunction;
+$.fn.tree.defaults.onLoadError = easyuiErrorFunction;
+$.fn.combogrid.defaults.onLoadError = easyuiErrorFunction;
+$.fn.combobox.defaults.onLoadError = easyuiErrorFunction;
+$.fn.form.defaults.onLoadError = easyuiErrorFunction;
+
+/**
+ * @author 孙宇
+ * 
+ * @requires jQuery,EasyUI
+ * 
+ * 为datagrid、treegrid增加表头菜单，用于显示或隐藏列，注意：冻结列不在此菜单中
+ */
+var createGridHeaderContextMenu = function(e, field) {
+	e.preventDefault();
+	var grid = $(this);/* grid本身 */
+	var headerContextMenu = this.headerContextMenu;/* grid上的列头菜单对象 */
+	if (!headerContextMenu) {
+		var tmenu = $('<div style="width:100px;"></div>').appendTo('body');
+		var fields = grid.datagrid('getColumnFields');
+		console.log('id='+grid.attr('id'));
+		 storage=$.localStorage;if(!storage)storage=$.cookieStorage;
+		var cols = storage.get(grid.attr('id')+'hiddenColumns');
+		var init=true;
+		if(cols){
+			init=false;
+		}
+		for ( var i = 0; i < fields.length; i++) {
+			var fildOption = grid.datagrid('getColumnOption', fields[i]);
+			console.log(fields[i]+'='+fildOption.hidden);
+			if (!fildOption.hidden||fildOption.hidden==false) {
+				$('<div iconCls="icon-ok" field="' + fields[i] + '"/>').html(fildOption.title).appendTo(tmenu);
+			} else {
+				if(init==false){
+					for(var j=0;j<cols.length;j++){
+						if(cols[j].field==fields[i]&&cols[j].visible!=false){
+							//console.log(cols[j].field+'=='+cols[j].visible);
+							$('<div iconCls="icon-empty" field="' + fields[i] + '"/>').html(fildOption.title).appendTo(tmenu);
+						}
+					}
+				}
+			}
+		}
+		headerContextMenu = this.headerContextMenu = tmenu.menu({
+			onClick : function(item) {
+				var field = $(item.target).attr('field');
+				if (item.iconCls == 'icon-ok') {
+					grid.datagrid('hideColumn', field);
+					$(this).menu('setIcon', {
+						target : item.target,
+						iconCls : 'icon-empty'
+					});saveHeader(field,true);//龙金波添加保存表头
+				} else if (item.iconCls == 'icon-empty') {
+					grid.datagrid('showColumn', field);
+					$(this).menu('setIcon', {
+						target : item.target,
+						iconCls : 'icon-ok'
+					});saveHeader(field,false);//龙金波添加保存表头
+				}else{
+					//恢复表头
+					
+				}
+			}
+		});
+	}
+	headerContextMenu.menu('show', {
+		left : e.pageX,
+		top : e.pageY
+	});
+};
+
+$.fn.datagrid.defaults.onHeaderContextMenu = createGridHeaderContextMenu;
+$.fn.treegrid.defaults.onHeaderContextMenu = createGridHeaderContextMenu;
+
+/**
+ * @author 孙宇
+ * 
+ * @requires jQuery,EasyUI
+ * 
+ * 扩展validatebox，添加验证两次密码功能
+ */
+$.extend($.fn.validatebox.defaults.rules, {
+	eqPwd : {
+		validator : function(value, param) {
+			return value == $(param[0]).val();
+		},
+		message : '密码不一致！'
+	}
+});
+
+/**
+ * @author 夏悸
+ * 
+ * @requires jQuery,EasyUI
+ * 
+ * 扩展tree，使其支持平滑数据格式
+ */
+$.fn.tree.defaults.loadFilter = function(data, parent) {
+	var opt = $(this).data().tree.options;
+	var idFiled, textFiled, parentField;
+	if (opt.parentField) {
+		idFiled = opt.idFiled || 'id';
+		textFiled = opt.textFiled || 'text';
+		parentField = opt.parentField;
+		var i, l, treeData = [], tmpMap = [];
+		for (i = 0, l = data.length; i < l; i++) {
+			tmpMap[data[i][idFiled]] = data[i];
+		}
+		for (i = 0, l = data.length; i < l; i++) {
+			if (tmpMap[data[i][parentField]] && data[i][idFiled] != data[i][parentField]) {
+				if (!tmpMap[data[i][parentField]]['children'])
+					tmpMap[data[i][parentField]]['children'] = [];
+				data[i]['text'] = data[i][textFiled];
+				tmpMap[data[i][parentField]]['children'].push(data[i]);
+			} else {
+				data[i]['text'] = data[i][textFiled];
+				treeData.push(data[i]);
+			}
+		}
+		return treeData;
+	}
+	return data;
+};
+
+/**
+ * @author 孙宇
+ * 
+ * @requires jQuery,EasyUI
+ * 
+ * 扩展treegrid，使其支持平滑数据格式
+ */
+$.fn.treegrid.defaults.loadFilter = function(data, parentId) {
+	var opt = $(this).data().treegrid.options;
+	var idFiled, textFiled, parentField;
+	if (opt.parentField) {
+		idFiled = opt.idFiled || 'id';
+		textFiled = opt.textFiled || 'text';
+		parentField = opt.parentField;
+		var i, l, treeData = [], tmpMap = [];
+		for (i = 0, l = data.length; i < l; i++) {
+			tmpMap[data[i][idFiled]] = data[i];
+		}
+		for (i = 0, l = data.length; i < l; i++) {
+			if (tmpMap[data[i][parentField]] && data[i][idFiled] != data[i][parentField]) {
+				if (!tmpMap[data[i][parentField]]['children'])
+					tmpMap[data[i][parentField]]['children'] = [];
+				data[i]['text'] = data[i][textFiled];
+				tmpMap[data[i][parentField]]['children'].push(data[i]);
+			} else {
+				data[i]['text'] = data[i][textFiled];
+				treeData.push(data[i]);
+			}
+		}
+		return treeData;
+	}
+	return data;
+};
+
+/**
+ * @author 孙宇
+ * 
+ * @requires jQuery,EasyUI
+ * 
+ * 扩展combotree，使其支持平滑数据格式
+ */
+$.fn.combotree.defaults.loadFilter = $.fn.tree.defaults.loadFilter;
+
+/**
+ * @author 孙宇
+ * 
+ * @requires jQuery,EasyUI
+ * 
+ * 防止panel/window/dialog组件超出浏览器边界
+ * @param left
+ * @param top
+ */
+var easyuiPanelOnMove = function(left, top) {
+	var l = left;
+	var t = top;
+	if (l < 1) {
+		l = 1;
+	}
+	if (t < 1) {
+		t = 1;
+	}
+	var width = parseInt($(this).parent().css('width')) + 14;
+	var height = parseInt($(this).parent().css('height')) + 14;
+	var right = l + width;
+	var buttom = t + height;
+	var browserWidth = $(window).width();
+	var browserHeight = $(window).height();
+	if (right > browserWidth) {
+		l = browserWidth - width;
+	}
+	if (buttom > browserHeight) {
+		t = browserHeight - height;
+	}
+	$(this).parent().css({/* 修正面板位置 */
+		left : l,
+		top : t
+	});
+};
+$.fn.dialog.defaults.onMove = easyuiPanelOnMove;
+$.fn.window.defaults.onMove = easyuiPanelOnMove;
+$.fn.panel.defaults.onMove = easyuiPanelOnMove;
+
+/**
+ * @author 孙宇
+ * 
+ * @requires jQuery,EasyUI,jQuery cookie plugin
+ * 
+ * 更换EasyUI主题的方法
+ * 
+ * @param themeName
+ *            主题名称
+ */
+changeTheme = function(themeName) {
+	var $easyuiTheme = $('#easyuiTheme');
+	var url = $easyuiTheme.attr('href');
+	var href = url.substring(0, url.indexOf('themes')) + 'themes/' + themeName + '/easyui.css';
+	$easyuiTheme.attr('href', href);
+
+	var $iframe = $('iframe');
+	if ($iframe.length > 0) {
+		for ( var i = 0; i < $iframe.length; i++) {
+			var ifr = $iframe[i];
+			$(ifr).contents().find('#easyuiTheme').attr('href', href);
+		}
+	}
+
+	$.cookie('easyuiThemeName', themeName, {
+		expires : 7
+	});
+};
+
+/**
+ * @author 孙宇
+ * 
+ * @requires jQuery
+ * 
+ * 将form表单元素的值序列化成对象
+ * 
+ * @returns object
+ */
+serializeObject = function(form) {
+	var o = {};
+	$.each(form.serializeArray(), function(index) {
+		if (o[this['name']]) {
+			o[this['name']] = o[this['name']] + "," + this['value'];
+		} else {
+			o[this['name']] = this['value'];
+		}
+	});
+	return o;
+};
+
+/**
+ * @author 孙宇
+ * 
+ * 增加formatString功能
+ * 
+ * 使用方法：formatString('字符串{0}字符串{1}字符串','第一个变量','第二个变量');
+ * 
+ * @returns 格式化后的字符串
+ */
+formatString = function(str) {
+	for ( var i = 0; i < arguments.length - 1; i++) {
+		str = str.replace("{" + i + "}", arguments[i + 1]);
+	}
+	return str;
+};
+
+/**
+ * @author 孙宇
+ * 
+ * 接收一个以逗号分割的字符串，返回List，list里每一项都是一个字符串
+ * 
+ * @returns list
+ */
+stringToList = function(value) {
+	if (value != undefined && value != '') {
+		var values = [];
+		var t = value.split(',');
+		for ( var i = 0; i < t.length; i++) {
+			values.push('' + t[i]);/* 避免他将ID当成数字 */
+		}
+		return values;
+	} else {
+		return [];
+	}
+};
+
+/**
+ * @author 孙宇
+ * 
+ * @requires jQuery
+ * 
+ * 改变jQuery的AJAX默认属性和方法
+ */
+$.ajaxSetup({
+	type : 'POST',
+	error : function(XMLHttpRequest, textStatus, errorThrown) {
+		$.messager.progress('close');
+		$.messager.alert('错误', XMLHttpRequest.responseText);
+	}
+});
+
+function clearLocalstorage(){
+	storage=$.localStorage; 
+	if(!storage)
+		storage=$.cookieStorage;
+	storage.removeAll();
+	$.messager.alert('信息', "浏览器缓存清除成功!");
+}
+
+/**
+ * 公共导出excel
+ * @param url 数据导出请求
+ * @param exportId 导出窗口iframeId
+ */
+function exportExcel(url, params, datagridId, exportId, cols){
+	if(!url){
+		$.messager.alert('导出', "导出excel请求路径不能为空!");
+	}
+	if(!params){
+		params = serializeObject($("#searchFormId").ajaxForm());
+	}
+	params['rows'] = 8000;
+	var datagrid = $(!datagridId ? '#datagrid' : '#'+datagridId);
+	if(!datagrid.length) throw new Error("无法找到表格，请传递表格id或者默认id=datagrid");
+	var opts = datagrid.datagrid('getColumnFields'); //这是获取到所有的FIELD
+	var cols = cols || [];
+	if(!cols || !cols.length){
+		for(i = 0; i < opts.length; i++) {
+			var col = datagrid.datagrid( "getColumnOption" , opts[i] );
+			if(('undefined' == typeof(col.hidden) || !col.hidden) && col.title){
+				var colName = {};
+				colName['field'] = col.field;
+				colName['title'] = col.title;
+				cols.push(colName);
+			}
+		}
+	}
+	exportId = exportId || "exportExcelFrame";
+	var iframeEl = document.getElementById(exportId);
+    if(!iframeEl){
+    	iframeEl = document.createElement("iframe");
+        iframeEl.id = exportId;
+        iframeEl.style.display = "none";
+        var oBody = document.getElementsByTagName('BODY').item(0); 
+        oBody.appendChild(iframeEl);
+    }
+    var exportUrl = url + "&cols=" + JSON.stringify(cols) + "&" + parseParam(params);
+    iframeEl.src = exportUrl;
+}
+
+/**
+ * js对象转url参数
+ * @param param
+ * @param key
+ * @returns
+ */
+function parseParam(param, key){
+    var paramStr="";
+    if(param instanceof String||param instanceof Number||param instanceof Boolean){
+        paramStr+="&"+key+"="+encodeURIComponent(param);
+    }else{
+        $.each(param,function(i){
+            var k=key==null?i:key+(param instanceof Array?"["+i+"]":"."+i);
+            paramStr+='&'+parseParam(this, k);
+        });
+    }
+    return paramStr.substr(1);
+};
+
+/**
+ * 防止回车键提交表单，并将焦点转移至下一个元素
+ */
+$(function(){
+	$("input").keypress(function (e){
+		var keyCode = e.keyCode ? e.keyCode : e.which ? e.which : e.charCode;
+		if (keyCode == 13){
+			var i;
+			for (i = 0; i < this.form.elements.length; i++)
+				if (this == this.form.elements[i])
+					break;
+			i = (i + 1) % this.form.elements.length;
+			this.form.elements[i].focus();
+			return false;
+		}else{
+			return true;
+		}
+	});
+});
+
+/**
+ * 日期加天数
+ * @param date
+ * @param days
+ * @returns {String}
+ */
+function addDate(date, days) {
+	var d = new Date(date);
+	d.setDate(d.getDate() + days);
+	var month = d.getMonth() + 1;
+	var day = d.getDate();
+	if (month < 10) {
+		month = "0" + month;
+	}
+	if (day < 10) {
+		day = "0" + day;
+	}
+	var val = d.getFullYear() + "-" + month + "-" + day;
+	return val;
+}
+
+/**
+ * 获取两日期相差天数
+ * @param dateStart
+ * @param dateEnd
+ * @returns
+ */
+function getDays(dateStart,dateEnd){
+   var strSeparator = "-"; //日期分隔符
+   var oDate1;
+   var oDate2;
+   var iDays;
+   oDate1= dateStart.split(strSeparator);
+   oDate2= dateEnd.split(strSeparator);
+   var strDateS = new Date(oDate1[0], oDate1[1]-1, oDate1[2]);
+   var strDateE = new Date(oDate2[0], oDate2[1]-1, oDate2[2]);
+   iDays = parseInt(Math.abs(strDateS - strDateE ) / 1000 / 60 / 60 /24)//把相差的毫秒数转换为天数 
+   return iDays ;
+}
+
+/**
+ * 日期格式转换
+ */
+Date.prototype.doformat = function (format) {  
+    var o = {  
+        "M+": this.getMonth() + 1, // month  
+        "d+": this.getDate(), // day  
+        "h+": this.getHours(), // hour  
+        "m+": this.getMinutes(), // minute  
+        "s+": this.getSeconds(), // second  
+        "q+": Math.floor((this.getMonth() + 3) / 3), // quarter  
+        "S": this.getMilliseconds()  
+        // millisecond  
+    }  
+    if (/(y+)/.test(format))  
+        format = format.replace(RegExp.$1, (this.getFullYear() + "")  
+            .substr(4 - RegExp.$1.length));  
+    for (var k in o)  
+        if (new RegExp("(" + k + ")").test(format))  
+            format = format.replace(RegExp.$1, RegExp.$1.length == 1 ? o[k] : ("00" + o[k]).substr(("" + o[k]).length));  
+    return format;  
+} 
+
+//同步加载cssjs等
+function cssJs(path, asyc){//默认同步,支持异步,但不支持跨域
+	var match, jsCss = true;
+	if(!(match = path.match(/^.+(\.js|\.css|\.html|api.*)([?#].*)?$/))) 
+		throw new Error('Only support css,js,html!');
+	var pathId = path.replace(/[\/\?=:\.\[\]\\]/g,'');
+	if(!!$('#'+pathId).length) return;
+	if(match[1] == '.css') jsCss = false;
+	
+	var oXmlHttp = null;
+    if(window.XMLHttpRequest) // Gecko 
+    	oXmlHttp = new XMLHttpRequest() ; 
+    else if(window.ActiveXObject) // IE 
+    	oXmlHttp = new ActiveXObject("MsXml2.XmlHttp") ; 
+    oXmlHttp.onreadystatechange = function() { 
+    	if(oXmlHttp.readyState == 4){ 
+			if(oXmlHttp.status == 200 || oXmlHttp.status == 304){
+				if(!!oXmlHttp.responseText){
+					var oHead = document.getElementsByTagName('HEAD').item(0); 
+			        var ele = null;
+			        if(jsCss){
+			        	ele = document.createElement("script");
+				        ele.language = "javascript"; 
+				        ele.type = "text/javascript";
+				        ele.text = oXmlHttp.responseText + '//@ sourceURL=ajax-'+path;
+			        }else{
+			        	ele = document.createElement('style');
+			        	ele.type = 'text/css';
+			        	if (ele.styleSheet) { //IE
+			        		ele.styleSheet.cssText = oXmlHttp.responseText;
+		        		} else { //w3c
+		        			ele.innerHTML = oXmlHttp.responseText;
+		        		}
+			        }
+			        ele.id = pathId;
+			        oHead.appendChild(ele);
+				}
+            } else {
+				throw new Error('XML request error: ' + oXmlHttp.statusText + ' (' + oXmlHttp.status + ')' ) ; 
+            } 
+        } 
+    }
+    oXmlHttp.open('GET', path, asyc==true ? true:false);
+    oXmlHttp.send(null); 
+}
+
+/**
+ * 扫描
+ */
+$(function(){
+	//扫描并加载ef-对应类所需组件
+	$('input[class*="ef-"]').each(function(){
+		var loadjsName = /ef-[^\s]*/.exec(this.className);
+		var hasjs = $('script[src*='+loadjsName+']');
+		if(!hasjs.length){
+			cssJs(basePathJs + "/plug-in/ef-component/"+loadjsName+"/"+loadjsName+".js");
+		}
+	});
+	//扫描表单datatype或required，加红星
+	$('form table').find('[datatype][ignore!="ignore"],[required][ignore!="ignore"]').each(function(){
+ 		if(/^\*0-\d+$/.test($(this).attr("datatype"))){
+ 			return true;
+ 		}
+ 		var redTd = $(this).parent().prev();
+ 		if(redTd.length && /td/i.test(redTd.get(0).nodeName)){
+ 			redTd.addClass('redStar');
+ 		}
+ 	});
+ 	//如果页面是详细查看页面，无效化所有表单元素，只能进行查看
+ 	//获取当前页面的url，只要包含了“Detail”的页面默认disabled
+ 	var url = location.href;
+	/*if(windowapi && windowapi.DOM && windowapi.DOM.buttons && 'none' == windowapi.DOM.buttons.css('display')) {
+		$('.value').children().attr('disabled', 'disabled');
+		$('#file_uploadspan').parent().parent().remove();
+	}*/
+ 	//注意！！！ 查看详细页面的请求url就必须包含Detail或者detail字段了，并且其他请求不能包含这玩意
+ 	if(url.indexOf('Detail') > -1 || url.indexOf('detail') > -1 ) {
+ 		$('.value').children().attr('disabled', 'disabled');
+		$('#file_uploadspan').parent().parent().remove();
+ 	}
+});
+
+//对Date的扩展，将 Date 转化为指定格式的String
+//月(M)、日(d)、小时(h)、分(m)、秒(s)、季度(q) 可以用 1-2 个占位符， 
+//年(y)可以用 1-4 个占位符，毫秒(S)只能用 1 个占位符(是 1-3 位的数字) 
+//例子： 
+//(new Date()).Format("yyyy-MM-dd hh:mm:ss.S") ==> 2006-07-02 08:09:04.423 
+//(new Date()).Format("yyyy-M-d h:m:s.S")      ==> 2006-7-2 8:9:4.18 
+Date.prototype.Format = function (fmt) { //author: meizz 
+var o = {
+   "M+": this.getMonth() + 1, //月份 
+   "d+": this.getDate(), //日 
+   "h+": this.getHours(), //小时 
+   "m+": this.getMinutes(), //分 
+   "s+": this.getSeconds(), //秒 
+   "q+": Math.floor((this.getMonth() + 3) / 3), //季度 
+   "S": this.getMilliseconds() //毫秒 
+};
+if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+for (var k in o)
+if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+return fmt;
+}

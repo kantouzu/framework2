@@ -1,0 +1,30 @@
+$(function(){
+	layui.use('table', function(){
+		  var table = layui.table;
+		  
+		  //第一个实例
+		  table.render({
+		    elem: '#datagrid'
+		    ,height: 449
+//		    ,even: true
+		    ,url: Utils.getRootPath() + "/userInfoController/dataList" //数据接口
+		    ,page: {
+		    	theme: '#22262e' 
+		    } //开启分页
+		    ,cols: [[ //表头
+		      {field: 'id', title: 'ID', width:'10%', sort: true, fixed: 'left'}
+		      ,{field: 'userName', title: '用户名', width:'20%'}
+		      ,{field: 'name', title: '性名', width:'20%', sort: true}
+		      ,{field: 'phone', title: '手机号', width:'20%'} 
+		      ,{field: 'email', title: '邮箱', width: '30%'}
+		      ,{fixed: 'right', width:150, align:'center', toolbar: '#toolbar'} //这里的toolbar值是模板元素的选择器
+		    ]]
+		  });
+		  
+		});
+		 
+})
+
+function add(){
+	Utils.createCommonWindow('新增用户',Utils.getRootPath() + "/userInfoController/goAddOrEdit", 900, 600);
+}

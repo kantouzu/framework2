@@ -1,0 +1,31 @@
+package com.cisdi.business.service;
+
+import java.util.List;
+import java.util.Map;
+import com.cisdi.base.common.json.AjaxJson;
+import com.cisdi.base.common.responseBean.LayGridReturn;
+import com.cisdi.business.entity.Dictionary;
+import com.cisdi.business.example.DictionaryExample;
+
+public interface DictionaryService {
+    
+    Dictionary selectByPrimaryKey(Integer id);
+
+    List<Map<String, Object>> selectByExample(DictionaryExample record);
+
+    AjaxJson insertSelective(Dictionary record);
+    
+    AjaxJson deleteByPrimaryKey(Integer id);
+    
+    AjaxJson deleteByExample(DictionaryExample example);
+    
+    AjaxJson deleteByExampleInLogic(DictionaryExample example);
+    
+    AjaxJson countByExample(DictionaryExample example);
+    
+    AjaxJson updateByPrimaryKeySelective(Dictionary entity);
+    
+    LayGridReturn selectDataGridByExample(DictionaryExample record);
+    
+    AjaxJson saveOrUpdate(Dictionary entity);
+}

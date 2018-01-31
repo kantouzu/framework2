@@ -1,0 +1,143 @@
+package com.cisdi.business.controller;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.cisdi.base.common.constant.CommonConstant;
+import com.cisdi.base.common.enums.CommonEnumType.YesOrNo;
+import com.cisdi.base.common.json.AjaxJson;
+import com.cisdi.base.common.responseBean.LayGridReturn;
+import com.cisdi.base.controller.BaseController;
+import com.cisdi.base.util.BaseUtil;
+import com.cisdi.business.common.annotation.SystemLog;
+import com.cisdi.business.entity.RoleInfo;
+import com.cisdi.business.entity.RoleRelMenu;
+import com.cisdi.business.example.RoleRelMenuExample;
+import com.cisdi.business.requestBean.DataGrid;
+import com.cisdi.business.responseBean.LayerTree;
+import com.cisdi.business.service.MenuService;
+import com.cisdi.business.service.RoleInfoService;
+import com.cisdi.business.service.RoleRelMenuService;
+
+@Controller
+@RequestMapping(value="roleRelMenuController")
+public class RoleRelMenuController extends BaseController {
+
+    @Autowired
+    private RoleRelMenuService roleRelMenuService;
+    @Autowired
+    private RoleInfoService roleInfoService;
+    @Autowired
+    private MenuService menuService;
+    
+    @RequestMapping(value = "pageList")
+    public ModelAndView list(HttpServletRequest req, RoleRelMenu roleRelMenu, RoleRelMenuExample roleRelMenuExample) {
+        
+        ModelAndView mv = new ModelAndView();
+        mv.setViewName("RoleRelMenu/RoleRelMenuList");
+        return mv;
+    }
+    
+    @RequestMapping(value = "dataList")
+    @ResponseBody
+    public LayGridReturn dataList(HttpServletRequest req, RoleRelMenu roleRelMenu, RoleRelMenuExample roleRelMenuExample, DataGrid datagrid) {
+    	roleRelMenuExample.setLimitStart(datagrid.getStartRow());
+    	roleRelMenuExample.setLimitEnd(datagrid.getLimit());
+    	roleRelMenuExample.setOrderByClause("order by id desc");
+    	roleRelMenuExample.or().andDeleteflagEqualTo(YesOrNo.否.getValue());
+    	return roleRelMenuService.selectDataGridByExample(roleRelMenuExample);
+    	
+    }
+    
+    @RequestMapping(value = "goAddOrEdit")
+    public ModelAndView goAddOrEdit(HttpServletRequest req, RoleRelMenu roleRelMenu, RoleRelMenuExample roleRelMenuExample, boolean isCheckOnly) {
+        
+        ModelAndView mv = new ModelAndView();
+        RoleRelMenu entity = roleRelMenuService.selectByPrimaryKey(roleRelMenu.getId());
+        mv.setViewName("RoleRelMenu/RoleRelMenuEdit");
+        mv.addObject("roleRelMenu", entity);
+        mv.addObject("isCheckOnly", isCheckOnly);
+        return mv;
+    }
+    
+    @RequestMapping(value = "doSaveOrUpdate", method=RequestMethod.POST)
+    @ResponseBody
+    @SystemLog(module = CommonConstant.LOG_ROLE_REL_MENU,description = "role_rel_menu",businessType=CommonConstant.BUSINESS_ADDOREDIT)
+    public AjaxJson doSaveOrUpdate(HttpServletRequest req, RoleRelMenu roleRelMenu) {
+    	AjaxJson j = null;
+        try {
+        	j = roleRelMenuService.saveOrUpdate(roleRelMenu);
+        	return j;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return AjaxJson.returnJsonObj(false);
+		}
+    } 
+    
+    @RequestMapping(value = "batchDelete", method=RequestMethod.POST)
+    @ResponseBody
+    @SystemLog(module = CommonConstant.LOG_ROLE_REL_MENU,description = "role_rel_menu",businessType=CommonConstant.BUSINESS_DEL)
+    public AjaxJson batchDelete(HttpServletRequest req, @RequestParam List<Integer> ids) {
+        RoleRelMenuExample roleRelMenuExample = new RoleRelMenuExample();
+        roleRelMenuExample.or().andIdIn(ids);
+        return roleRelMenuService.deleteByExample(roleRelMenuExample);
+    }    
+    
+    @RequestMapping(value = "batchDeleteInLogic", method=RequestMethod.POST)
+    @ResponseBody
+    @SystemLog(module = CommonConstant.LOG_ROLE_REL_MENU,description = "role_rel_menu",businessType=CommonConstant.BUSINESS_DELINLOGIC)
+    public AjaxJson batchDeleteInLogic(HttpServletRequest req, @RequestParam List<Integer> ids) {
+        RoleRelMenuExample roleRelMenuExample = new RoleRelMenuExample();
+        roleRelMenuExample.or().andIdIn(ids);
+        return roleRelMenuService.deleteByExampleInLogic(roleRelMenuExample);
+    }  
+    
+    /**
+	 * 根据角色加载菜单树
+	 * @param request
+	 * @param response
+	 */
+	@RequestMapping(value = "getMenuListDataByRole")
+	@ResponseBody
+	public List<LayerTree> getMenuListDataByRole(HttpServletRequest req, Integer roleId){
+		String checkedIds = null;
+		if(!BaseUtil.isEmpty(roleId)){
+			checkedIds = roleRelMenuService.getMenuIdsByRole(roleId);
+		}
+		return menuService.getMenuList(null, checkedIds);
+	}
+	
+	/**
+     * 刷新用户角色权限，先删除对应userId的所有关联数据，再重新添加
+     * @param req
+     * @param roleCode
+     * @param userId
+     * @return
+     */
+    @RequestMapping(value = "flushRoleRelMenus", method=RequestMethod.POST)
+    @ResponseBody
+    @SystemLog(module = CommonConstant.LOG_USER_REL_ROLE,description = "刷新用户角色权限",businessType=CommonConstant.BUSINESS_OTHER)
+    public AjaxJson flushUserRelRoles(HttpServletRequest req, String menuIds, String roleId) {
+    	AjaxJson j = null;
+        try {
+        	Map<String, Object> businessMap = new HashMap<String, Object>();
+        	businessMap.put("roleId", roleId);
+        	businessMap.put("menuIds", menuIds);
+        	return roleRelMenuService.flushRoleRelMenus(businessMap);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return AjaxJson.returnJsonObj(false);
+		}
+    }
+}

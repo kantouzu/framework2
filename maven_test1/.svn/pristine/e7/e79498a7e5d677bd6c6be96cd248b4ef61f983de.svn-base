@@ -1,0 +1,826 @@
+package com.cisdi.base.util;
+
+import java.beans.BeanInfo;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import com.cisdi.base.common.enums.CommonEnumType;
+
+/**
+ * 主要工具
+ *
+ * @author xiangjz
+ */
+public class BaseUtil {
+
+    public static <T> boolean isListEmpty(List<T> obj) {
+        return isEmpty(obj) || obj.size() <= 0;
+    }
+
+    public static boolean isEmpty(Object obj) {
+        return obj == null || obj.toString().equalsIgnoreCase("null") || obj.toString().length() == 0;
+    }
+
+    public static String retStr(Object obj) {
+        return isEmpty(obj) ? "" : obj.toString();
+    }
+
+    public static String getSortNo(String sort, Integer count) {
+        if (sort.length() == count) {
+            return sort;
+        } else if (sort.length() > count) {
+            return sort;
+        } else {
+            Integer zeroCount = count - sort.length();
+            for (int i = 0; i < zeroCount; i++) {
+                sort = "0" + sort;
+            }
+            return sort;
+        }
+    }
+
+    public static Map<String, Object> transBean2Map(Object obj) {
+
+        if (isEmpty(obj)) {
+            return null;
+        }
+        Map<String, Object> map = new HashMap<String, Object>();
+        try {
+            BeanInfo beanInfo = Introspector.getBeanInfo(obj.getClass());
+            PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();
+            for (PropertyDescriptor property : propertyDescriptors) {
+                String key = property.getName();
+
+                // 过滤class属性  
+                if (!key.equals("class")) {
+                    // 得到property对应的getter方法  
+                    Method getter = property.getReadMethod();
+                    Object value = getter.invoke(obj);
+
+                    map.put(key, value);
+                }
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return map;
+
+    }
+
+    public static Object transMapToBean(Map<String, Object> map, Class<?> beanClass) throws Exception {
+        if (isEmpty(map))
+            return null;
+
+        Object obj = beanClass.newInstance();
+        //循环向上转型获取父类属性
+        for(; beanClass != Object.class ; beanClass = beanClass.getSuperclass()) {    
+            try {    
+            	Field[] fields = beanClass.getDeclaredFields();
+                for (Field field : fields) {
+                    int mod = field.getModifiers();
+                    String fieldName = underlineToCamel(field.getName());
+                    if (Modifier.isStatic(mod) || Modifier.isFinal(mod)) {
+                        continue;
+                    }
+                    /*//由于本框架的特殊性，顶层对象的id封装在hashAttributes内，故做如下处理
+                	if(field.getName().equals("hashAttributes")){
+                		Map<String, Object> hashAttributes = new HashMap<String, Object>();
+                		hashAttributes.put("id", map.get("id"));
+                		map.put("hashAttributes", hashAttributes);
+                	}*/
+                	field.setAccessible(true);
+                	Object value = null;
+                	String simpleTypeName = field.getType().getSimpleName();
+                	if(simpleTypeName.equals("Double") || simpleTypeName.equals("double")){
+                		value = isEmpty(map.get(fieldName))
+                				?0.0
+                				:Double.parseDouble(retStr(map.get(fieldName)));
+                	}else if(simpleTypeName.equals("Integer") || simpleTypeName.equals("int")){
+                		value = isEmpty(map.get(fieldName))
+                				?0
+                				:Integer.parseInt(retStr(map.get(fieldName)));
+                	}else if(simpleTypeName.equals("Float") || simpleTypeName.equals("float")){
+                		value = isEmpty(map.get(fieldName))
+                				?0
+                				:Float.parseFloat(retStr(map.get(fieldName)));
+                	}else{
+                		value = map.get(fieldName);
+                	}
+                	field.set(obj, value);
+                }
+            } catch (Exception e) {  
+            	e.printStackTrace();
+                //这里甚么都不要做！并且这里的异常必须这样写，不能抛出去。    
+                //如果这里的异常打印或者往外抛，则就不会执行clazz = clazz.getSuperclass(),最后就不会进入到父类中了                      
+            }     
+        }  
+
+        return obj;
+    }
+    
+    public static String transMonthToYear_month(Integer month) {
+        if (!BaseUtil.isEmpty(month) && month >= 0) {
+            Integer year = month / 12;
+            Integer mon = month % 12;
+            return year == 0 ? mon + "个月" : mon == 0 ? year + "年" : year + "年零" + mon + "个月";
+        } else {
+            return "";
+        }
+    }
+
+    public static String getPreSortDateNum() {
+        Date d = new Date();
+        String month = ((d.getMonth() + 1) + "").length() == 1 ? ("0" + (d.getMonth() + 1)) : ((d.getMonth() + 1) + "");
+        String date = (d.getDate() + "").length() == 1 ? ("0" + (d.getDate() + "")) : (d.getDate() + "");
+        String hours = (d.getHours() + "").length() == 1 ? ("0" + (d.getHours() + "")) : (d.getHours() + "");
+        String minutes = (d.getMinutes() + "").length() == 1 ? ("0" + (d.getMinutes() + "")) : (d.getMinutes() + "");
+        String seconds = (d.getSeconds() + "").length() == 1 ? ("0" + (d.getSeconds() + "")) : (d.getSeconds() + "");
+        return (d.getYear() + 1900) + month + date + hours + minutes + seconds;
+    }
+
+    public static String getDotTwoDigit(double digit) {
+        String result = new DecimalFormat("#.00").format(digit);
+        if (!isEmpty(result) && result.startsWith("."))
+            result = "0.00";
+        return result;
+    }
+
+    /**
+     * 汉语中数字大写
+     */
+    private static final String[] CN_UPPER_NUMBER = {"零", "壹", "贰", "叁", "肆",
+            "伍", "陆", "柒", "捌", "玖"};
+    /**
+     * 汉语中货币单位大写，这样的设计类似于占位符
+     */
+    private static final String[] CN_UPPER_MONETRAY_UNIT = {"分", "角", "元",
+            "拾", "佰", "仟", "万", "拾", "佰", "仟", "亿", "拾", "佰", "仟", "兆", "拾",
+            "佰", "仟"};
+    /**
+     * 特殊字符：整
+     */
+    private static final String CN_FULL = "整";
+    /**
+     * 特殊字符：负
+     */
+    private static final String CN_NEGATIVE = "负";
+    /**
+     * 金额的精度，默认值为2
+     */
+    private static final int MONEY_PRECISION = 2;
+    /**
+     * 特殊字符：零元整
+     */
+    private static final String CN_ZEOR_FULL = "零元" + CN_FULL;
+
+    /**
+     * 把输入的金额转换为汉语中人民币的大写
+     *
+     * @param numberOfMoney 输入的金额
+     * @return 对应的汉语大写
+     */
+    public static String number2CNMontrayUnit(BigDecimal numberOfMoney) {
+        StringBuffer sb = new StringBuffer();
+        // -1, 0, or 1 as the value of this BigDecimal is negative, zero, or
+        // positive.
+        int signum = numberOfMoney.signum();
+        // 零元整的情况
+        if (signum == 0) {
+            return CN_ZEOR_FULL;
+        }
+        //这里会进行金额的四舍五入
+        long number = numberOfMoney.movePointRight(MONEY_PRECISION)
+                .setScale(0, 4).abs().longValue();
+        // 得到小数点后两位值
+        long scale = number % 100;
+        int numUnit = 0;
+        int numIndex = 0;
+        boolean getZero = false;
+        // 判断最后两位数，一共有四中情况：00 = 0, 01 = 1, 10, 11
+        if (!(scale > 0)) {
+            numIndex = 2;
+            number = number / 100;
+            getZero = true;
+        }
+        if ((scale > 0) && (!(scale % 10 > 0))) {
+            numIndex = 1;
+            number = number / 10;
+            getZero = true;
+        }
+        int zeroSize = 0;
+        while (true) {
+            if (number <= 0) {
+                break;
+            }
+            // 每次获取到最后一个数
+            numUnit = (int) (number % 10);
+            if (numUnit > 0) {
+                if ((numIndex == 9) && (zeroSize >= 3)) {
+                    sb.insert(0, CN_UPPER_MONETRAY_UNIT[6]);
+                }
+                if ((numIndex == 13) && (zeroSize >= 3)) {
+                    sb.insert(0, CN_UPPER_MONETRAY_UNIT[10]);
+                }
+                sb.insert(0, CN_UPPER_MONETRAY_UNIT[numIndex]);
+                sb.insert(0, CN_UPPER_NUMBER[numUnit]);
+                getZero = false;
+                zeroSize = 0;
+            } else {
+                ++zeroSize;
+                if (!(getZero)) {
+                    sb.insert(0, CN_UPPER_NUMBER[numUnit]);
+                }
+                if (numIndex == 2) {
+                    if (number > 0) {
+                        sb.insert(0, CN_UPPER_MONETRAY_UNIT[numIndex]);
+                    }
+                } else if (((numIndex - 2) % 4 == 0) && (number % 1000 > 0)) {
+                    sb.insert(0, CN_UPPER_MONETRAY_UNIT[numIndex]);
+                }
+                getZero = true;
+            }
+            // 让number每次都去掉最后一个数
+            number = number / 10;
+            ++numIndex;
+        }
+        // 如果signum == -1，则说明输入的数字为负数，就在最前面追加特殊字符：负
+        if (signum == -1) {
+            sb.insert(0, CN_NEGATIVE);
+        }
+        // 输入的数字小数点后两位为"00"的情况，则要在最后追加特殊字符：整
+        if (!(scale > 0)) {
+            sb.append(CN_FULL);
+        }
+        return sb.toString();
+    }
+
+    /**
+     * 拼接sql转换枚举值
+     *
+     * @param column
+     * @param enumTypeName
+     * @return
+     */
+    public static <T> String transEnumValueToName(String column, String enumTypeName) {
+        String sql = "case ";
+        Class[] c = CommonEnumType.class.getClasses();
+        for (Class class1 : c) {
+            Method[] methods = class1.getDeclaredMethods();
+            if (!isEmpty(enumTypeName) && enumTypeName.equals(class1.getName().substring(class1.getName().indexOf("$") + 1))) {
+                T[] objList = (T[]) class1.getEnumConstants();
+                for (T obj : objList) {
+                    Method method = null;
+                    try {
+                        method = obj.getClass().getMethod("getValue", null);
+                        Enum<?> tempEnum = (Enum<?>) obj;
+                        sql += " when " + column + " = '" + method.invoke(obj).toString() + "' then '" + tempEnum.name().toString() + "' ";
+                    } catch (NoSuchMethodException e) {
+                        e.printStackTrace();
+                    } catch (SecurityException e) {
+                        e.printStackTrace();
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    } catch (IllegalArgumentException e) {
+                        e.printStackTrace();
+                    } catch (InvocationTargetException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+                if ("YesOrNo".equals(enumTypeName)) {
+                    sql += " when " + column + " is null then '否' ";
+                }
+            }
+        }
+        sql += " end ";
+        return sql;
+    }
+
+    /**
+     * 返回项目编码
+     *
+     * @param moduleCode：模块编码
+     * @param machine：机器码
+     * @param leveCode：企业等级编码
+     * @param sort：序列
+     * @return
+     */
+    public static String getProjectCode(String moduleCode, String machine, String leveCode, int sort, Date addDate) {
+        String projectCode = "";
+        //获得当前年份
+        Calendar a = Calendar.getInstance();
+        int year = isEmpty(addDate) ? a.get(Calendar.YEAR) : (addDate.getYear() + 1900);
+        String yearStr = (year + "").substring(2, 4);
+        sort = sort + 1;
+        int len = String.valueOf(sort).length();
+        if (len == 1) {
+            projectCode = moduleCode + yearStr + machine + leveCode + "00000" + sort;
+        } else if (len == 2) {
+            projectCode = moduleCode + yearStr + machine + leveCode + "0000" + sort;
+        } else if (len == 3) {
+            projectCode = moduleCode + yearStr + machine + leveCode + "000" + sort;
+        } else if (len == 4) {
+            projectCode = moduleCode + yearStr + machine + leveCode + "00" + sort;
+        } else if (len == 5) {
+            projectCode = moduleCode + yearStr + machine + leveCode + "0" + sort;
+        } else {
+            projectCode = moduleCode + yearStr + machine + leveCode + sort;
+        }
+        return projectCode;
+    }
+
+    /**
+     * 根据count大小，自动为num参数前面补多少个0
+     *
+     * @param num
+     * @param count
+     * @return
+     */
+    public static String addZero(Integer num, Integer count) {
+        if (count <= 0)
+            return num + "";
+        String numStr = num + "";
+        for (int i = 0; i < count; i++) {
+            numStr = "0" + numStr;
+        }
+        return numStr;
+    }
+
+    /**
+     * 月份自动补0
+     *
+     * @param num
+     * @param count
+     * @return
+     */
+    public static String addZeroToMonth(Integer num) {
+        String numStr = num + "";
+        numStr = numStr.length() == 1 ? "0" + numStr : numStr;
+        return numStr;
+    }
+
+    /**
+     * 获得月报查询条件
+     *
+     * @return
+     */
+    public static Map<String, Object> getMonthCondition() {
+        Map<String, Object> map = new HashMap<>();
+        String beforDate = "";
+        String afterDate = "";
+        //获得系统当前时间
+        Calendar a = Calendar.getInstance();
+        //获得当前年份
+        int year = a.get(Calendar.YEAR);
+        //获得当前月份
+        int month = a.get(Calendar.MONTH) + 1;
+        //获得当前时间中的天
+        int day = a.get(Calendar.DATE);
+        //判断day属于当前月份中的时间段
+        //判断当前月份
+        if (month == 1) {
+            if (day < 9) {//day小于9号，该记录比较填报日期为上一年12月9号到本年本月9号
+                beforDate = (year - 1) + "-12-09";
+                afterDate = year + "-" + (month < 10 ? "0" + month : month) + "-09";
+            } else {//day大于9号，该记录比较填报日期为本年1月9号到本年下月9号
+                int m = month + 1;
+                beforDate = year + "-" + (month < 10 ? "0" + month : month) + "-09";
+                afterDate = year + "-" + (m < 10 ? "0" + m : m) + "-09";
+            }
+        } else if (month == 7) {//如果为7月份，只能填报上月的月报
+            if (day < 9) {//day小于9号，该记录比较填报日期为本年上月9号到本年本月9号
+                int m = month - 1;
+                beforDate = year + "-" + (m < 10 ? "0" + m : m) + "-09";
+                afterDate = year + "-" + (month < 10 ? "0" + month : month) + "-09";
+            }
+// 			else{
+// 				beforDate = year+"-07-26";
+// 	 			afterDate = year+"-08-10";
+// 			}
+
+        } else if (month == 12) {
+            if (day < 9) {//day小于9号，该记录比较填报日期为本年上月9号到本年本月9号
+                int m = month - 1;
+                beforDate = year + "-" + (m < 10 ? "0" + m : m) + "-09";
+                afterDate = year + "-" + (month < 10 ? "0" + month : month) + "-09";
+            } else {//day大于9号，该记录比较填报日期为本年本月9号到下年一月9号
+// 				int m = month+1;
+                beforDate = year + "-" + (month < 10 ? "0" + month : month) + "-09";
+                afterDate = (year + 1) + "-01-09";
+            }
+        } else {
+            if (day < 9) {//day小于9号，该记录比较填报日期为本年上月9号到本年本月9号
+                int m = month - 1;
+                beforDate = year + "-" + (m < 10 ? "0" + m : m) + "-09";
+                afterDate = year + "-" + (month < 10 ? "0" + month : month) + "-09";
+            } else {//day大于9号，该记录比较填报日期为本年本月9号到本年下月9号
+                int m = month + 1;
+                beforDate = year + "-" + (month < 10 ? "0" + month : month) + "-09";
+                afterDate = year + "-" + (m < 10 ? "0" + m : m) + "-09";
+            }
+        }
+        //TODO:10月份填报期临时更改(3)--已改回
+         /*if(month == 10 && (day >= 9 && day < 21)){
+			 int m = month-1;
+			 beforDate = year+"-"+(m<10?"0"+m:m)+"-09";
+			 afterDate = year+"-"+(month<10?"0"+month:month)+"-21";
+		 }*/
+        map.put("beforDate", beforDate);
+        map.put("afterDate", afterDate);
+        return map;
+
+    }
+
+    /**
+     * 获得半年报查询条件
+     *
+     * @param args
+     */
+    public static Map<String, Object> getHalfYearCondition() {
+        Map<String, Object> map = new HashMap<>();
+        String beforDate = "";
+        String afterDate = "";
+        //获得系统当前时间
+        Calendar a = Calendar.getInstance();
+        //获得当前年份
+        int year = a.get(Calendar.YEAR);
+        beforDate = year + "-07-09";
+        afterDate = year + "-07-31";
+        map.put("beforDate", beforDate);
+        map.put("afterDate", afterDate);
+        return map;
+    }
+
+
+    /**
+     * 获得月报查询条件
+     *
+     * @return
+     */
+    public static Map<String, Object> getMonthCondition(Date fillDate) {
+        Calendar c = Calendar.getInstance();
+        c.setTime(fillDate);
+        Map<String, Object> map = new HashMap<>();
+        String beforDate = "";
+        String afterDate = "";
+        //获得系统当前时间
+//    	 Calendar a=Calendar.getInstance();
+        //获得当前年份
+        int year = c.get(Calendar.YEAR);//fillDate.getYear();
+        //获得当前月份
+        int month = c.get(Calendar.MONTH) + 1;
+        //获得当前时间中的天
+        int day = c.get(Calendar.DATE);
+        //判断day属于当前月份中的时间段
+        //判断当前月份
+        if (month == 1) {
+            if (day < 9) {//day小于9号，该记录比较填报日期为上一年12月9号到本年本月9号
+                beforDate = (year - 1) + "-12-09";
+                afterDate = year + "-" + (month < 10 ? "0" + month : month) + "-09";
+            } else {//day大于9号，该记录比较填报日期为本年1月9号到本年下月9号
+                int m = month + 1;
+                beforDate = year + "-" + (month < 10 ? "0" + month : month) + "-09";
+                afterDate = year + "-" + (m < 10 ? "0" + m : m) + "-09";
+            }
+        } else if (month == 7) {//如果为7月份，只能填报上月的月报
+            if (day < 9) {//day小于9号，该记录比较填报日期为本年上月9号到本年本月9号
+                int m = month - 1;
+                beforDate = year + "-" + (m < 10 ? "0" + m : m) + "-09";
+                afterDate = year + "-" + (month < 10 ? "0" + month : month) + "-09";
+            }
+// 			else{
+// 				beforDate = year+"-07-26";
+// 	 			afterDate = year+"-08-10";
+// 			}
+
+        } else if (month == 12) {
+            if (day < 9) {//day小于9号，该记录比较填报日期为本年上月9号到本年本月9号
+                int m = month - 1;
+                beforDate = year + "-" + (m < 10 ? "0" + m : m) + "-09";
+                afterDate = year + "-" + (month < 10 ? "0" + month : month) + "-09";
+            } else {//day大于9号，该记录比较填报日期为本年本月9号到下年一月9号
+// 				int m = month+1;
+                beforDate = year + "-" + (month < 10 ? "0" + month : month) + "-09";
+                afterDate = (year + 1) + "-01-09";
+            }
+        } else {
+            if (day < 9) {//day小于9号，该记录比较填报日期为本年上月9号到本年本月9号
+                int m = month - 1;
+                beforDate = year + "-" + (m < 10 ? "0" + m : m) + "-09";
+                afterDate = year + "-" + (month < 10 ? "0" + month : month) + "-09";
+            } else {//day大于9号，该记录比较填报日期为本年本月9号到本年下月9号
+                int m = month + 1;
+                beforDate = year + "-" + (month < 10 ? "0" + month : month) + "-09";
+                afterDate = year + "-" + (m < 10 ? "0" + m : m) + "-09";
+            }
+        }
+        //TODO:10月份填报期临时更改(1)--已改回
+		 /*if(month == 10 && (day >= 9 && day < 21)){
+			 int m = month-1;
+			 beforDate = year+"-"+(m<10?"0"+m:m)+"-09";
+			 afterDate = year+"-"+(month<10?"0"+month:month)+"-09";
+		 }*/
+        map.put("beforDate", beforDate);
+        map.put("afterDate", afterDate);
+        return map;
+
+    }
+
+    /**
+     * 获得半年报查询条件
+     *
+     * @param args
+     */
+    public static Map<String, Object> getHalfYearCondition(Date fillDate) {
+        Map<String, Object> map = new HashMap<>();
+        String beforDate = "";
+        String afterDate = "";
+        //获得系统当前时间
+//    	 Calendar a=Calendar.getInstance();
+        //获得当前年份
+        int year = fillDate.getYear();
+        beforDate = year + "-07-09";
+        afterDate = year + "-07-31";
+        map.put("beforDate", beforDate);
+        map.put("afterDate", afterDate);
+        return map;
+    }
+
+    public static Map<String, Object> getQuarterCondition() {
+
+        Map<String, Object> map = new HashMap<>();
+        String beforDate = "";
+        String afterDate = "";
+
+        //获得系统当前时间
+        Calendar a = Calendar.getInstance();
+        //获得当前年份
+        int year = a.get(Calendar.YEAR);
+        //获得当前月份
+        int month = a.get(Calendar.MONTH) + 1;
+        //获得当前时间中的天
+        int day = a.get(Calendar.DATE);
+        if (month == 1) {//查询条件为上一年12月9号到本年1月9号
+            beforDate = (year - 1) + "-12-09";
+            afterDate = year + "-01-09";
+        } else if (month == 3 || month == 4) {//查询条件为本年3月9号到本年4月9号
+            beforDate = year + "-03-09";
+            afterDate = year + "-04-09";
+        } else if (month == 6 || month == 7) {//查询条件为本年6月9号到本年7月9号
+            beforDate = year + "-06-09";
+            afterDate = year + "-07-09";
+        } else if (month == 9 || month == 10) {//查询条件为本年9月9号到本年10月9号
+            beforDate = year + "-09-09";
+            afterDate = year + "-10-09";
+        } else if (month == 12) {//查询条件为本年12月9号到下年1月9号
+            beforDate = year + "-12-09";
+            afterDate = (year + 1) + "-01-09";
+        }
+        map.put("beforDate", beforDate);
+        map.put("afterDate", afterDate);
+        return map;
+    }
+
+    
+    /**
+     * 快速排序小练习
+     * @param a
+     * @param start
+     * @param last
+     */
+    private static void quicksort(int[] a,int start,int last) 
+    { 
+        int i,j,  //当前排序中的左右游标
+        	t,	//存储每一次交换时的临时数据
+        	temp;  //基准数
+        if(start > last) 
+           return; 
+                                    
+        temp=a[start]; //temp中存的就是基准数 
+        i=start; 
+        j=last; 
+        while(i != j){ 
+           //顺序很重要，要先从右边开始找 
+           while(a[j]>=temp && i<j) 
+                    j--; 
+           //再找右边的 
+           while(a[i]<=temp && i<j) 
+                    i++; 
+           //交换两个数在数组中的位置 
+           if(i<j){ 
+                    t=a[i]; 
+                    a[i]=a[j]; 
+                    a[j]=t; 
+           } 
+        } 
+        //最终将基准数归位 
+        a[start]=a[i]; 
+        a[i]=temp; 
+                                 
+        quicksort(a,start,i-1);//继续处理左边的，这里是一个递归的过程 
+        quicksort(a,i+1,last);//继续处理右边的 ，这里是一个递归的过程 
+    } 
+    
+    /**
+     * 冒泡练习
+     * @param arr
+     */
+    private static void bubbleSort(int[] arr){
+    	if(isEmpty(arr)) return;
+    	for (int j = arr.length; j > 0; j--) {
+    		for (int i = 0; i < j - 1; i++) {
+    			if(arr[i] > arr[i+1]){
+    				int temp = arr[i];
+    				arr[i] = arr[i+1];
+    				arr[i+1] = temp;
+    			}
+    		}
+		}
+    }
+
+    /**
+     * 判断是否是季度填报期
+     */
+    public static Map<String, Integer> isQuart() {
+        //当前系统时间
+        Calendar calendar = Calendar.getInstance();
+        //年份
+        int year = calendar.get(Calendar.YEAR);
+        //月份
+        int month = calendar.get(Calendar.MONTH) + 1;
+        //天数
+        int day = calendar.get(Calendar.DATE);
+        //季度
+        int quart = 1;
+        //是否是填报季度期
+        int isAdd = 0;
+        if (month == 3 && day >= 9 || month == 4 && day <= 8) {
+            quart = 1;
+            isAdd = 1;
+        } else if (month == 6 && day >= 9 || month == 7 && day <= 8) {
+            quart = 2;
+            isAdd = 1;
+        } else if (month == 9 && day >= 9 || month == 10 && day <= 8) {
+//		}else if(month == 9 && day >= 9 || month == 10 && day <= 20){
+            quart = 3;
+            isAdd = 1;
+        } else if (month == 12 && day >= 9) {
+            quart = 4;
+            isAdd = 1;
+        } else if (month == 1 && day <= 8) {
+            quart = 4;
+            year -= 1;
+            isAdd = 1;
+        }
+        if (month == 3 && day < 9 || month < 3 && month > 1 || month == 1 && day > 8) {
+            quart = 4;
+            year -= 1;
+            isAdd = 0;
+        } else if (month == 4 && day > 8 || month > 4 && month < 6 || month == 6 && day < 9) {
+            quart = 1;
+            isAdd = 0;
+        } else if (month == 7 && day > 8 || month > 7 && month < 9 || month == 9 && day < 9) {
+            quart = 2;
+            isAdd = 0;
+        } else if (month == 10 && day > 8 || month > 10 && month < 12 || month == 12 && day < 9) {
+//		}else if(month == 10 && day > 20 || month > 10 && month < 12 || month == 12 && day < 9){
+            quart = 3;
+            isAdd = 0;
+        }
+        Map<String, Integer> map = new HashMap<>();
+        map.put("year", year);
+        map.put("quart", quart);
+        map.put("isAdd", isAdd);
+        return map;
+    }
+
+    /**
+     * 判断是否是年度填报期
+     */
+    public static Map<String, Integer> isYear() {
+        //当前系统时间
+        Calendar calendar = Calendar.getInstance();
+        //年份
+        int year = calendar.get(Calendar.YEAR);
+        //月份
+        int month = calendar.get(Calendar.MONTH) + 1;
+        //是否是填报季度期
+        int isAdd = 0;
+        if (month == 12) {
+            isAdd = 1;
+        } else if (month == 1 || month == 2) {
+            isAdd = 1;
+            year -= 1;
+        }
+        Map<String, Integer> map = new HashMap<>();
+        map.put("year", year);
+        map.put("isAdd", isAdd);
+        return map;
+    }
+
+    public Double getDoubleByThousand(String str) {
+        Double d = null;
+        try {
+            d = Double.valueOf(NumberFormat.getInstance(Locale.getDefault()).parse(str).doubleValue());
+            return d;
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return d;
+        }
+    }
+
+    public static String getInCondition(String str) {
+        String result = "";
+        if (!BaseUtil.isEmpty(str)) {
+            String[] strTemp = str.split(",");
+            for (String string : strTemp) {
+                result = "'" + string + "',";
+            }
+            result = result.substring(0, result.length() - 1);
+        }
+        return result;
+    }
+
+    /**
+     * 根据填报时间和报表名称类型，转换时间段timePeriod
+     *
+     * @param fillTime
+     * @param excelNameType
+     * @return
+     */
+    public static String getTimePeriodByFillTimeAndExcelType(String fillTime, String excelNameType) {
+        //TODO
+        return excelNameType;
+
+    }
+
+    public static BigDecimal convert(BigDecimal db) {
+        double d = isEmpty(db) ? 0.0 : db.doubleValue();
+        long l1 = Math.round(d * 100); // 四舍五入
+        double ret = l1 / 100.0;
+        return new BigDecimal(ret);
+    }
+    /**
+     * String 转 date
+     * @param db
+     * @return
+     */
+    public static Date toDate(String date) {
+    	SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");//小写的mm表示的是分钟  
+    	String dstr=date; 
+    	java.util.Date yearDate = null;
+		try {
+			yearDate = sdf.parse(dstr);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return yearDate;
+    }
+    
+    /**
+     * 下划线格式字符串转换为驼峰格式字符串
+     * 
+     * @param param
+     * @return
+     */
+    public static String underlineToCamel(String param) {
+        if (param == null || "".equals(param.trim())) {
+            return "";
+        }
+        int len = param.length();
+        StringBuilder sb = new StringBuilder(len);
+        for (int i = 0; i < len; i++) {
+            char c = param.charAt(i);
+            if (c == '_') {
+                if (++i < len) {
+                    sb.append(Character.toUpperCase(param.charAt(i)));
+                }
+            } else {
+                sb.append(c);
+            }
+        }
+        return sb.toString();
+    }
+    
+    public static void main(String[] args) {
+		System.out.println(underlineToCamel("user_name"));
+	}
+}

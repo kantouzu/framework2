@@ -1,0 +1,114 @@
+package com.cisdi.business.service.impl;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.cisdi.base.common.enums.CommonEnumType.DeleteFlag;
+import com.cisdi.base.common.json.AjaxJson;
+import com.cisdi.base.common.responseBean.LayGridReturn;
+import com.cisdi.base.util.BaseUtil;
+import com.cisdi.business.dao.UserRelDepartDao;
+import com.cisdi.business.entity.UserRelDepart;
+import com.cisdi.business.example.UserRelDepartExample;
+import com.cisdi.business.service.UserRelDepartService;
+
+@Service
+public class UserRelDepartServiceImpl implements UserRelDepartService {
+
+    @Autowired
+    private UserRelDepartDao userRelDepartDao;
+    
+    @Override
+    public UserRelDepart selectByPrimaryKey(Integer id) {
+        UserRelDepart result = userRelDepartDao.selectByPrimaryKey(id);
+        return result;
+    }
+    
+    @Override
+    public List<Map<String, Object>> selectByExample(UserRelDepartExample  record) {
+        List<Map<String, Object>> result = userRelDepartDao.selectByExample(record);
+        return result;
+    }    
+
+    @Override
+    @Transactional
+    public AjaxJson insertSelective(UserRelDepart record) {
+         int resultKey = userRelDepartDao.insertSelective(record);
+         return AjaxJson.returnJsonObj(resultKey != 0?true:false);
+    }   
+    
+    @Override
+    @Transactional
+    public AjaxJson deleteByExample(UserRelDepartExample  record) {
+        int resultKey = userRelDepartDao.deleteByExample(record);
+        return AjaxJson.returnJsonObj(resultKey != 0?true:false);
+    }
+    
+    @Override
+    @Transactional
+    public AjaxJson deleteByExampleInLogic(UserRelDepartExample  record) {
+        int resultKey = userRelDepartDao.deleteByExampleInLogic(record);
+        return AjaxJson.returnJsonObj(resultKey != 0?true:false);
+    }
+
+    @Override
+    @Transactional
+    public AjaxJson deleteByPrimaryKey(Integer id) {
+        int resultKey = userRelDepartDao.deleteByPrimaryKey(id);
+        return AjaxJson.returnJsonObj(resultKey != 0?true:false);
+    }
+    
+    @Override
+    public AjaxJson countByExample(UserRelDepartExample example){
+        Integer count = userRelDepartDao.countByExample(example);
+        return AjaxJson.returnJsonObj(true, count);
+    }
+    
+    @Override
+    @Transactional
+    public AjaxJson updateByPrimaryKeySelective(UserRelDepart entity){
+        int resultKey = userRelDepartDao.updateByPrimaryKeySelective(entity);
+        return AjaxJson.returnJsonObj(resultKey != 0?true:false);
+    }
+    
+    @Override
+	public LayGridReturn selectDataGridByExample(UserRelDepartExample record) {
+		return new LayGridReturn(0, "", userRelDepartDao.selectByExample(record), userRelDepartDao.countByExample(record));
+	}
+	
+	@Override
+    @Transactional
+    public AjaxJson saveOrUpdate(UserRelDepart entity){
+		if(BaseUtil.isEmpty(entity))
+			return AjaxJson.fail("数据不能为空");
+		if(BaseUtil.isEmpty(entity.getUserId()))
+			return AjaxJson.fail("用户id不能为空");
+		if(BaseUtil.isEmpty(entity.getDepartId()))
+			return AjaxJson.fail("机构id不能为空");
+		Integer id = entity.getId();
+		if(BaseUtil.isEmpty(id)){
+			UserRelDepartExample userRelDepartExample = new UserRelDepartExample();
+			userRelDepartExample.or().andUserIdEqualTo(entity.getUserId())
+									.andDepartIdEqualTo(entity.getDepartId())
+									.andDeleteflagEqualTo(DeleteFlag.未删除.getValue());
+			List<Map<String, Object>> checkList = userRelDepartDao.selectByExample(userRelDepartExample);
+			if(!BaseUtil.isEmpty(checkList))
+				return AjaxJson.fail("不可重复绑定");
+			userRelDepartDao.insertSelective(entity);
+		}else{
+			userRelDepartDao.updateByPrimaryKeySelective(entity);
+		}
+        return AjaxJson.returnJsonObj(true);
+    }
+	
+
+    @Override
+	public List<Map<String, Object>> selectTotalGridByExample(UserRelDepartExample record) {
+		return userRelDepartDao.selectTotalByExample(record);
+	}
+    
+}

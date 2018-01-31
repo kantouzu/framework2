@@ -1,0 +1,63 @@
+#parse("layout/resource.vm")
+<script src="${rc.contextPath}/resources/js/Menu/MenuEdit.js" type="text/javascript"></script>
+#parse("layout/tree_resource.vm")
+<script>
+	var isCheckOnly = $!isCheckOnly;
+</script>
+<!-- BEGIN CONTAINER -->
+  <!-- BEGIN PAGE CONTAINER-->
+<div class="panel-body" >
+	<form class="animated fadeIn validate" id="formSubmit" action="${rc.contextPath}/menuController/doSaveOrUpdate" METHOD="POST" enctype="application/x-www-form-urlencoded" >
+		        <input id="id" name="id" type="hidden" value="$!{menu.id}">
+					<div class="row form-row m-l-20 m-r-20 xs-m-l-10 xs-m-r-10">
+                      <div class="col-md-6 col-sm-6">
+            			<label class="form-label">菜单名称</label>
+                        <input class="form-control" id="menuName" name="menuName" placeholder="填写菜单名称" type="text" value="$!{menu.menuName}">
+                      </div>
+                      <div class="col-md-6 col-sm-6">
+            			<label class="form-label">选择父级菜单</label>
+						<input type="hidden" id="parentId" name="parentId" value="$!{menu.parentId}" />
+                        <input id="combotree" class="form-control" placeholder="选择父级菜单" type="text" value="$!{menu.parentId}">
+                      </div>
+                    </div>
+					
+    		        <div class="row form-row m-l-20 m-r-20 xs-m-l-10 xs-m-r-10">
+                      <div class="col-md-12">
+            			<label class="form-label">跳转地址</label>
+                        <input class="form-control" id="url" name="url" placeholder="填写跳转地址" type="text" value="$!{menu.url}">
+                      </div>
+                    </div>
+    		        <div class="row form-row m-l-20 m-r-20 xs-m-l-10 xs-m-r-10">
+                      <div class="col-md-12">
+            			<label class="form-label">排序顺序</label>
+                        <input class="form-control" id="orderNum" name="orderNum" placeholder="填写排序顺序" type="text" value="$!{menu.orderNum}">
+                      </div>
+                    </div>
+    		        <div class="row form-row m-l-20 m-r-20 xs-m-l-10 xs-m-r-10">
+                      <div class="col-md-12">
+            			<label class="form-label">图标class</label>
+                        <input class="form-control" id="icon" name="icon" placeholder="填写图标class" type="text" value="$!{menu.icon}">
+                      </div>
+                    </div>
+    		        #*<div class="row form-row m-l-20 m-r-20 xs-m-l-10 xs-m-r-10">
+                      <div class="col-md-12">
+            			<label class="form-label">是否忽略前缀</label>
+                        <input class="form-control" id="isIgnorePre" name="isIgnorePre" placeholder="填写YesOrNo" type="text" value="$!{menu.isIgnorePre}">
+                      </div>
+                    </div>
+    		        <div class="row form-row m-l-20 m-r-20 xs-m-l-10 xs-m-r-10">
+                      <div class="col-md-12">
+            			<label class="form-label">请求前处理地址</label>
+                        <input class="form-control" id="preHandleUrl" name="preHandleUrl" placeholder="填写请求前处理地址" type="text" value="$!{menu.preHandleUrl}">
+                      </div>
+                    </div>*#
+    		        <div class="row form-row m-l-20 m-r-20 xs-m-l-10 xs-m-r-10">
+                      <div class="col-md-12">
+            			<label class="form-label">备注</label>
+                        <input class="form-control" id="remark" name="remark" placeholder="填写备注" type="text" value="$!{menu.remark}">
+                      </div>
+                    </div>
+      </form>
+  </div>
+  <!-- END TAG INPUTS / FILE UPLOADER CONTROLS-->
+  <!-- END PAGE -->

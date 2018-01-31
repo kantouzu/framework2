@@ -1,0 +1,94 @@
+package com.cisdi.business.service.impl;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.cisdi.base.common.json.AjaxJson;
+import com.cisdi.base.common.responseBean.LayGridReturn;
+import com.cisdi.base.util.BaseUtil;
+import com.cisdi.business.dao.DictionaryDao;
+import com.cisdi.business.entity.Dictionary;
+import com.cisdi.business.example.DictionaryExample;
+import com.cisdi.business.service.DictionaryService;
+
+@Service
+public class DictionaryServiceImpl implements DictionaryService {
+
+    @Autowired
+    private DictionaryDao dictionaryDao;
+    
+    @Override
+    public Dictionary selectByPrimaryKey(Integer id) {
+        Dictionary result = dictionaryDao.selectByPrimaryKey(id);
+        return result;
+    }
+    
+    @Override
+    public List<Map<String, Object>> selectByExample(DictionaryExample  record) {
+        List<Map<String, Object>> result = dictionaryDao.selectByExample(record);
+        return result;
+    }    
+
+    @Override
+    @Transactional
+    public AjaxJson insertSelective(Dictionary record) {
+         int resultKey = dictionaryDao.insertSelective(record);
+         return AjaxJson.returnJsonObj(resultKey != 0?true:false);
+    }   
+    
+    @Override
+    @Transactional
+    public AjaxJson deleteByExample(DictionaryExample  record) {
+        int resultKey = dictionaryDao.deleteByExample(record);
+        return AjaxJson.returnJsonObj(resultKey != 0?true:false);
+    }
+    
+    @Override
+    @Transactional
+    public AjaxJson deleteByExampleInLogic(DictionaryExample  record) {
+        int resultKey = dictionaryDao.deleteByExampleInLogic(record);
+        return AjaxJson.returnJsonObj(resultKey != 0?true:false);
+    }
+
+    @Override
+    @Transactional
+    public AjaxJson deleteByPrimaryKey(Integer id) {
+        int resultKey = dictionaryDao.deleteByPrimaryKey(id);
+        return AjaxJson.returnJsonObj(resultKey != 0?true:false);
+    }
+    
+    @Override
+    public AjaxJson countByExample(DictionaryExample example){
+        Integer count = dictionaryDao.countByExample(example);
+        return AjaxJson.returnJsonObj(true, count);
+    }
+    
+    @Override
+    @Transactional
+    public AjaxJson updateByPrimaryKeySelective(Dictionary entity){
+        int resultKey = dictionaryDao.updateByPrimaryKeySelective(entity);
+        return AjaxJson.returnJsonObj(resultKey != 0?true:false);
+    }
+    
+    @Override
+	public LayGridReturn selectDataGridByExample(DictionaryExample record) {
+		return new LayGridReturn(0, "", dictionaryDao.selectByExample(record), dictionaryDao.countByExample(record));
+	}
+	
+	@Override
+    @Transactional
+    public AjaxJson saveOrUpdate(Dictionary entity){
+		Integer id = entity.getId();
+		if(BaseUtil.isEmpty(id)){
+			dictionaryDao.insertSelective(entity);
+		}else{
+			dictionaryDao.updateByPrimaryKeySelective(entity);
+		}
+        return AjaxJson.returnJsonObj(true);
+    }
+    
+}

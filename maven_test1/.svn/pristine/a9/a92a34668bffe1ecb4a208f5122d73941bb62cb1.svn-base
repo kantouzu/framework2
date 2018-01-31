@@ -1,0 +1,72 @@
+$(function() {
+	//加载数据网格
+	loadDateGrid();
+})
+
+function loadDateGrid(){
+	Utils.layerDatagrid({
+		//这里是datagrid参数
+		url : Utils.getRootPath() + "/logInfoController/dataList", 
+		fields : [{field : 'id',title : 'ID',width : '5%',sort : true,fixed : 'left'}
+                        ,{field : 'userId',title : '用户id',width : '20%'}
+                        ,{field : 'ipAddress',title : 'ip地址',width : '20%'}
+                        ,{field : 'moduleType',title : '模块名称',width : '20%'}
+                        ,{field : 'businessType',title : '业务类型',width : '20%'}
+                        ,{field : 'operation',title : '操作内容',width : '20%'}
+                        ,{field : 'isSuccess',title : 'YesOrNo',width : '20%'}
+                        ,{field : 'requestParam',title : '请求参数',width : '20%'}
+                        ,{field : 'responseResult',title : '返回结果字符串',width : '20%'}
+                        ,{field : 'errMsg',title : '异常信息',width : '20%'}
+                        ,{field : 'remark',title : '备注',width : '20%'}
+                        ,{field : 'clientType',title : 'ClientType',width : '20%'}
+                        ,{field : 'createTime',title : '注册时间',width : '20%'}
+                        ,{field : 'updateTime',title : '更新时间',width : '20%'}
+                        ,{field : 'deleteflag',title : 'DeleteFlag',width : '20%'}
+				,{fixed : 'right',width : 150,align : 'center',toolbar : '#toolbar'} // 这里的toolbar值是模板元素的选择器
+				]
+	}, 
+	//这里是tool工具栏方法
+	{
+		edit : edit, 
+		del : delInLogic,
+		detail : detail
+	});
+}
+
+//新增页面
+function add() {
+	Utils.createCommonWindow({
+		title : '新增信息', 
+		url : Utils.getRootPath() + "/logInfoController/goAddOrEdit"
+	});
+}
+
+//编辑页面
+function edit(id) {
+	Utils.createCommonWindow({
+		title : '编辑信息', 
+		url : Utils.getRootPath() + "/logInfoController/goAddOrEdit?id=" + id
+	});
+}
+
+//查询页面
+function detail(id) {
+	Utils.createWindowWithoutBtn({
+		title : '查询信息', 
+		url : Utils.getRootPath() + "/logInfoController/goAddOrEdit?id=" + id + "&isCheckOnly=true"
+	});
+}
+
+//提交真删除
+function del(ids) {
+	Utils.commonAjaxHandler(Utils.getRootPath() + "/logInfoController/batchDelete", {
+		ids : JSON.stringify(ids)
+	});
+}
+
+//提交逻辑删除
+function delInLogic(ids) {
+	Utils.commonAjaxHandler(Utils.getRootPath() + "/logInfoController/batchDeleteInLogic", {
+		ids : JSON.stringify(ids)
+	});
+}

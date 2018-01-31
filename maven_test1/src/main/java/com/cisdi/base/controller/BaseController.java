@@ -1,0 +1,178 @@
+package com.cisdi.base.controller;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.cisdi.base.common.enums.CommonEnumType.DeleteFlag;
+import com.cisdi.base.common.enums.CommonEnumType.UserTypeCode;
+import com.cisdi.base.common.json.AjaxJson;
+import com.cisdi.base.util.BaseUtil;
+import com.cisdi.business.common.SessionTokenLoader;
+import com.cisdi.business.entity.RoleInfo;
+import com.cisdi.business.entity.SessionToken;
+import com.cisdi.business.entity.UserInfo;
+import com.cisdi.business.example.SessionTokenExample;
+import com.cisdi.business.example.UserRelRoleExample;
+import com.cisdi.business.service.RoleInfoService;
+import com.cisdi.business.service.SessionTokenService;
+import com.cisdi.business.service.UserInfoService;
+import com.cisdi.business.service.UserRelRoleService;
+import com.cisdi.business.util.BusinessUtil;
+
+public class BaseController {
+	
+	@Autowired
+	private UserInfoService userInfoService;
+	@Autowired
+	private RoleInfoService roleInfoService;
+	@Autowired
+	private UserRelRoleService userRelRoleService;
+	@Autowired
+	private SessionTokenService sessionTokenService;
+	
+	/**
+	 * Logger for this class
+	 */
+	private static final Logger logger = Logger.getLogger(BaseController.class);
+
+	protected ModelAndView createSingleView(String path){
+        ModelAndView view = new ModelAndView();
+        view.setViewName(path);
+        return view;
+    }
+    
+    protected ModelAndView createLayoutView(String path){   
+    
+	    ModelAndView view = new ModelAndView("layout/layout");
+        view.addObject("resource_path", "layout/resource.vm");
+        view.addObject("header_path", "layout/header.vm");
+        view.addObject("title", "租赁管理系统");
+        view.addObject("left_path", "layout/userLeft.vm");
+        view.addObject("content_path", path + ".vm");
+        return view;
+    }
+    protected ModelAndView createTreeLayoutView(String path, HttpServletRequest req){
+        ModelAndView view = new ModelAndView("layout/layout");
+        view.addObject("resource_path", "layout/resource.vm");
+        view.addObject("header_path", "layout/header.vm");
+        view.addObject("left_path", BaseUtil.isEmpty(req.getSession().getAttribute("user"))?"":"layout/userLeft.vm");
+        view.addObject("content_path", path + ".vm");
+        view.addObject("pathInfo", req.getPathInfo());
+        /*//查询当前在线用户数量
+        HttpSession session = req.getSession();
+        ServletContext application = session.getServletContext();
+        HashSet<String> sessions = (HashSet<String>) application.getAttribute("sessions");
+        int onlineNumber = sessions.size();*/
+        return view; 
+    }
+    
+    /**
+     * 验证token
+     * @param paramMap
+     * @return
+     */
+    public AjaxJson validToken(Map<String, Object> paramMap){
+    	String token = BaseUtil.retStr(paramMap.get("token"));
+    	//在缓存中找token
+    	Date expireTime = SessionTokenLoader.getInstance().getObjectByKey(token);
+    	if(BaseUtil.isEmpty(expireTime))
+    		//找不到视为未登录
+    		return AjaxJson.returnJsonObj(false, "请先登录");
+    	else {
+    		//找到了再看是否过期
+    		SessionToken sessionToken = new SessionToken();
+    		sessionToken.setExpireTime(expireTime);
+    		if(BusinessUtil.isTokenInvalid(sessionToken)){
+    			//已过期
+    			return AjaxJson.returnJsonObj(false, "当前登录已失效，请重新登录");
+    		}
+    	}
+    	return AjaxJson.returnJsonObj(true);
+    }
+    
+    /**
+     * 获取session的登录用户
+     * @param req
+     * @return
+     */
+    public AjaxJson getSessionUser(HttpServletRequest req){
+    	return AjaxJson.returnJsonObj(true, (UserInfo) req.getSession().getAttribute("user"));
+    }
+    
+    /**
+     * 获取token的登录用户
+     * @param req
+     * @return
+     */
+    public AjaxJson getTokenUser(HttpServletRequest req){
+    	String token = req.getHeader("session_token");
+    	if(BaseUtil.isEmpty(token))
+    		return AjaxJson.returnJsonObj(false, "请求头中token不能为空");
+    	SessionToken sessionToken = new SessionToken();
+    	sessionToken.setToken(token);
+    	sessionToken.setExpireTime(SessionTokenLoader.getInstance().getObjectByKey(token));
+    	if(BusinessUtil.isTokenInvalid(sessionToken))
+    		return AjaxJson.returnJsonObj(false, "当前登录态已失效，请重新登录");
+    	SessionTokenExample sessionTokenExample = new SessionTokenExample();
+    	sessionTokenExample.or().andTokenEqualTo(token)
+    							.andDeleteflagEqualTo(DeleteFlag.未删除.getValue());
+    	List<SessionToken> sessionTokenList = 
+    			sessionTokenService.selectByExample(sessionTokenExample);
+    	if(BaseUtil.isEmpty(sessionTokenList))
+    		return AjaxJson.returnJsonObj(false, "你的token持久化错误，请重新登录");
+    	Integer userId = sessionTokenList.get(0).getUserId();
+    	UserInfo userInfo = userInfoService.selectByPrimaryKey(userId);
+    	return AjaxJson.returnJsonObj(true, userInfo);
+    }
+    
+    /**
+     * 输出excel
+     * @param wb
+     * @param response
+     * @param fileName
+     * @throws IOException
+     *//*
+    public void writeResponseExcelStream(XSSFWorkbook wb, HttpServletResponse response, String fileName) throws IOException{
+    	response.addHeader("content-type", "application/x-msdownload");
+        response.addHeader("Content-Disposition", "attachment;filename=" + new String((fileName).getBytes("GB2312"), "ISO-8859-1"));
+        ServletOutputStream out = response.getOutputStream();
+        response.setContentType("application/vnd.ms-excel;charset=gb2312");
+        response.setContentType("application/vnd.ms-excel;charset=gb2312");
+        wb.write(out);
+        out.flush();
+        out.close();
+    }*/
+    
+    /**
+	 * 验证是否是超管
+	 * @param user
+	 * @return
+	 */
+	public boolean isSuperAdmin(UserInfo user){
+		boolean result = false;
+		Integer userId = user.getId();
+        UserRelRoleExample userRelRoleExample = new UserRelRoleExample();
+        userRelRoleExample.or().andUserIdEqualTo(userId)
+        						.andDeleteflagEqualTo(DeleteFlag.未删除.getValue());
+        List<Map<String, Object>> userRelRoleList = 
+        		userRelRoleService.selectByExample(userRelRoleExample);
+        if(!BaseUtil.isEmpty(userRelRoleList)){
+        	for (Map<String, Object> userRelRole : userRelRoleList) {
+        		Integer roleId = Integer.parseInt(BaseUtil.retStr(userRelRole.get("roleId")));
+        		RoleInfo role = roleInfoService.selectByPrimaryKey(roleId);
+				if(UserTypeCode.超级管理员.getValue().equals(BaseUtil.retStr(role.getRoleCode()))){
+					result = true;
+					break;
+				}
+			}
+        }
+        return result;
+	}
+}

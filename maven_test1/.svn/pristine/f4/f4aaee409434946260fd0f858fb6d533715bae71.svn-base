@@ -1,0 +1,22 @@
+$(function(){
+	layui.use('table', function(){
+		  var table = layui.table;
+		  
+		  //第一个实例
+		  table.render({
+		    elem: '#datagrid'
+		    ,height: 515
+		    ,url: Utils.getRootPath() + "/userInfoController/dataList" //数据接口
+		    ,page: true //开启分页
+		    ,cols: [[ //表头
+		      {field: 'id', title: 'ID', width:100, sort: true, fixed: 'left'}
+		      ,{field: 'userName', title: '用户名', width:100}
+		      ,{field: 'name', title: '性名', width:100, sort: true}
+		      ,{field: 'phone', title: '手机号', width:100} 
+		      ,{field: 'email', title: '邮箱', width: 100}
+		    ]]
+		  });
+		  
+		});
+		 
+})

@@ -1,0 +1,28 @@
+package com.cisdi.business.service;
+
+import java.util.List;
+import com.cisdi.base.common.json.AjaxJson;
+import com.cisdi.base.common.responseBean.LayGridReturn;
+import com.cisdi.business.entity.LogInfo;
+import com.cisdi.business.example.LogInfoExample;
+
+public interface LogInfoService {
+    
+    LogInfo selectByPrimaryKey(Integer id);
+
+    List<LogInfo> selectByExample(LogInfoExample record);
+
+    AjaxJson insertSelective(LogInfo record);
+    
+    AjaxJson deleteByPrimaryKey(Integer id);
+    
+    AjaxJson deleteByExample(LogInfoExample example);
+    
+    AjaxJson countByExample(LogInfoExample example);
+    
+    AjaxJson updateByPrimaryKeySelective(LogInfo entity);
+    
+    LayGridReturn selectDataGridByExample(LogInfoExample record);
+    
+    AjaxJson saveOrUpdate(LogInfo entity);
+}

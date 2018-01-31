@@ -1,0 +1,35 @@
+function showIframePageContent(url, preHandleUrl){
+	if(!Utils.isEmpty(preHandleUrl)){
+		/*var loading = layer.load(1);
+		$.ajax({
+    		type: 'post',
+    		url: Utils.getRootPath()+"/"+preHandleUrl,
+    		success: function(data, textStatus){
+				layer.close(loading);
+    			if(data.success){
+    				url += '&userEntrpCode='+userEntrpCode+'&userName='+userName+'&userEntrpLevel='+userEntrpLevel+'&checkUserTypeCode='+checkUserTypeCode+'&personId='+userId+'&isBranchComp='+isBranchComp;
+                		var iframe;
+                      iframe = document.createElement('iframe');
+                      iframe.setAttribute('src',url);
+                      iframe.setAttribute('width','100%');
+                      iframe.setAttribute('height','700');
+                	  $('#searchListId').html(iframe);
+    			}else{
+    				Utils.showToastFail(data.msg);
+    			}
+    		},
+    		error: function(){
+				layer.close(loading);
+    			Utils.showToastFail(loadErrorMsg);
+    		}
+    	});*/
+	}else{
+	  var iframe;
+      iframe = document.createElement('iframe');
+      iframe.setAttribute('src',url);
+      iframe.setAttribute('width','100%');
+      iframe.setAttribute('height','730');
+	  $('#page-content').html(iframe);
+	}
+	
+}

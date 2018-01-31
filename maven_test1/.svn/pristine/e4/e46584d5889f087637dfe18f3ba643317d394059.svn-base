@@ -1,0 +1,346 @@
+package com.cisdi.base.controller;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.apache.log4j.Logger;
+import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.cisdi.base.common.enums.CommonEnumType.FinishSituationRecordType;
+import com.cisdi.base.util.BaseUtil;
+
+public class BaseController {
+	/**
+	 * Logger for this class
+	 */
+	private static final Logger logger = Logger.getLogger(BaseController.class);
+
+	protected ModelAndView createSingleView(String path){
+        ModelAndView view = new ModelAndView();
+        view.setViewName(path);
+        return view;
+    }
+    
+    protected ModelAndView createLayoutView(String path){   
+    
+	    ModelAndView view = new ModelAndView("layout/layout");
+        view.addObject("resource_path", "layout/resource.vm");
+        view.addObject("header_path", "layout/header.vm");
+        view.addObject("title", "租赁管理系统");
+        view.addObject("left_path", "layout/userLeft.vm");
+        view.addObject("content_path", path + ".vm");
+        return view;
+    }
+    protected ModelAndView createTreeLayoutView(String path, HttpServletRequest req){
+        ModelAndView view = new ModelAndView("layout/layout");
+        view.addObject("resource_path", "layout/resource.vm");
+        view.addObject("header_path", "layout/header.vm");
+        view.addObject("left_path", BaseUtil.isEmpty(req.getSession().getAttribute("user"))?"":"layout/userLeft.vm");
+        view.addObject("content_path", path + ".vm");
+        view.addObject("pathInfo", req.getPathInfo());
+        /*//查询当前在线用户数量
+        HttpSession session = req.getSession();
+        ServletContext application = session.getServletContext();
+        HashSet<String> sessions = (HashSet<String>) application.getAttribute("sessions");
+        int onlineNumber = sessions.size();*/
+        return view; 
+    }
+    
+    @InitBinder
+    protected void dateBinder(WebDataBinder binder){
+        // The date format to parse or output your dates
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        // Create a new CustomDateEditor
+        CustomDateEditor editor = new CustomDateEditor(dateFormat, true);
+        // Register it as custom editor for the Date type
+        binder.registerCustomEditor(Date.class, editor);
+        
+    }
+    
+    /**
+     * 验证单点登录
+     * @param request
+     * @param response
+     * @return
+     * @throws Exception
+     */
+//    public UserInfo getUsersBySingleLogin(HttpServletRequest request,
+//    		HttpServletResponse response) throws Exception{
+//		String ticket = request.getParameter("iticket");
+//		if (StringUtils.isBlank(ticket)) {
+//			logger.error("获取iticket失败！");
+//			return null;
+//		}
+//		// 用户中心单点登录地址
+//		String centerUrl = GlobalConfigHolder.getProperty("singleLoginUrl");
+//		logger.info("单点登录地址:"+centerUrl);
+//		String appid = GlobalConfigHolder.getProperty("singleAppID");
+//		String param = "appid=" + appid + "&iticket=" + ticket;
+//		String result = HttpUtils.post(centerUrl, param, "GET", "utf-8");
+//		Map<String, Object> resultMap = new HashMap<String, Object>();
+//		if (StringUtils.isNotBlank(result)) {
+//			resultMap = (Map<String, Object>) JSONObject.fromObject(result);
+//		}
+//		if (!((Boolean) resultMap.get("status"))) {
+//			logger.error("单点登录失败：" + resultMap.get("result"));
+//			return null;
+//
+//		}
+//		String iopenid = resultMap.get("result").toString();
+////		//从用户中心获得登录用户信息
+//		Map<String, Object> userMap = UserCenterUtils.getCenterUserInfo(iopenid,appid);
+//		String nameString = null;//用户姓名
+//		String phoneString = null;//联系电话
+//		String email = null;//邮箱
+//		String teamName = null;//所在单位
+//		//循环获得用户信息
+//		for (Map.Entry<String, Object> entry : userMap.entrySet()) {
+//			if (!StringUtils.isEmpty(entry.getValue() == null ? "" : String
+//					.valueOf(entry.getValue()))) {
+//				if ("EMPLOYEENAME".equals(entry.getKey())) {
+//					nameString = String.valueOf(entry.getValue());
+//				} else if ("PHONE".equals(entry.getKey())) {
+//					phoneString = String.valueOf(entry.getValue());
+//				}else if("EMAIL".equals(entry.getKey())){
+//					email = String.valueOf(entry.getValue());
+//				}else if("TEAMNAME".equals(entry.getKey())){
+//					teamName = String.valueOf(entry.getValue());
+//				}
+//			}
+//		}
+//		// 通过iopenid获得用户信息
+//		UserInfo userInfo = null;
+//		// 判断UserInfo中是否存在该条信息（如果没有就存入UserInfo）
+//		userInfo = userInfoService.getUserInfoByCenterID(iopenid);
+//		//判断userInfo是否有值
+//		if(userInfo == null){//如果userinfo不存在,则添加用户
+//			//定义一个ctpUser
+//			User ctpUser = null;
+//			//通过邮箱和电话查询该ctp用户是否存在
+////			ctpUser = userInfoService.getctpUserByPhoneorEmail(phoneString, email);
+//			//通过iopenid查询用户
+//			ctpUser = userInfoService.getUserByName(iopenid);
+//			//如果ctp用户不存在,添加用户
+//			if(ctpUser == null){
+//				// 实例化一个ctpuser
+//				ctpUser = new User();
+//				ctpUser.setName(iopenid);
+//				//保存ctpuser
+//				userInfoService.saveCtpUser(ctpUser);
+//				//获得用户角色
+//				//获得机构name
+////				String roleName = GlobalConfigHolder.getProperty("roleName");
+////				Role role = userInfoService.getRoleByName(roleName);
+////				urDataMng.createU2Role(ctpUser, role);
+//			}
+//			//通过
+//			//实例化一个
+//			userInfo = new UserInfo();
+//			
+////			userInfo.setCenterUserID(iopenid);//设置用户中心用户ID
+////			userInfo.setIopenedID(iopenid);//设置我openedID
+//			userInfo.setName(nameString);//设置姓名
+//			userInfo.setPhone(phoneString);//设置电话
+//			userInfo.setEmail(email);//设置邮箱
+////			userInfo.setTeamName(teamName);//设置所在单位
+////			userInfo.setUser(ctpUser);//设置ctpUser
+//			//保存该用户信息
+//			 userInfoService.saveUserInfo(userInfo);
+//		}else{
+//			//定义一个ctpUser
+//			User ctpUser = null;
+//			//通过iopenid查询用户
+//			ctpUser = userInfoService.getUserByName(iopenid);
+//			//如果ctp用户不存在,添加用户
+//			if(ctpUser == null){
+//				// 实例化一个ctpuser
+//				ctpUser = new User();
+//				ctpUser.setName(iopenid);
+//				//保存ctpuser
+//				userInfoService.saveCtpUser(ctpUser);
+//				//获得用户角色
+//				//获得机构name
+////				String roleName = GlobalConfigHolder.getProperty("roleName");
+////				Role role = userInfoService.getRoleByName(roleName);
+////				urDataMng.createU2Role(ctpUser, role);
+//			}
+////			userInfo.setUser(ctpUser);//设置ctpUser
+//			userInfoService.updateUserInfo(userInfo);//保存更新
+//		}
+//    	return userInfo;
+//    }
+	
+    /**
+     * 获得当前报送期
+     * @return
+     */
+    public String getDeliveryTime(){
+    	//获得系统当前时间
+ 		Calendar a=Calendar.getInstance();
+ 		//获得当前年份
+ 		int year = a.get(Calendar.YEAR);
+ 		//获得当前月份
+ 		int month = a.get(Calendar.MONTH)+1;
+ 		//获得当前时间中的天
+ 		int day = a.get(Calendar.DATE);
+ 		
+ 		if(day<9&&month==1){
+ 			year=year-1;
+ 			month=12;
+		}else if(day<9&&month!=1){
+ 			month=month-1;
+ 		}
+		//TODO:10月份填报期临时更改(2)--已改回
+		/*if(month == 10 && (day >= 9 && day < 21)){
+			month=month-1;
+		}*/
+ 		String time=year+"-"+month;
+		return time;
+    	
+    }
+    
+    public Map<String, Object> getTimeMap(String engCode, String finishSituationRecordType){
+		Integer year = new Date().getYear()+1900;
+		Integer month = new Date().getMonth()+1;
+		Integer date = new Date().getDate();
+		//10月特殊需求，10月9号——10月20号的，全部转为10月8号
+		if(month == 10 && date >= 9 && date <= 20 ){
+			date = 8;
+		}
+		Map<String, Object> timeMap = new HashMap<String, Object>();
+		timeMap.put("finishSituationRecordType", finishSituationRecordType);
+		String returnMsg = "";
+		Calendar calendar = Calendar.getInstance(); 
+		//判断当前时间，是否属于常规填报日期（非7月10号—7月25号且非12月1号——2月最后一天）
+		if(((month == 7 && (date < 9)) || month != 7) && month != 1 && month != 2 ){
+			if(date >= 9){
+				//处理月份在12月的情况
+				Integer year1 = year;
+				Integer year2 = year;
+				Integer month1 = month;
+				Integer month2 = month;
+				if(month == 12){
+					year2 ++;
+					month2 = 1;
+				}
+				//这个时候算本月为起始月
+				Integer zeroNum1 = month1<10?1:0;
+				Integer zeroNum2 = (month2+1)<10?1:0;
+				timeMap.put("beginTime", year1+"-"+BaseUtil.addZero(month1, zeroNum1)+"-09");
+				//这里已经过滤掉了12月的可能，故无需判断
+				timeMap.put("endTime", year2+"-"+BaseUtil.addZero(month2, zeroNum2)+"-08");
+				returnMsg = "您在"+year1+"-"+BaseUtil.addZero(month1, zeroNum1)+"-09至"+year2+"-"+BaseUtil.addZero(month2, zeroNum2)+"-08期间内已经添加过记录";
+			}else{
+				//这个时候算上一月为起始月
+				//这里已经过滤掉了1月的可能，故无需判断
+				Integer zeroNum2 = month<10?1:0;
+				Integer zeroNum1 = (month-1)<10?1:0;
+				timeMap.put("beginTime", year+"-"+BaseUtil.addZero(month, zeroNum1)+"-09");
+				timeMap.put("endTime", year+"-"+BaseUtil.addZero(month+1, zeroNum2)+"-08");
+				returnMsg = "您在"+year+"-"+BaseUtil.addZero(month, zeroNum1)+"-09至"+year+"-"+BaseUtil.addZero(month+1, zeroNum2)+"-08期间内已经添加过记录";
+			}
+		}else{
+			//如果刚好处于特殊时间范围内
+			//如果是7月，则按照目前的逻辑，只可能是在[10, 25)范围内，这期间新增的记录只能是半年报调整数
+			if(month == 7){
+				timeMap.put("beginTime", year+"-"+BaseUtil.addZero(month, 1)+"-09");
+				timeMap.put("endTime", year+"-"+BaseUtil.addZero(month, 1)+"-31");
+				returnMsg = "您在"+year+"-"+BaseUtil.addZero(month, 1)+"-09至"+year+"-"+BaseUtil.addZero(month, 1)+"-31期间内已经添加过半年报记录";
+			}else if(month == 1 || month == 2){
+				//这期间可能会存在一条年报记录，也会存在本月的普通记录
+				//先判断是否是年报记录，如果是年报记录，则从12月1号至2月底判断
+				if(FinishSituationRecordType.年报.getValue().equals(finishSituationRecordType)){
+					Integer maxYear = 0;
+					Integer minYear = 0;
+					Integer febDates = 28; //二月份天数
+					//判断是不是12月    年报时间改为1月9——2月底    2017-11-17  by陈雨薇
+					/*if(month == 12){
+						minYear = year;
+						maxYear = year+1;
+						if(((GregorianCalendar)calendar).isLeapYear(maxYear)){
+							febDates = 29;
+						}
+						timeMap.put("beginTime", minYear+"-"+month+"-01");
+						timeMap.put("endTime", maxYear+"-02-"+febDates);
+					}else{*/
+						minYear = year - 1;
+						maxYear = year;
+						if(((GregorianCalendar)calendar).isLeapYear(maxYear)){
+							febDates = 29;
+						}
+						timeMap.put("beginTime", maxYear+"-01-09");
+						timeMap.put("endTime", maxYear+"-02-"+febDates);
+//					}
+					returnMsg = "您在"+minYear+"-01-09至"+maxYear+"-02-"+febDates+"期间内已经添加过年报记录";
+				}else if(FinishSituationRecordType.月报.getValue().equals(finishSituationRecordType)){
+					//根据不同的月份查看月报记录是否添加
+					//判断12月和1月的特殊日期
+					if(month == 12 && date < 9){
+						//如果是12月9号以内，则认为是11月的月报
+						timeMap.put("beginTime", year+"-"+(month-1)+"-09");
+						timeMap.put("endTime", year+"-"+month+"-08");
+						returnMsg = "您在"+year+"-"+(month-1)+"-09至"+year+"-"+month+"-08期间内已经添加过记录";
+					}else if(month == 12 && date >= 9){
+						//如果是12月大于等于10号的，则认为是12月份的月报
+						timeMap.put("beginTime", year+"-"+month+"-09");
+						timeMap.put("endTime", (year+1)+"-01-08");
+						returnMsg = "您在"+year+"-"+month+"-09至"+(year+1)+"-01-08期间内已经添加过记录";
+					}else if(month == 1 && date < 9){
+						//如果是1月9号以内，则认为是去年12月的月报
+						timeMap.put("beginTime", (year-1)+"-12-09");
+						timeMap.put("endTime", year+"-01-08");
+						returnMsg = "您在"+(year-1)+"-12-09至"+year+"-01-08期间内已经添加过记录";
+					}else{
+						if(date >= 9){
+							//这个时候算本月为起始月
+							timeMap.put("beginTime", year+"-"+BaseUtil.addZero(month, 1)+"-09");
+							//这里已经过滤掉了12月的可能，故无需判断
+							timeMap.put("endTime", year+"-"+BaseUtil.addZero((month+1), 1)+"-08");
+							returnMsg = "您在"+year+"-"+BaseUtil.addZero(month, 1)+"-09至"+year+"-"+BaseUtil.addZero((month+1), 1)+"-08期间内已经添加过记录";
+						}else{
+							//这个时候算上一月为起始月
+							//这里已经过滤掉了1月的可能，故无需判断
+							timeMap.put("beginTime", year+"-"+BaseUtil.addZero((month-1), 1)+"-09");
+							timeMap.put("endTime", year+"-"+BaseUtil.addZero(month, 1)+"-08");
+							returnMsg = "您在"+year+"-"+BaseUtil.addZero((month-1), 1)+"-09至"+year+"-"+BaseUtil.addZero(month, 1)+"-08期间内已经添加过记录";
+						}
+					}
+				}
+			}
+		}
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		resultMap.put("timeMap", timeMap);
+		resultMap.put("returnMsg", returnMsg);
+		return resultMap;
+	}
+    
+    /**
+     * 输出excel
+     * @param wb
+     * @param response
+     * @param fileName
+     * @throws IOException
+     *//*
+    public void writeResponseExcelStream(XSSFWorkbook wb, HttpServletResponse response, String fileName) throws IOException{
+    	response.addHeader("content-type", "application/x-msdownload");
+        response.addHeader("Content-Disposition", "attachment;filename=" + new String((fileName).getBytes("GB2312"), "ISO-8859-1"));
+        ServletOutputStream out = response.getOutputStream();
+        response.setContentType("application/vnd.ms-excel;charset=gb2312");
+        response.setContentType("application/vnd.ms-excel;charset=gb2312");
+        wb.write(out);
+        out.flush();
+        out.close();
+    }*/
+}

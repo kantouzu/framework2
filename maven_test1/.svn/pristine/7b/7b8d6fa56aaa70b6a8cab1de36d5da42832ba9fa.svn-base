@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cisdi.business.dao.LogInfoDao">
+
+  <resultMap id="BaseResultMap" type="com.cisdi.business.entity.LogInfo">
+		<id column="id" jdbcType="INTEGER" property="id" />
+		<result column="user_id" jdbcType="INTEGER" property="userId" />
+		<result column="ip_address" jdbcType="VARCHAR" property="ipAddress" />
+		<result column="module_type" jdbcType="VARCHAR" property="moduleType" />
+		<result column="operation" jdbcType="VARCHAR" property="operation" />
+		<result column="is_success" jdbcType="VARCHAR" property="isSuccess" />
+		<result column="request_param" jdbcType="VARCHAR" property="requestParam" />
+		<result column="response_result" jdbcType="VARCHAR" property="responseResult" />
+		<result column="err_msg" jdbcType="VARCHAR" property="errMsg" />
+		<result column="remark" jdbcType="VARCHAR" property="remark" />
+		<result column="client_type" jdbcType="VARCHAR" property="clientType" />
+		<result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+		<result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+		<result column="deleteflag" jdbcType="VARCHAR" property="deleteflag" />
+  </resultMap>
+  
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+#{listItem}                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+#{listItem}                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  
+  <sql id="Base_Column_List">
+		id,
+		user_id,
+		ip_address,
+		module_type,
+		operation,
+		is_success,
+		request_param,
+		response_result,
+		err_msg,
+		remark,
+		client_type,
+		create_time,
+		update_time,
+		deleteflag
+  </sql>  
+  
+  <select id="selectByExample" parameterType="com.cisdi.business.example.LogInfoExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    'true' as QUERYID,
+    <include refid="Base_Column_List" />
+    from log_info
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+    <if test="limitStart != null">
+      limit ${limitStart} , ${limitEnd}
+    </if>
+  </select>    
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from log_info
+    where id = #{id,jdbcType=Integer}
+  </select>
+  
+ <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from log_info
+    where id = #{id,jdbcType=Integer}
+  </delete>   
+  
+  <delete id="deleteByExample" parameterType="com.cisdi.business.example.LogInfoExample" >
+    delete from log_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  
+  <insert id="insertSelective" parameterType="com.cisdi.business.entity.LogInfo">
+    insert into log_info
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+		  <if test="id != null">
+			id,
+		  </if>		
+		  <if test="userId != null">
+			user_id,
+		  </if>		
+		  <if test="ipAddress != null">
+			ip_address,
+		  </if>		
+		  <if test="moduleType != null">
+			module_type,
+		  </if>		
+		  <if test="operation != null">
+			operation,
+		  </if>		
+		  <if test="isSuccess != null">
+			is_success,
+		  </if>		
+		  <if test="requestParam != null">
+			request_param,
+		  </if>		
+		  <if test="responseResult != null">
+			response_result,
+		  </if>		
+		  <if test="errMsg != null">
+			err_msg,
+		  </if>		
+		  <if test="remark != null">
+			remark,
+		  </if>		
+		  <if test="clientType != null">
+			client_type,
+		  </if>		
+		  <if test="createTime != null">
+			create_time,
+		  </if>		
+		  <if test="updateTime != null">
+			update_time,
+		  </if>		
+		  <if test="deleteflag != null">
+			deleteflag,
+		  </if>		
+    </trim>  
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id, jdbcType=INTEGER},
+			</if>
+			<if test="userId != null">
+				#{userId, jdbcType=INTEGER},
+			</if>
+			<if test="ipAddress != null">
+				#{ipAddress, jdbcType=VARCHAR},
+			</if>
+			<if test="moduleType != null">
+				#{moduleType, jdbcType=VARCHAR},
+			</if>
+			<if test="operation != null">
+				#{operation, jdbcType=VARCHAR},
+			</if>
+			<if test="isSuccess != null">
+				#{isSuccess, jdbcType=VARCHAR},
+			</if>
+			<if test="requestParam != null">
+				#{requestParam, jdbcType=VARCHAR},
+			</if>
+			<if test="responseResult != null">
+				#{responseResult, jdbcType=VARCHAR},
+			</if>
+			<if test="errMsg != null">
+				#{errMsg, jdbcType=VARCHAR},
+			</if>
+			<if test="remark != null">
+				#{remark, jdbcType=VARCHAR},
+			</if>
+			<if test="clientType != null">
+				#{clientType, jdbcType=VARCHAR},
+			</if>
+			<if test="createTime != null">
+				#{createTime, jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime != null">
+				#{updateTime, jdbcType=TIMESTAMP},
+			</if>
+			<if test="deleteflag != null">
+				#{deleteflag, jdbcType=VARCHAR},
+			</if>
+    </trim>
+  </insert>
+  
+  <select id="countByExample" parameterType="com.cisdi.business.example.LogInfoExample" resultType="java.lang.Integer" >
+    select count(1) from log_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  
+  <update id="updateByPrimaryKeySelective" parameterType="com.cisdi.business.entity.LogInfo">
+    update log_info 
+    <set>
+			<if test="id != null">
+				id = #{id,jdbcType=INTEGER},
+			</if>
+			<if test="userId != null">
+				user_id = #{userId,jdbcType=INTEGER},
+			</if>
+			<if test="ipAddress != null">
+				ip_address = #{ipAddress,jdbcType=VARCHAR},
+			</if>
+			<if test="moduleType != null">
+				module_type = #{moduleType,jdbcType=VARCHAR},
+			</if>
+			<if test="operation != null">
+				operation = #{operation,jdbcType=VARCHAR},
+			</if>
+			<if test="isSuccess != null">
+				is_success = #{isSuccess,jdbcType=VARCHAR},
+			</if>
+			<if test="requestParam != null">
+				request_param = #{requestParam,jdbcType=VARCHAR},
+			</if>
+			<if test="responseResult != null">
+				response_result = #{responseResult,jdbcType=VARCHAR},
+			</if>
+			<if test="errMsg != null">
+				err_msg = #{errMsg,jdbcType=VARCHAR},
+			</if>
+			<if test="remark != null">
+				remark = #{remark,jdbcType=VARCHAR},
+			</if>
+			<if test="clientType != null">
+				client_type = #{clientType,jdbcType=VARCHAR},
+			</if>
+			<if test="createTime != null">
+				create_time = #{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime != null">
+				update_time = #{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="deleteflag != null">
+				deleteflag = #{deleteflag,jdbcType=VARCHAR},
+			</if>
+   
+    </set>
+    where id = #{id,jdbcType=Integer}
+  </update>   
+  
+</mapper>

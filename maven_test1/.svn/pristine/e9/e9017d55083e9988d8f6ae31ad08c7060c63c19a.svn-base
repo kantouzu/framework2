@@ -1,0 +1,55 @@
+package com.cisdi.business.controller;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+import javax.management.relation.RoleInfo;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.cisdi.base.common.enums.CommonEnumType.AuditLevel;
+import com.cisdi.base.common.enums.CommonEnumType.UserTypeCode;
+import com.cisdi.base.common.enums.CommonEnumType.YesOrNo;
+import com.cisdi.base.controller.BaseController;
+import com.cisdi.base.util.BaseUtil;
+
+
+@Controller
+public class IndexController extends BaseController{
+	@RequestMapping("home")
+	public ModelAndView index(HttpServletRequest req) {
+		ModelAndView view = createTreeLayoutView("layout/index", req);
+		return view;
+	}
+	
+	@RequestMapping("top")
+	@ResponseBody
+	public ModelAndView top() {
+		ModelAndView mav=createSingleView("common/header");
+		return mav;
+	}
+	
+	@RequestMapping("left")
+	public ModelAndView left() {
+		return createSingleView("common/left");
+	}
+	
+	@RequestMapping("foot")
+	public ModelAndView foot() {
+		return createSingleView("common/footer");
+	}
+	@RequestMapping("main")
+	public ModelAndView main(HttpServletRequest request,
+            HttpServletResponse response) {
+		ModelAndView view = createLayoutView("common/main");
+		return view;
+	}
+
+}

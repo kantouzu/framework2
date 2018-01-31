@@ -1,0 +1,43 @@
+#parse("layout/resource.vm")
+<script src="${rc.contextPath}/resources/js/Dictionary/DictionaryEdit.js" type="text/javascript"></script>
+#parse("layout/tree_resource.vm")
+<script>
+	var isCheckOnly = $!isCheckOnly;
+</script>
+<!-- BEGIN CONTAINER -->
+<!-- BEGIN PAGE CONTAINER-->
+<div class="panel-body" >
+  <form class="animated fadeIn validate" id="formSubmit" action="${rc.contextPath}/dictionaryController/doSaveOrUpdate" METHOD="POST" enctype="application/x-www-form-urlencoded" >
+	        <input id="id" name="id" type="hidden" value="$!{dictionary.id}">
+			#if(!$!parentId)
+	        <div class="row form-row m-l-20 m-r-20 xs-m-l-10 xs-m-r-10">
+			  <div class="col-md-12">
+				<label class="form-label">字典类型</label>
+                <select class="wb" id="dicType" name="dicType" enumType="DicType" enumValue="$!{dictionary.dicType}" placeholder="选择字典类型" type="text" value="$!{roleInfo.roleCode}"></select>
+			  </div>
+              #*<div class="col-md-6 col-sm-6">
+				<label class="form-label">选择父级菜单</label>
+				<input type="hidden" id="parentId" name="parentId" value="$!{dictionary.parentId}" />
+                <input id="dics" class="form-control" placeholder="选择父级字典" type="text" value="$!{dictionary.parentId}">
+              </div>*#
+            </div>
+			#else
+			<input id="parentId" name="parentId" type="hidden" value="$!{parentId}">
+			<input id="dicType" name="dicType" type="hidden" value="$!{dictionary.dicType}">
+			#end
+	        <div class="row form-row m-l-20 m-r-20 xs-m-l-10 xs-m-r-10">
+              <div class="col-md-12">
+    			<label class="form-label">名称</label>
+                <input class="form-control" id="name" name="name" placeholder="填写名称" type="text" value="$!{dictionary.name}"/>
+              </div>
+            </div>
+	        <div class="row form-row m-l-20 m-r-20 xs-m-l-10 xs-m-r-10">
+              <div class="col-md-12">
+    			<label class="form-label">备注</label>
+                <input class="form-control" id="remark" name="remark" placeholder="填写备注" type="text" value="$!{dictionary.remark}"/>
+              </div>
+            </div>
+  </form>
+</div>
+<!-- END TAG INPUTS / FILE UPLOADER CONTROLS-->
+<!-- END PAGE -->

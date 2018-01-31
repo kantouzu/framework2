@@ -1,0 +1,65 @@
+var init = function(){
+	var grid = common.bootgrid("mcgHelperUserTable", {
+		isPaged: true,
+		url : baseUrl+'mcgHelperUserController/list.html',	
+		statusMapping : [],
+		filters : function(){
+			var filter = {};
+			var searchPhase = $("#searchPhase").val();			
+			if(searchPhase != '')
+				filter['searchPhase'] = searchPhase;
+			return filter;
+		},			
+		formatters: {
+			"commands": function(column, row) {
+				return "<button type='button' class='btn btn-info command-edit' data-row-id='" + row.id + "'><span class='zmdi zmdi-edit'></span> 编辑</button> " +
+				"<button type='button' class='btn btn-info command-delete' data-row-id=" + row.id + "><span class='zmdi zmdi-delete'></span> 删除</button> ";
+			}, "status" : function(column, row) {
+				return statusMap[row.status];
+			}
+			
+		}
+	}).on("loaded.rs.jquery.bootgrid", function(e) {
+		grid.find(".command-edit").on("click", function(e)
+		{
+			common.showAjaxModal(baseUrl+"mcgHelperUserController/edit.html", {"id":$(this).data("row-id")});
+		});
+		grid.find(".command-delete").on("click", function (e) {
+			var id = $(this).data("row-id");
+			common.confirm({
+				title: "确认删除吗?",
+				text: "删除数据不可恢复",
+				type: "warning",
+				showCancelButton: true,
+				confirmButtonColor: "#DD6B55",
+				confirmButtonText: "确认",
+				cancelButtonText: "取消",
+				closeOnConfirm: true,
+				closeOnCancel: true
+			}, function () {
+				common.ajax({
+					url: baseUrl+"mcgHelperUserController/delete.html",
+					data: {"id":id,
+					success: function (resp) {
+						common.alertOk("删除成功");
+						$('#mcgHelperUserTable').bootgrid("reload");
+					}
+				});
+			});
+		});			
+	});
+};
+
+$(function(){
+	init();
+
+	$('#addButton').click(function(){
+		common.showAjaxModal(baseUrl+"mcgHelperUserController/list.html", null);
+	});		
+	$('#searchBtn').click(function(){
+		$('#mcgHelperUserTable').bootgrid("reload");
+	});	
+	$('#refreshBtn').click(function(){
+		$('#mcgHelperUserTable').bootgrid("reload");
+	});		
+});

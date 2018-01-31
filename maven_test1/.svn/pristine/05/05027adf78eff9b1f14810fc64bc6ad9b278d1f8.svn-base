@@ -1,0 +1,103 @@
+package com.cisdi.business.entity;
+
+import java.util.Date;
+
+/* 读取表结构信息 */
+public class UserInfo {
+    
+    public UserInfo() {
+
+    }
+    
+    /* 自增主键  */
+    private Integer id;
+    /* 用户名  */
+    private String userName;
+    /* 密码  */
+    private String pwd;
+    /* 姓名  */
+    private String name;
+    /* 所属单位编码  */
+    private String departno;
+    /* 是否可用  */
+    private String usable;
+    /* 手机号码  */
+    private String phone;
+    /* 邮箱  */
+    private String email;
+    /* 注册时间  */
+    private Date createTime;
+    /* 更新时间  */
+    private Date updateTime;
+    /* 是否删除  */
+    private String deleteflag;
+    
+    public Integer getId() {
+        return this.id;
+    }
+    public String getUserName() {
+        return this.userName;
+    }
+    public String getPwd() {
+        return this.pwd;
+    }
+    public String getName() {
+        return this.name;
+    }
+    public String getDepartno() {
+        return this.departno;
+    }
+    public String getUsable() {
+        return this.usable;
+    }
+    public String getPhone() {
+        return this.phone;
+    }
+    public String getEmail() {
+        return this.email;
+    }
+    public Date getCreateTime() {
+        return this.createTime;
+    }
+    public Date getUpdateTime() {
+        return this.updateTime;
+    }
+    public String getDeleteflag() {
+        return this.deleteflag;
+    }
+   
+    public void setId(Integer id) {
+        this.id = id;
+    }
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+    public void setPwd(String pwd) {
+        this.pwd = pwd;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+    public void setDepartno(String departno) {
+        this.departno = departno;
+    }
+    public void setUsable(String usable) {
+        this.usable = usable;
+    }
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+    public void setEmail(String email) {
+        this.email = email;
+    }
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
+    }
+    public void setDeleteflag(String deleteflag) {
+        this.deleteflag = deleteflag;
+    }
+  
+}

@@ -1,0 +1,78 @@
+package com.cisdi.business.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.cisdi.base.controller.BaseController;
+import com.cisdi.business.entity.LogInfo;
+import com.cisdi.business.example.LogInfoExample;
+import com.cisdi.business.service.LogInfoService;
+
+import com.cisdi.base.common.enums.CommonEnumType.YesOrNo;
+import com.cisdi.base.common.json.AjaxJson;
+import com.cisdi.base.common.responseBean.LayGridReturn;
+import com.cisdi.business.requestBean.DataGrid;
+
+@Controller
+@RequestMapping(value="logInfoController")
+public class LogInfoController extends BaseController {
+
+    @Autowired
+    private LogInfoService logInfoService;
+    
+    @RequestMapping(value = "pageList")
+    public ModelAndView list(LogInfo logInfo, LogInfoExample logInfoExample) {
+        
+        ModelAndView mv = new ModelAndView();
+        mv.setViewName("LogInfo/LogInfoList");
+        return mv;
+    }
+    
+    @RequestMapping(value = "dataList")
+    @ResponseBody
+    public LayGridReturn dataList(LogInfo logInfo, LogInfoExample logInfoExample, DataGrid datagrid) {
+    	logInfoExample.setLimitStart(datagrid.getStartRow());
+    	logInfoExample.setLimitEnd(datagrid.getLimit());
+    	logInfoExample.setOrderByClause("order by id desc");
+    	logInfoExample.or().andDeleteflagEqualTo(YesOrNo.否.getValue());
+    	return logInfoService.selectDataGridByExample(logInfoExample);
+    	
+    }
+    
+    @RequestMapping(value = "goAddOrEdit")
+    public ModelAndView goAddOrEdit(LogInfo logInfo, LogInfoExample logInfoExample) {
+        
+        ModelAndView mv = new ModelAndView();
+        LogInfo entity = logInfoService.selectByPrimaryKey(logInfo.getId());
+        mv.setViewName("LogInfo/LogInfoEdit");
+        mv.addObject("logInfo", entity);
+        return mv;
+    }
+    
+    @RequestMapping(value = "doSaveOrUpdate", method=RequestMethod.POST)
+    @ResponseBody
+    public AjaxJson doSaveOrUpdate(LogInfo logInfo) {
+    	AjaxJson j = null;
+        try {
+        	j = logInfoService.saveOrUpdate(logInfo);
+        	return j;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return AjaxJson.returnJsonObj(false);
+		}
+    } 
+    
+    @RequestMapping(value = "delete", method=RequestMethod.POST)
+    @ResponseBody
+    public AjaxJson delete(Integer id) {
+        
+        return logInfoService.deleteByPrimaryKey(id);
+    }    
+}

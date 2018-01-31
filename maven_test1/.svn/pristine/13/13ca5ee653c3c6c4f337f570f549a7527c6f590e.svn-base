@@ -1,0 +1,34 @@
+package com.cisdi.business.entity;
+
+import com.cisdi.base.entity.BaseEntity;
+import java.util.Date;
+
+/* 读取表结构信息 */
+public class RoleRelMenu extends BaseEntity {
+    
+	private static final long serialVersionUID = 1L;
+    
+    public RoleRelMenu() {
+
+    }
+    
+    /* 角色编码  */
+    private String roleCode;
+    /* 菜单id  */
+    private Integer menuId;
+    
+    public String getRoleCode() {
+        return this.roleCode;
+    }
+    public Integer getMenuId() {
+        return this.menuId;
+    }
+   
+    public void setRoleCode(String roleCode) {
+        this.roleCode = roleCode;
+    }
+    public void setMenuId(Integer menuId) {
+        this.menuId = menuId;
+    }
+  
+}

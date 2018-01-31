@@ -1,0 +1,109 @@
+package com.cisdi.business.service.impl;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.cisdi.base.common.json.AjaxJson;
+import com.cisdi.base.common.responseBean.LayGridReturn;
+import com.cisdi.base.util.BaseUtil;
+import com.cisdi.base.util.DepartUtils;
+import com.cisdi.business.dao.DepartInfoDao;
+import com.cisdi.business.entity.DepartInfo;
+import com.cisdi.business.example.DepartInfoExample;
+import com.cisdi.business.responseBean.DepartModule;
+import com.cisdi.business.responseBean.DepartTree;
+import com.cisdi.business.responseBean.LayerTree;
+import com.cisdi.business.service.DepartInfoService;
+
+@Service
+public class DepartInfoServiceImpl implements DepartInfoService {
+
+    @Autowired
+    private DepartInfoDao departInfoDao;
+    
+    @Override
+    public DepartInfo selectByPrimaryKey(Integer id) {
+        DepartInfo result = departInfoDao.selectByPrimaryKey(id);
+        return result;
+    }
+    
+    @Override
+    public List<Map<String, Object>> selectByExample(DepartInfoExample  record) {
+        List<Map<String, Object>> result = departInfoDao.selectByExample(record);
+        return result;
+    }    
+
+    @Override
+    @Transactional
+    public AjaxJson insertSelective(DepartInfo record) {
+         int resultKey = departInfoDao.insertSelective(record);
+         return AjaxJson.returnJsonObj(resultKey != 0?true:false);
+    }   
+    
+    @Override
+    @Transactional
+    public AjaxJson deleteByExample(DepartInfoExample  record) {
+        int resultKey = departInfoDao.deleteByExample(record);
+        return AjaxJson.returnJsonObj(resultKey != 0?true:false);
+    }
+    
+    @Override
+    @Transactional
+    public AjaxJson deleteByExampleInLogic(DepartInfoExample  record) {
+        int resultKey = departInfoDao.deleteByExampleInLogic(record);
+        return AjaxJson.returnJsonObj(resultKey != 0?true:false);
+    }
+
+    @Override
+    @Transactional
+    public AjaxJson deleteByPrimaryKey(Integer id) {
+        int resultKey = departInfoDao.deleteByPrimaryKey(id);
+        return AjaxJson.returnJsonObj(resultKey != 0?true:false);
+    }
+    
+    @Override
+    public AjaxJson countByExample(DepartInfoExample example){
+        Integer count = departInfoDao.countByExample(example);
+        return AjaxJson.returnJsonObj(true, count);
+    }
+    
+    @Override
+    @Transactional
+    public AjaxJson updateByPrimaryKeySelective(DepartInfo entity){
+        int resultKey = departInfoDao.updateByPrimaryKeySelective(entity);
+        return AjaxJson.returnJsonObj(resultKey != 0?true:false);
+    }
+    
+    @Override
+	public LayGridReturn selectDataGridByExample(DepartInfoExample record) {
+		return new LayGridReturn(0, "", departInfoDao.selectByExample(record), departInfoDao.countByExample(record));
+	}
+	
+	@Override
+    @Transactional
+    public AjaxJson saveOrUpdate(DepartInfo entity){
+		Integer id = entity.getId();
+		if(BaseUtil.isEmpty(id)){
+			departInfoDao.insertSelective(entity);
+		}else{
+			departInfoDao.updateByPrimaryKeySelective(entity);
+		}
+        return AjaxJson.returnJsonObj(true);
+    }
+	
+	@Override
+	public List<DepartTree> getDepartList(Map<String, Object> param) {
+		List<DepartModule> dicData = departInfoDao.selectTreeDepartByCondition(param);
+		List<DepartTree> menus = DepartUtils.drawMenuDepartTree(dicData, null);
+		if(menus == null){
+			menus = new ArrayList<DepartTree>();
+		}
+		return menus;
+	}
+    
+}

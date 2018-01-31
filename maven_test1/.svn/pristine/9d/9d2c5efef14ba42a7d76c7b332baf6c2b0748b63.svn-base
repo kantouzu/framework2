@@ -1,0 +1,195 @@
+package com.cisdi.base.common.enums;
+
+import com.cisdi.base.util.BaseUtil;
+
+
+/**
+ * 
+ * @功能说明：枚举定义{ }
+ * @作者：xiangjz
+ * @创建日期： 2018-01-02
+ */
+public class CommonEnumType {
+
+	private static SystemResourceUtil util = SystemResourceUtil.getInstance();
+
+	/**
+	 * 根据key获取名称
+	 * 
+	 * @param val
+	 * @return
+	 */
+	public static String getEnumNameByKey(String val, String keys) {
+
+		Object key = util.resourceAsMap("comEnum_" + val + "_map").get(keys);
+		if (BaseUtil.isEmpty(key))
+			return "";
+		return (String) key;
+	}
+
+	/**
+	 * 用户类型代码
+	 */
+	public enum UserTypeCode {
+		超级管理员("1000"), 普通管理员("2000"), 录入人员("3000"), 分公司录入人员("3001"), 股份_集团本部录入人员("3002"), 
+		一级审批人员("4001"), 二级审批人员("6002"), 初审人员("40021"), 复审人员("40022"), 终审人员("40023"), 
+		三级审批人员("4003"), 集团审批人员("5001"), 股份审批人员("7001"), 股份外审批人员("7002"), 本部查询人员("8001"), 分公司查询人员("8002");
+
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		UserTypeCode(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 审核状态:(13-草稿,1-待确认，2-初审中，3-复审中，4-终审中，5-集团审核中，6-通过，7-退回)
+	 */
+	public enum CheckStatue {
+        待确认("1"), 三级审核中("2"), 二级初审中("3"), 二级复审中("8"), 二级终审中("9"), 集团初审中("4"), 集团复审中("5"), 集团终审中("10"), 股份审核中("11"), 股份外审核中("12"), 通过("6"), 退回("7"),草稿("13");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		CheckStatue(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 审核结果:0--不通过,1--通过
+	 */
+	public enum AuditResult {
+		不通过("0"), 通过("1");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		AuditResult(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 比较运算枚举:大于("0"),小于("1"),等于("2");
+	 */
+	public enum CompareCalculate {
+		大于("0"), 小于("1"), 等于("2");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		CompareCalculate(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 附件类型:
+	 */
+	public enum AttachType {
+		工程合同附件("1"), 房地产相关附件("2"), 消息附件("3");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		AttachType(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 未删除/已删除
+	 */
+	public enum DeleteFlag {
+		未删除("0"), 已删除("1");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		DeleteFlag(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 性别
+	 */
+	public enum GenderFlag {
+		女("f"), 男("m");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		GenderFlag(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 是/否
+	 */
+	public enum YesOrNo {
+		否("0"), 是("1");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		YesOrNo(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 日志记录模块名称
+	 */
+	public enum LogModuleType {
+		用户登录("0"),其他_水处理项目("1"),其他_贸易项目("2"),其他_其他项目("3"),建筑业_建筑业企业经营情况("4"),建筑业_总产值在外省完成情况("5"),建筑业_建筑企业房屋竣工情况("6"),
+        企业信息("7"),工程项目("8"),房地产_商品房项目("9"),房地产_保障安居项目("10"),房地产_一级土地项目("11"),房地产_城市建设项目("12"),房地产_其他房地产项目("13"),
+        资源项目("14"),制造类项目("15"),PPP项目("16"),年末统计人员情况("17"),分公司绑定("18")/*,个人信息("19")*/,用户管理("20"),菜单管理("21"),角色管理("22"),数据字典("23"),
+        数据流水("24"),消息相关("25"),报表相关("26"),基地信息("27"),其他("28"),附件("29");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		LogModuleType(String value) {
+			this.value = value;
+		}
+	}
+	
+	/**
+	 * 客户端种类
+	 */
+	public enum ClientType {
+		pc("0"),Android("1"),iOS("2"),wap("3"),other("4");
+		private String value;
+		
+		public String getValue() {
+			return value;
+		}
+		
+		ClientType(String value) {
+			this.value = value;
+		}
+	}
+}

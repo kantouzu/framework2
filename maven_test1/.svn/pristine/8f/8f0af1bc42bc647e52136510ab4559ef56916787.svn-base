@@ -1,0 +1,159 @@
+var menus;
+var updateOutput;
+$(function() {
+	//加载数据网格
+//	loadDateGrid();
+	
+//	var menus = eval('('+menuTree+')');
+	/*layui.use('tree', function(){
+	  var tree = layui.tree;
+	  tree({
+		  elem: '#datagrid' //传入元素选择器
+		  ,nodes: menus
+		});
+	});*/
+	
+	updateOutput = function(e)
+    {
+        var list   = e.length ? e : $(e.target),
+            output = list.data('output');
+        if (window.JSON) {
+            output.html(window.JSON.stringify(list.nestable('serialize')));//, null, 2));
+        } else {
+            output.html('JSON browser support required for this demo.');
+        }
+    };
+	
+	getMenuTreeData($('#nestable'));
+})
+
+function getMenuTreeData(selector){
+//	var index = loading();
+	$.ajax({
+		url: Utils.getRootPath() + "/menuController/getAllMenuTree", 
+		type : 'post',
+		dataType: 'json',
+		async:false,
+		success: function(d){
+//			Utils.closeLayerWindow(index);
+			if(d.success){
+				selector.empty();
+				loadMenuTree(d.obj, selector)
+				$('#nestable').nestable({
+					group: 1
+				})
+				.on('change', updateOutput);
+				updateOutput($('#nestable').data('output', $('#nestable-output')));
+			}else{
+				Utils.showToastFail(d.msg);
+			}
+		},
+		error: function(d){
+//			Utils.closeLayerWindow(index);
+			Utils.showToastFail(d.msg);
+		}
+	});
+}
+
+function loadMenuTree(menus, selector){
+	$.each(menus, function(index,obj){
+		selector.append(
+			'<ol class="dd-list">'+
+                '<li class="dd-item" data-id="'+obj.id+'" id="menuTree_'+obj.id+'">'+
+                  '<div class="dd-handle">'+obj.name+
+                  	'<div class="fr">'+
+	                  	'<a class="layui-btn layui-btn-xs" javascript=":;" onclick="edit('+obj.id+')" lay-event="edit">编辑</a>'+
+	                  	'<a class="layui-btn layui-btn-danger layui-btn-xs " javascript=":;" onclick="delInLogic('+obj.id+')" lay-event="del">删除</a>&nbsp'+
+                  	'</div>'+
+                  '</div>'+
+                '</li>'+
+            '</ol>'
+		)
+		if(!Utils.isEmpty(obj.children)){
+			var nextSelector = $('#menuTree_'+obj.id);
+			loadMenuTree(obj.children, nextSelector);
+		}
+	});
+}
+
+function loadDateGrid(){
+	Utils.layerDatagrid({
+		//这里是datagrid参数
+		url : Utils.getRootPath() + "/menuController/dataList", 
+		fields : [{field : 'id',title : 'ID',width : '5%',sort : true,fixed : 'left'}
+                        ,{field : 'menuName',title : '菜单名称',width : '20%'}
+                        ,{field : 'url',title : '跳转地址',width : '20%'}
+                        ,{field : 'parentId',title : '父节点Id',width : '20%'}
+                        ,{field : 'orderNum',title : '排序顺序',width : '20%'}
+                        ,{field : 'icon',title : '图标class',width : '20%'}
+                        ,{field : 'isIgnorePre',title : 'YesOrNo',width : '20%'}
+                        ,{field : 'preHandleUrl',title : '请求前处理地址',width : '20%'}
+                        ,{field : 'remark',title : '备注',width : '20%'}
+                        ,{field : 'createTime',title : '注册时间',width : '20%'}
+                        ,{field : 'updateTime',title : '更新时间',width : '20%'}
+                        ,{field : 'deleteflag',title : 'YesOrNo',width : '20%'}
+				,{fixed : 'right',width : 150,align : 'center',toolbar : '#toolbar'} // 这里的toolbar值是模板元素的选择器
+				]
+	}, 
+	//这里是tool工具栏方法
+	{
+		edit : edit, 
+		del : delInLogic,
+		detail : detail
+	});
+}
+
+//新增页面
+function add() {
+	Utils.createCommonWindow({
+		title : '新增信息', 
+		url : Utils.getRootPath() + "/menuController/goAddOrEdit",
+		func1 : function(){
+			getMenuTreeData($('#nestable'));
+		}
+	});
+}
+
+//编辑页面
+function edit(id) {
+	Utils.createCommonWindow({
+		title : '编辑信息', 
+		url : Utils.getRootPath() + "/menuController/goAddOrEdit?id=" + id,
+		func1 : function(){
+			getMenuTreeData($('#nestable'));
+		}
+	});
+}
+
+//查询页面
+function detail(id) {
+	Utils.createWindowWithoutBtn({
+		title : '查询信息', 
+		url : Utils.getRootPath() + "/menuController/goAddOrEdit?id=" + id + "&isCheckOnly=true"
+	});
+}
+
+//提交真删除
+function del(ids) {
+	Utils.commonAjaxHandler(Utils.getRootPath() + "/menuController/batchDelete", {
+		ids : JSON.stringify(ids)
+	},{
+		func1 : function(){
+			getMenuTreeData($('#nestable'));
+		}
+	});
+}
+
+//提交逻辑删除
+function delInLogic(ids) {
+	Utils.showConfirm('确定删除？', function(){
+		Utils.commonAjaxHandler(Utils.getRootPath() + "/menuController/batchDeleteInLogic", {
+			ids : JSON.stringify(ids)
+		},{
+			notReloadLayerTable : true,
+			func1 : function(){
+				getMenuTreeData($('#nestable'));
+			}
+		});
+	});
+}

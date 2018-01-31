@@ -1,0 +1,157 @@
+$(function() {
+	
+	$('#searchForm').find('select').bind("change", function(){
+		loadDateGrid();
+	})
+	$('#searchForm').find('input').bind("input", function(){
+		loadDateGrid();
+	})
+	
+	//加载数据网格
+	loadDateGrid();
+	//加载角色列表
+//	loadRoles($('#roles'));
+	
+})
+
+function loadDateGrid(){
+	Utils.layerDatagrid({
+		//这里是datagrid参数
+		url : Utils.getRootPath() + "/userInfoController/dataList", 
+		fields : [{field : 'id',title : 'ID',width : '5%',sort : true,fixed : 'left'}
+				,{field : 'userName',title : '用户名',width : '10%'}
+				,{field : 'name',title : '姓名',width : '10%',sort : true}
+				,{field : 'roleNames',title : '角色',width : '23%',sort : true}
+				,{field : 'phone',title : '手机号',width : '12%'}
+				,{field : 'email',title : '邮箱',width : '20%'}
+				,{field : 'usableName',title : '是否可用',width : '20%'}
+				,{fixed : 'right',width : 200,align : 'center',toolbar : '#toolbar'} // 这里的toolbar值是模板元素的选择器
+				]
+		,
+		requestParam : getRequestParam()
+	}, 
+	//这里是tool工具栏方法
+	{
+		edit : edit, 
+		del : delInLogic,
+		detail : detail
+	}, 
+	//这里是tool工具栏其它附加方法
+	{
+		func1 : showRights
+	});
+}
+
+//加载角色
+function showRights(id) {
+	$('#roleUserId').val(id);
+	loadRoles($('#roles'), id);
+	$('#rolesWindow').removeClass('displaynone');
+	$('#userWindow').addClass('width85');
+}
+
+//新增页面
+function add() {
+	Utils.createCommonWindow({
+		title : '新增用户', 
+		url : Utils.getRootPath() + "/userInfoController/goAddOrEdit"
+	});
+}
+
+//编辑页面
+function edit(id) {
+	Utils.createCommonWindow({
+		title : '编辑用户', 
+		url : Utils.getRootPath() + "/userInfoController/goAddOrEdit?id=" + id
+	});
+}
+
+//查询页面
+function detail(id) {
+	Utils.createWindowWithoutBtn({
+		title : '用户查询', 
+		url : Utils.getRootPath() + "/userInfoController/goAddOrEdit?id=" + id + "&isCheckOnly=true"
+	});
+}
+
+//提交真删除
+function del(ids) {
+	Utils.commonAjaxHandler(Utils.getRootPath() + "/userInfoController/batchDelete", {
+		ids : JSON.stringify(ids)
+	});
+}
+
+//提交逻辑删除
+function delInLogic(ids) {
+	Utils.commonAjaxHandler(Utils.getRootPath() + "/userInfoController/batchDeleteInLogic", {
+		ids : JSON.stringify(ids)
+	});
+}
+
+//渲染角色关联信息
+function loadRoles(selector, userId){
+	$.ajax({
+		url:Utils.getRootPath()+"/userRelRoleController/loadUserRoles",
+		type:"post",
+		dataType : "json",
+		data:{userId:userId},
+		async:false,
+		success : function(data){
+			if(data.success){
+				selector.empty();
+				selector.append(
+					//如果不选的话，狗日的参数为空，会报400，先暂时放一个防止空参数
+					'<input type="hidden" name="roleCode" value="test">'
+				)
+				var allRoles = data.attributes.allRoles;
+				var userRelRolesStr = data.attributes.userRelRolesStr;
+				$.each(allRoles, function(index,obj){
+					var checked = userRelRolesStr.indexOf(obj.value) >= 0?'checked="checked"':'';
+					selector.append(
+						'<div class="row-fluid">'+
+							'<div class="checkbox check-success">'+
+								'<input id="role'+index+'" type="checkbox" name="roleCode" value="'+obj.value+'" '+checked+'>'+
+								'<label for="role'+index+'">'+obj.name+'</label>'+
+							'</div>'+
+						'</div>'
+					)
+				});
+			}
+		}
+	});
+}
+
+//异步提交用户角色绑定请求
+function submitSaveUserRelRoles(thiz){
+	var form = $('#rolesForm');
+	var loading = Utils.loading();
+	form.ajaxSubmit({
+		type: "POST",
+		url:form.attr('action'),
+		dataType: "json",
+	    success: function(result){
+    	  if(result.success){
+    		  Utils.showToastSuccess(result.msg);
+    		  Utils.closeLayerWindow(loading);//如果设定了yes回调，需进行手工关闭
+		  }else{
+			  closeLayerWindow(loading);
+			  Utils.showToastFail(result.msg);
+		  }
+		},
+		error: function(result){
+			closeLayerWindow(loading);
+			Utils.showToastFail(loadErrorMsg);
+		}
+	});
+}
+
+//关闭角色权限右侧窗口
+function hideRoleWindow(){
+	$('#rolesWindow').addClass('displaynone');
+	$('#userWindow').removeClass('width85');
+}
+
+//获取请求查询条件参数
+function getRequestParam(){
+	return serializeObject($("#searchForm").ajaxForm());
+}

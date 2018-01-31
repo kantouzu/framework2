@@ -1,0 +1,138 @@
+package com.cisdi.business.controller;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.cisdi.base.common.constant.CommonConstant;
+import com.cisdi.base.controller.BaseController;
+import com.cisdi.business.entity.UserRelRole;
+import com.cisdi.business.example.UserRelRoleExample;
+import com.cisdi.business.service.UserRelRoleService;
+import com.cisdi.base.common.enums.CommonEnumType;
+import com.cisdi.base.common.enums.CommonEnumType.YesOrNo;
+import com.cisdi.base.common.enums.SystemResourceUtil;
+import com.cisdi.base.common.json.AjaxJson;
+import com.cisdi.base.common.responseBean.BaseDataBean;
+import com.cisdi.base.common.responseBean.LayGridReturn;
+import com.cisdi.base.util.BaseUtil;
+import com.cisdi.business.requestBean.DataGrid;
+import com.cisdi.business.common.annotation.SystemLog;
+
+@Controller
+@RequestMapping(value="userRelRoleController")
+public class UserRelRoleController extends BaseController {
+
+    @Autowired
+    private UserRelRoleService userRelRoleService;
+    
+    @RequestMapping(value = "dataList")
+    @ResponseBody
+    public LayGridReturn dataList(HttpServletRequest req, UserRelRole userRelRole, UserRelRoleExample userRelRoleExample, DataGrid datagrid) {
+    	userRelRoleExample.setLimitStart(datagrid.getStartRow());
+    	userRelRoleExample.setLimitEnd(datagrid.getLimit());
+    	userRelRoleExample.setOrderByClause("order by id desc");
+    	userRelRoleExample.or().andDeleteflagEqualTo(YesOrNo.否.getValue());
+    	return userRelRoleService.selectDataGridByExample(userRelRoleExample);
+    	
+    }
+    
+    @RequestMapping(value = "doSaveOrUpdate", method=RequestMethod.POST)
+    @ResponseBody
+    @SystemLog(module = CommonConstant.LOG_USER_REL_ROLE,description = "user_rel_role",businessType=CommonConstant.BUSINESS_ADDOREDIT)
+    public AjaxJson doSaveOrUpdate(HttpServletRequest req, UserRelRole userRelRole) {
+    	AjaxJson j = null;
+        try {
+        	j = userRelRoleService.saveOrUpdate(userRelRole);
+        	return j;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return AjaxJson.returnJsonObj(false);
+		}
+    } 
+    
+    @RequestMapping(value = "batchDelete", method=RequestMethod.POST)
+    @ResponseBody
+    @SystemLog(module = CommonConstant.LOG_USER_REL_ROLE,description = "user_rel_role",businessType=CommonConstant.BUSINESS_DEL)
+    public AjaxJson batchDelete(HttpServletRequest req, @RequestParam List<Integer> ids) {
+        UserRelRoleExample userRelRoleExample = new UserRelRoleExample();
+        userRelRoleExample.or().andIdIn(ids);
+        return userRelRoleService.deleteByExample(userRelRoleExample);
+    }    
+    
+    @RequestMapping(value = "batchDeleteInLogic", method=RequestMethod.POST)
+    @ResponseBody
+    @SystemLog(module = CommonConstant.LOG_USER_REL_ROLE,description = "user_rel_role",businessType=CommonConstant.BUSINESS_DELINLOGIC)
+    public AjaxJson batchDeleteInLogic(HttpServletRequest req, @RequestParam List<Integer> ids) {
+        UserRelRoleExample userRelRoleExample = new UserRelRoleExample();
+        userRelRoleExample.or().andIdIn(ids);
+        return userRelRoleService.deleteByExampleInLogic(userRelRoleExample);
+    }  
+    
+    /**
+     * 刷新用户角色权限，先删除对应userId的所有关联数据，再重新添加
+     * @param req
+     * @param roleCode
+     * @param userId
+     * @return
+     */
+    @RequestMapping(value = "flushUserRelRoles", method=RequestMethod.POST)
+    @ResponseBody
+    @SystemLog(module = CommonConstant.LOG_USER_REL_ROLE,description = "刷新用户角色权限",businessType=CommonConstant.BUSINESS_OTHER)
+    public AjaxJson flushUserRelRoles(HttpServletRequest req, @RequestParam List<String> roleCode, String userId) {
+    	AjaxJson j = null;
+        try {
+        	Map<String, Object> businessMap = new HashMap<String, Object>();
+        	businessMap.put("userId", userId);
+        	businessMap.put("roleCode", roleCode);
+        	return userRelRoleService.flushUserRelRoles(businessMap);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return AjaxJson.returnJsonObj(false);
+		}
+    }
+    
+    /**
+     * 根据userId获取所有角色权限，并对每个角色权限找到对应枚举值
+     * @param req
+     * @param userId
+     * @return
+     */
+    @RequestMapping(value = "loadUserRoles", method=RequestMethod.POST)
+    @ResponseBody
+    public AjaxJson loadUserRoles(HttpServletRequest req, Integer userId) {
+    	AjaxJson j = null;
+        try {
+        	UserRelRoleExample userRelRoleExample = new UserRelRoleExample();
+			userRelRoleExample.or().andUserIdEqualTo(userId);
+        	List<Map<String, Object>> userRelRoles = 
+        			userRelRoleService.selectByExample(userRelRoleExample);
+        	//先获取所有角色枚举list
+        	List<Object> allRoles = SystemResourceUtil.getCommonEnumList("UserTypeCode");
+        	String userRelRolesStr = "";
+        	if(!BaseUtil.isListEmpty(userRelRoles)){
+				for (Map<String, Object> userRelRole : userRelRoles) {
+					userRelRolesStr += BaseUtil.retStr(userRelRole.get("roleCode"))+",";
+				}
+        	}
+        	Map<String, Object> resultMap = new HashMap<String, Object>();
+        	resultMap.put("allRoles", allRoles);
+        	resultMap.put("userRelRolesStr", userRelRolesStr);
+        	return AjaxJson.returnJsonObj(true, resultMap);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return AjaxJson.returnJsonObj(false);
+		}
+    }
+}

@@ -1,0 +1,180 @@
+package com.cisdi.business.responseBean;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Date;
+
+/**
+ */
+public class MenuModule implements Serializable{
+	
+	private static final long serialVersionUID = 1L;
+	private Integer id;
+	private Date createTime;
+	private Date updateTime;
+	private String deleteflag;
+	// 菜单名称
+	private String menuName;
+	// 菜单跳转地址
+	private String url;
+	// 父节点Id
+	private Integer parentId;
+	// 备注
+	private String remark;
+	// 排序
+	private Integer orderNum;
+    // 子模块数量
+	private Integer childrenNum;
+	// 图标class
+	private String icon;
+	// url是否省略前缀
+	private String isIgnorePre;
+	// 提前处理url
+	private String preHandleUrl;
+
+	public Integer getId() {
+		return id;
+	}
+
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+
+	public Date getCreateTime() {
+		return createTime;
+	}
+
+
+	public void setCreateTime(Date createTime) {
+		this.createTime = createTime;
+	}
+
+
+	public Date getUpdateTime() {
+		return updateTime;
+	}
+
+
+	public void setUpdateTime(Date updateTime) {
+		this.updateTime = updateTime;
+	}
+
+
+	public String getDeleteflag() {
+		return deleteflag;
+	}
+
+
+	public void setDeleteflag(String deleteflag) {
+		this.deleteflag = deleteflag;
+	}
+
+
+	public String getMenuName() {
+		return menuName;
+	}
+
+
+	public void setMenuName(String menuName) {
+		this.menuName = menuName;
+	}
+
+
+	public String getUrl() {
+		return url;
+	}
+
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
+
+	public Integer getParentId() {
+		return parentId;
+	}
+
+
+	public void setParentId(Integer parentId) {
+		this.parentId = parentId;
+	}
+
+
+	public String getRemark() {
+		return remark;
+	}
+
+
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+
+
+	public Integer getOrderNum() {
+		return orderNum;
+	}
+
+
+	public void setOrderNum(Integer orderNum) {
+		this.orderNum = orderNum;
+	}
+
+
+	public Integer getChildrenNum() {
+		return childrenNum;
+	}
+
+
+	public void setChildrenNum(Integer childrenNum) {
+		this.childrenNum = childrenNum;
+	}
+
+
+	public String getIcon() {
+		return icon;
+	}
+
+
+	public void setIcon(String icon) {
+		this.icon = icon;
+	}
+
+
+	public String getIsIgnorePre() {
+		return isIgnorePre;
+	}
+
+
+	public void setIsIgnorePre(String isIgnorePre) {
+		this.isIgnorePre = isIgnorePre;
+	}
+
+
+	public String getPreHandleUrl() {
+		return preHandleUrl;
+	}
+
+
+	public void setPreHandleUrl(String preHandleUrl) {
+		this.preHandleUrl = preHandleUrl;
+	}
+
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj){
+			return true;
+		}
+		if(getClass() != obj.getClass()){
+			return false;
+		}
+		MenuModule other = (MenuModule) obj;
+		if(this.id != null || other.getId() != null){
+			return this.getId().equals(other.getId());
+		}else{
+			return this.menuName.equals(other.getMenuName());
+		}
+	}
+}

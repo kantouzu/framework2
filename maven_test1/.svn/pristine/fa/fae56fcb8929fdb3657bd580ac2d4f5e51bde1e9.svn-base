@@ -1,0 +1,91 @@
+package com.cisdi.base.common.interceptor;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+
+import com.cisdi.base.util.BaseUtil;
+import com.cisdi.business.entity.UserInfo;
+
+public class LoginInterceptor extends HandlerInterceptorAdapter
+{
+    
+    @Override
+    public boolean preHandle(HttpServletRequest request,
+                             HttpServletResponse response,
+                             Object handler) throws Exception
+    {
+        String URL = request.getRequestURI().toString();
+        int len = URL.split("/").length;
+//        System.err.println(URL);
+        UserInfo user=(UserInfo) request.getSession().getAttribute("user");
+        
+        if (URL.endsWith("login")) {
+            request.getSession().removeAttribute("userId");
+       
+           
+        }
+        
+        /*if(URL.contains("saveOrUpdate")){
+        	Map parameteMap = request.getParameterMap();
+			Collection params = parameteMap.values();
+			for (Iterator it = params.iterator(); it.hasNext();) {
+				String[] value = (String[]) it.next();
+				for (int i = 0; i < value.length; i++) {
+					String val = value[i];
+					if(!BaseUtil.isEmpty(val) && val.indexOf(",") > 0){
+						val = val.replace(",", "");
+						value[i] = new String(val.getBytes("ISO-8859-1"),"utf-8");
+					}
+				}
+			}
+        }*/
+        
+       // if (user == null && !URL.contains("login") && !URL.contains("resources")) {
+        if (BaseUtil.isEmpty(user) && !URL.contains("loginController") && !URL.contains("resources") && !URL.contains("submitReport")
+        		) {
+        	
+            if (null != request.getQueryString()) {
+                URL += "?" + request.getQueryString();
+            }
+            request.getSession().setAttribute("url", URL);
+            String contextPath = "";
+//            if(!BaseUtil.isEmpty(requestUrl) && !requestUrl.contains("localhost") && !requestUrl.contains(":")){
+//            	//视为域名地址
+//            	contextPath = requestUrl;
+//            }else{
+//            	contextPath = request.getContextPath();
+//            }
+            contextPath = request.getContextPath();
+            if(!BaseUtil.isEmpty(contextPath.endsWith("/")))
+            	contextPath += "/loginController";
+            else
+            	contextPath += "loginController";
+        	response.sendRedirect(contextPath);
+            return false;
+//        }else if(userId!=null && (URL.endsWith("SPACERENTMS")||URL.endsWith("SPACERENTMS/"))){
+        }else if(!BaseUtil.isEmpty(user) && URL.endsWith("/")){
+        	/*ServletContext application = request.getSession().getServletContext();
+        	String sessionId = (String) application.getAttribute(user.getUserName());
+        	if (null == sessionId || !sessionId.equals(request.getSession().getId())) {这说明用户已经在其他电脑或其它浏览器登录了，那么之前登录的session就无效了，自动被后面的登录给踢掉 
+        	    response.sendRedirect(request.getContextPath());// 跳转到首页或登录页面
+        	}*/
+        	
+        	//判断有几个"/"
+        	if(len<=1){
+        		URL +="home";
+        	}else{//去掉最后的"/"
+        		URL = URL.substring(0,URL.length()-1);
+        	}
+//        	if(URL.endsWith("SPACERENTMS")){
+//        		URL +="/home";
+//        	}else if(URL.endsWith("SPACERENTMS/")){
+//        	}
+        	request.getSession().setAttribute("url", URL);
+         	response.sendRedirect(URL);
+         	return false;
+        }
+        return true;
+    }
+}

@@ -1,0 +1,107 @@
+package com.cisdi.base.common.interceptor;
+
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Map;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+
+import com.cisdi.base.util.BaseUtil;
+
+public class LoginInterceptor extends HandlerInterceptorAdapter
+{
+    
+    @Override
+    public boolean preHandle(HttpServletRequest request,
+                             HttpServletResponse response,
+                             Object handler) throws Exception
+    {
+        String URL = request.getRequestURI().toString();
+        int len = URL.split("/").length;
+//        System.err.println(URL);
+    
+        if (URL.endsWith("login")) {
+            request.getSession().removeAttribute("userId");
+       
+           
+        }
+        
+        /*if(URL.contains("saveOrUpdate")){
+        	Map parameteMap = request.getParameterMap();
+			Collection params = parameteMap.values();
+			for (Iterator it = params.iterator(); it.hasNext();) {
+				String[] value = (String[]) it.next();
+				for (int i = 0; i < value.length; i++) {
+					String val = value[i];
+					if(!BaseUtil.isEmpty(val) && val.indexOf(",") > 0){
+						val = val.replace(",", "");
+						value[i] = new String(val.getBytes("ISO-8859-1"),"utf-8");
+					}
+				}
+			}
+        }*/
+        
+       // if (user == null && !URL.contains("login") && !URL.contains("resources")) {
+        if (!URL.contains("login") && !URL.contains("resources") && !URL.contains("submitReport")
+        		&& !URL.contains("businessOwner")
+        		&& !URL.contains("CommercialAuditController/AduitHouse")
+        		&& !URL.contains("auditBaseController/showAuditEnterpPage")
+        		&& !URL.contains("engineeringClass/auditEngListPage")
+        		&& !URL.contains("manufacturingEnterpriseController/auditManuBaseInfoPage")
+        		&& !URL.contains("resourceClass/auditResourcePage")
+        		&& !URL.contains("pppProjectController/auditPppPage")
+        		&& !URL.contains("otherproject/auditOtherPage")
+        		&& !URL.contains("baseExcelReport/auditExcelReportListPage")
+        		&& !URL.contains("IndexHomeController/getIndexCount")
+        		&& !URL.contains("IndexHomeController/inComeHttz")
+        		&& !URL.contains("baseExcelReport/oneTapGenerateEntrpJSXMQYHWCQKB")
+        		&& !URL.contains("NcInterface/tokenAccess")
+        		) {
+        	
+            if (null != request.getQueryString()) {
+                URL += "?" + request.getQueryString();
+            }
+            request.getSession().setAttribute("url", URL);
+            String contextPath = "";
+//            if(!BaseUtil.isEmpty(requestUrl) && !requestUrl.contains("localhost") && !requestUrl.contains(":")){
+//            	//视为域名地址
+//            	contextPath = requestUrl;
+//            }else{
+//            	contextPath = request.getContextPath();
+//            }
+            contextPath = request.getContextPath();
+            if(!BaseUtil.isEmpty(contextPath.endsWith("/")))
+            	contextPath += "/login";
+            else
+            	contextPath += "login";
+        	response.sendRedirect(contextPath);
+            return false;
+//        }else if(userId!=null && (URL.endsWith("SPACERENTMS")||URL.endsWith("SPACERENTMS/"))){
+        }else if(URL.endsWith("/")){
+        	/*ServletContext application = request.getSession().getServletContext();
+        	String sessionId = (String) application.getAttribute(user.getUserName());
+        	if (null == sessionId || !sessionId.equals(request.getSession().getId())) {这说明用户已经在其他电脑或其它浏览器登录了，那么之前登录的session就无效了，自动被后面的登录给踢掉 
+        	    response.sendRedirect(request.getContextPath());// 跳转到首页或登录页面
+        	}*/
+        	
+        	//判断有几个"/"
+        	if(len<=1){
+        		URL +="home";
+        	}else{//去掉最后的"/"
+        		URL = URL.substring(0,URL.length()-1);
+        	}
+//        	if(URL.endsWith("SPACERENTMS")){
+//        		URL +="/home";
+//        	}else if(URL.endsWith("SPACERENTMS/")){
+//        	}
+        	request.getSession().setAttribute("url", URL);
+         	response.sendRedirect(URL);
+         	return false;
+        }
+        return true;
+    }
+}

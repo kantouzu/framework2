@@ -1,0 +1,276 @@
+package com.cisdi.business.controller;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Executors;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.apache.commons.beanutils.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.cisdi.base.common.constant.CommonConstant;
+import com.cisdi.base.common.enums.CommonEnumType.ClientType;
+import com.cisdi.base.common.enums.CommonEnumType.DeleteFlag;
+import com.cisdi.base.common.enums.CommonEnumType.LogModuleType;
+import com.cisdi.base.common.enums.CommonEnumType.UserTypeCode;
+import com.cisdi.base.common.enums.CommonEnumType.YesOrNo;
+import com.cisdi.base.common.json.AjaxJson;
+import com.cisdi.base.controller.BaseController;
+import com.cisdi.base.util.BaseUtil;
+import com.cisdi.base.util.NetworkUtil;
+import com.cisdi.base.util.StringTools;
+import com.cisdi.business.common.SessionTokenLoader;
+import com.cisdi.business.common.annotation.SystemLog;
+import com.cisdi.business.entity.LogInfo;
+import com.cisdi.business.entity.SessionToken;
+import com.cisdi.business.entity.UserInfo;
+import com.cisdi.business.example.SessionTokenExample;
+import com.cisdi.business.example.UserInfoExample;
+import com.cisdi.business.example.UserRelRoleExample;
+import com.cisdi.business.responseBean.UserResp;
+import com.cisdi.business.service.LogInfoService;
+import com.cisdi.business.service.SessionTokenService;
+import com.cisdi.business.service.UserInfoService;
+import com.cisdi.business.service.UserRelRoleService;
+import com.cisdi.business.util.BusinessUtil;
+
+@Controller
+@RequestMapping(value="loginController")
+public class LoginController extends BaseController {
+
+	@Autowired
+	private LogInfoService logInfoService;
+    @Autowired
+    private UserInfoService userInfoService;
+    @Autowired
+    private UserRelRoleService userRelRoleService;
+    @Autowired
+    private SessionTokenService sessionTokenService;
+    
+    /**
+	 * 显示登录界面
+	 * @return
+	 */
+	@RequestMapping
+	public ModelAndView login(HttpServletRequest req){
+		if(!BaseUtil.isEmpty(getSessionUser(req))){
+			req.getSession().removeAttribute("user");
+			req.getSession().removeAttribute("roleMap");
+		}
+        ModelAndView view = new ModelAndView();
+        view.setViewName("layout/login");
+        view.addObject("resource_path", "layout/resource.vm");
+        return view;
+    }
+    
+    @RequestMapping(value = "mobileLogin")
+    @ResponseBody
+    @SystemLog(module = CommonConstant.LOG_LOGIN,description = "移动端登录",clientType="4")
+    public AjaxJson mobileLogin(HttpServletRequest req, HttpServletResponse resp, 
+    		String userName, String pwd) {
+    	try {
+    		//移动端登录
+    		//登录之后，查询session_token表中是否有该用户的token值，如果没有或者已过期，则删除后重新录入
+    		String md5Pwd = StringTools.encodePassword(pwd, "MD5");
+    		UserInfoExample userInfoExample = new UserInfoExample();
+    		//先验证用户是否存在
+    		userInfoExample.or().andUserNameEqualTo(userName);
+    		List<Map<String, Object>> userList = userInfoService.selectByExample(userInfoExample);
+    		if(BaseUtil.isEmpty(userList))
+    			return AjaxJson.returnJsonObj(false, "尚未注册该用户");
+    		//验证用户名密码匹配
+    		userInfoExample = new UserInfoExample();
+    		userInfoExample.or().andUserNameEqualTo(userName)
+    		.andPwdEqualTo(md5Pwd)
+    		.andDeleteflagEqualTo(DeleteFlag.未删除.getValue());
+    		userList = userInfoService.selectByExample(userInfoExample);
+    		if(BaseUtil.isEmpty(userList))
+    			return AjaxJson.returnJsonObj(false, "密码错误");
+    		//登录成功之后，查询是否存在未失效的token
+    		Integer userId = Integer.parseInt(BaseUtil.retStr(userList.get(0).get("ID")));
+    		SessionTokenExample sessionTokenExample = new SessionTokenExample(DeleteFlag.未删除.getValue());
+    		sessionTokenExample.or().andUserIdEqualTo(userId);
+    		List<SessionToken> tokenList = sessionTokenService.selectByExample(sessionTokenExample);
+    		AjaxJson reloadTokenResult = null;
+    		if(BaseUtil.isEmpty(tokenList) || BusinessUtil.isTokenInvalid(tokenList.get(0))){
+    			//代表从未登录或者token已失效，需要删除对应token数据并重新塞一条，之后将token放入内存
+    			UserInfo user = 
+    					(UserInfo) BaseUtil.transMapToBean(userList.get(0), UserInfo.class);
+    			reloadTokenResult = sessionTokenService.reloadTokenByUser(user);
+    			if(!reloadTokenResult.isSuccess())
+    				return AjaxJson.returnJsonObj(false, "会话注册失败");
+    		}
+    		//登录成功后，返回用户信息以及token到客户端本地保存
+    		UserResp userResp = new UserResp();
+    		BeanUtils.copyProperties(userResp, userList.get(0));
+    		Map<String, Date> tokenMap = (Map<String, Date>) reloadTokenResult.getObj();
+    		for (String token : tokenMap.keySet()) {
+    			userResp.setToken(token);
+    			break;
+			}
+    		return AjaxJson.returnJsonObj(true, userResp);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return AjaxJson.returnJsonObj(false);
+		}
+    }
+    
+    @RequestMapping(value = "pcLogin")
+    @ResponseBody
+    public AjaxJson pcLogin(HttpServletRequest req, HttpServletResponse resp, 
+    		String userName, String pwd) {
+    	final LogInfo logInfo = new LogInfo();
+    	try {
+    		//PC端登录
+    		Map<String, Object> paramMap = new HashMap<String, Object>();
+    		paramMap.put("userName", userName);
+    		paramMap.put("pwd", pwd);
+    		paramMap.put("clientType", ClientType.pc.getValue());
+    		AjaxJson j = userLogin(paramMap);
+			logInfo.setIpAddress(NetworkUtil.getIpAddress(req));
+			logInfo.setModuleType(LogModuleType.用户登录.getValue());
+			logInfo.setCreateTime(new Date());
+			logInfo.setOperation("PC端登录");
+			logInfo.setClientType(ClientType.pc.getValue());
+			logInfo.setRequestParam("用户名："+userName+" , 密码："+pwd);
+			UserInfo userInfo = 
+					(UserInfo) BaseUtil.transMapToBean((Map<String, Object>)j.getObj(), UserInfo.class);
+    		if(!BaseUtil.isEmpty(userInfo)){
+				//根据当前用户的企业code判断所属企业等级
+				if(BaseUtil.isEmpty(userInfo.getUsable()) || YesOrNo.否.getValue().equals(userInfo.getUsable()))
+					return AjaxJson.returnJsonObj(false, "当前账号已被禁用");
+				Integer userId = userInfo.getId();
+				//根据用户id查询对应的所有角色信息
+				req.getSession().setAttribute("userId", userId);
+				//塞菜单
+//				List<ComboTree> ModuleList=userInfoService.getMenus(userId);
+//				req.getSession().setAttribute("menus", ModuleList);
+				
+				//将新登录的用户Id存入application中的sessions集合中（在session有效期内，用户重复登录只算一个）
+				ServletContext application = req.getSession().getServletContext();
+				HashSet<String> sessions = (HashSet<String>) application.getAttribute("sessions");
+		        if (sessions == null) {
+		            sessions = new HashSet<String>();
+		            application.setAttribute("sessions", sessions);
+		        }
+		        // 新登录的userId均添加到HashSet集中
+		        if(req.getSession().getAttribute("userId") != null){
+		            sessions.add(req.getSession().getAttribute("userId").toString());
+		        }
+		        
+		        //如果是超管，则设置
+		        UserRelRoleExample userRelRoleExample = new UserRelRoleExample();
+		        userRelRoleExample.or().andUserIdEqualTo(userId)
+		        						.andDeleteflagEqualTo(DeleteFlag.未删除.getValue());
+		        List<Map<String, Object>> userRelRoleList = 
+		        		userRelRoleService.selectByExample(userRelRoleExample);
+		        if(!BaseUtil.isEmpty(userRelRoleList)){
+		        	for (Map<String, Object> userRelRole : userRelRoleList) {
+						if(UserTypeCode.超级管理员.getValue().equals(BaseUtil.retStr(userRelRole.get("roleCode")))){
+							userInfo.setIsSuperAdmin(YesOrNo.是.getValue());
+							break;
+						}
+					}
+		        }
+		        //将用户存入session中
+		        req.getSession().setAttribute("user",userInfo);
+		        
+		        /*//设置菜单
+		        List<LayerTree> ModuleList = userInfoService.getMenus(userId);
+				req.getSession().setAttribute("menus", JSONArray.toJSONString(ModuleList));*/
+				logInfo.setUserId(userInfo.getId());
+				logInfo.setIsSuccess(YesOrNo.是.getValue());
+				logInfo.setResponseResult("登录成功");
+				return AjaxJson.returnJsonObj(true);
+			}else{
+				logInfo.setIsSuccess(YesOrNo.否.getValue());
+				logInfo.setResponseResult("登陆失败，用户名密码验证失败");
+				return j;
+			}
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    		logInfo.setIsSuccess(YesOrNo.否.getValue());
+			logInfo.setResponseResult("登录异常，系统错误");
+			logInfo.setErrMsg("第"+e.getStackTrace()[0].getLineNumber()+"行代码报错："+e.getMessage());
+			return AjaxJson.returnJsonObj(false, "登录异常，系统错误");
+    	} finally {
+			Executors.newCachedThreadPool().execute(new Runnable() {
+				@Override
+				public void run() {
+					logInfoService.insertSelective(logInfo);
+				}
+			});
+		}
+    }
+    
+    /**
+	 * 用户注销登录
+	 * @param request
+	 * @param reponse
+	 * @return
+	 * @throws Exception 
+	 */
+    @RequestMapping(value="logOut")
+	@ResponseBody
+	public ModelAndView logOut(HttpServletRequest request,HttpServletResponse reponse) throws Exception{
+		HttpSession session = request.getSession();
+		session.removeAttribute("user");
+		//session销毁
+		session.invalidate();
+		ModelAndView view = new ModelAndView();
+        view.setViewName("layout/login");
+        view.addObject("resource_path", "layout/resource.vm");
+        return view;
+	}
+    
+    @RequestMapping(value = "validToken")
+    @ResponseBody
+    @SystemLog(module = CommonConstant.LOG_LOGIN,description = "验证token测试",clientType="4")
+    public AjaxJson validToken(String token) {
+    	Date expireTime = SessionTokenLoader.getInstance().getObjectByKey(token);
+    	return AjaxJson.returnJsonObj(BaseUtil.isEmpty(expireTime)?false:true, expireTime);
+    }
+    
+    /**
+     * 登录
+     * @param paramMap
+     * @return
+     */
+    private AjaxJson userLogin(Map<String, Object> paramMap){
+    	String userName = BaseUtil.retStr(paramMap.get("userName"));
+    	String pwd = BaseUtil.retStr(paramMap.get("pwd"));
+    	String clientType = BaseUtil.retStr(paramMap.get("clientType"));
+		//登录之后，查询session_token表中是否有该用户的token值，如果没有或者已过期，则删除后重新录入
+		String md5Pwd = StringTools.encodePassword(pwd, "MD5");
+		UserInfoExample userInfoExample = new UserInfoExample();
+		//先验证用户是否存在
+		userInfoExample.or().andUserNameEqualTo(userName);
+		List<Map<String, Object>> userList = userInfoService.selectByExample(userInfoExample);
+		if(BaseUtil.isEmpty(userList))
+			return AjaxJson.returnJsonObj(false, "尚未注册该用户");
+		//验证用户名密码匹配
+		userInfoExample = new UserInfoExample();
+		userInfoExample.or().andUserNameEqualTo(userName)
+		.andPwdEqualTo(md5Pwd)
+		.andDeleteflagEqualTo(DeleteFlag.未删除.getValue());
+		userList = userInfoService.selectByExample(userInfoExample);
+		if(BaseUtil.isEmpty(userList))
+			return AjaxJson.returnJsonObj(false, "密码错误");
+		return AjaxJson.returnJsonObj(true, "", userList.get(0), null);
+    }
+    
+    public static void main(String[] args) {
+		System.out.println(StringTools.encodePassword("666666", "MD5"));
+	}
+}

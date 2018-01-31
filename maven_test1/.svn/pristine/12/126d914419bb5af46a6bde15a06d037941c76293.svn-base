@@ -1,0 +1,33 @@
+package com.cisdi.business.service;
+
+import java.util.List;
+import java.util.Map;
+
+import com.cisdi.base.common.json.AjaxJson;
+import com.cisdi.base.common.responseBean.LayGridReturn;
+import com.cisdi.business.entity.UserInfo;
+import com.cisdi.business.example.UserInfoExample;
+
+public interface UserInfoService {
+    
+    UserInfo selectByPrimaryKey(Integer id);
+
+    List<Map<String, Object>> selectByExample(UserInfoExample record);
+
+    AjaxJson insertSelective(UserInfo record);
+    
+    AjaxJson deleteByPrimaryKey(Integer id);
+    
+    AjaxJson deleteByExample(UserInfoExample example);
+    
+    AjaxJson deleteByExampleInLogic(UserInfoExample example);
+    
+    AjaxJson countByExample(UserInfoExample example);
+    
+    AjaxJson updateByPrimaryKeySelective(UserInfo entity);
+    
+    LayGridReturn selectDataGridByExample(UserInfoExample record);
+    
+    AjaxJson saveOrUpdate(UserInfo entity);
+    
+}

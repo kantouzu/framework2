@@ -1,0 +1,55 @@
+<div id="left_tree" class="easyui-panel" title="房间信息" style="width:200px;">
+</div>
+<script type="text/javascript">
+$(function(){
+	$("#left_tree").tree({
+		url: "${rc.contextPath}/leftTree/getTree",
+		onBeforeLoad:function(node,param){
+		   
+			if(node){
+				param.level=$("#left_tree").tree('getLevel',node.target);
+				param.text = node.text
+			}
+			
+		},
+		onSelect: function(node){
+		//alert('level: '+node.level+', id: '+node.id+', text: '+node.text)
+    		 if(node.level !=5){
+        		 $.ajax({
+        			    type:"get",
+                    	url: "${request.contextPath}/index/redirectURL?timestamp="+new Date().getTime(),
+        				data :{level:node.level,id:node.id,text:node.text},
+        				cache: false,
+                        success: function (data) {
+                        	if(data!=null && data !=""){
+                        		$(".canrecreate").each(function(){
+        							var className = $(this).attr("class");
+        							if(className.indexOf("easyui-combobox")!=-1){
+        								$(this).combobox("destroy");
+        							}else if(className.indexOf("easyui-dialog")!=-1){
+                        				$(this).panel("destroy");
+        							}
+                        		})
+        				 		//window.location.href="${rc.contextPath}/"+data;
+        						$("#searchListId").html(data);
+                         	}
+                        }
+                    });	
+    		 }
+		}
+	})
+})
+
+function leftTreeReload(nodeId){
+	if(!nodeId){
+		nodeId = "-1";
+	}
+    var node = $('#left_tree').tree('find',nodeId);
+    if (node) {
+        $('#left_tree').tree('reload', node.target);
+    }
+    else {
+        $('#left_tree').tree('reload');
+    }
+}
+</script>

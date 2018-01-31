@@ -1,0 +1,104 @@
+package com.cisdi.business.controller;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.beanutils.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.cisdi.base.common.constant.CommonConstant;
+import com.cisdi.base.common.enums.CommonEnumType.DeleteFlag;
+import com.cisdi.base.common.json.AjaxJson;
+import com.cisdi.base.controller.BaseController;
+import com.cisdi.base.util.BaseUtil;
+import com.cisdi.base.util.StringTools;
+import com.cisdi.business.common.SessionTokenLoader;
+import com.cisdi.business.common.annotation.SystemLog;
+import com.cisdi.business.entity.SessionToken;
+import com.cisdi.business.entity.UserInfo;
+import com.cisdi.business.example.SessionTokenExample;
+import com.cisdi.business.example.UserInfoExample;
+import com.cisdi.business.responseBean.UserResp;
+import com.cisdi.business.service.SessionTokenService;
+import com.cisdi.business.service.UserInfoService;
+import com.cisdi.business.util.BusinessUtil;
+
+@Controller
+@RequestMapping(value="loginController")
+public class LoginController extends BaseController {
+
+    @Autowired
+    private UserInfoService userInfoService;
+    @Autowired
+    private SessionTokenService sessionTokenService;
+    
+    @RequestMapping(value = "mobileLogin")
+    @ResponseBody
+    @SystemLog(module = CommonConstant.LOG_LOGIN,description = "移动端登录",clientType="4")
+    public AjaxJson mobileLogin(HttpServletRequest req, HttpServletResponse resp, 
+    		String userName, String pwd) {
+    	try {
+    		//移动端登录
+    		//登录之后，查询session_token表中是否有该用户的token值，如果没有或者已过期，则删除后重新录入
+    		String md5Pwd = StringTools.encodePassword(pwd, "MD5");
+    		UserInfoExample userInfoExample = new UserInfoExample();
+    		//先验证用户是否存在
+    		userInfoExample.or().andUserNameEqualTo(userName);
+    		List<UserInfo> userList = userInfoService.selectByExample(userInfoExample);
+    		if(BaseUtil.isListEmpty(userList))
+    			return AjaxJson.returnJsonObj(false, "尚未注册该用户");
+    		//验证用户名密码匹配
+    		userInfoExample = new UserInfoExample();
+    		userInfoExample.or().andUserNameEqualTo(userName)
+    		.andPwdEqualTo(md5Pwd)
+    		.andDeleteflagEqualTo(DeleteFlag.未删除.getValue());
+    		userList = userInfoService.selectByExample(userInfoExample);
+    		if(BaseUtil.isListEmpty(userList))
+    			return AjaxJson.returnJsonObj(false, "密码错误");
+    		//登录成功之后，查询是否存在未失效的token
+    		Integer userId = userList.get(0).getId();
+    		SessionTokenExample sessionTokenExample = new SessionTokenExample(DeleteFlag.未删除.getValue());
+    		sessionTokenExample.or().andUserIdEqualTo(userId);
+    		List<SessionToken> tokenList = sessionTokenService.selectByExample(sessionTokenExample);
+    		AjaxJson reloadTokenResult = null;
+    		if(BaseUtil.isListEmpty(tokenList) || BusinessUtil.isTokenInvalid(tokenList.get(0))){
+    			//代表从未登录或者token已失效，需要删除对应token数据并重新塞一条，之后将token放入内存
+    			reloadTokenResult = sessionTokenService.reloadTokenByUser(userList.get(0));
+    			if(!reloadTokenResult.isSuccess())
+    				return AjaxJson.returnJsonObj(false, "会话注册失败");
+    		}
+    		//登录成功后，返回用户信息以及token到客户端本地保存
+    		UserResp userResp = new UserResp();
+    		BeanUtils.copyProperties(userResp, userList.get(0));
+    		Map<String, Date> tokenMap = (Map<String, Date>) reloadTokenResult.getObj();
+    		for (String token : tokenMap.keySet()) {
+    			userResp.setToken(token);
+    			break;
+			}
+    		return AjaxJson.returnJsonObj(true, userResp);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return AjaxJson.returnJsonObj(false);
+		}
+    }
+    
+    @RequestMapping(value = "validToken")
+    @ResponseBody
+    @SystemLog(module = CommonConstant.LOG_LOGIN,description = "验证token测试",clientType="4")
+    public AjaxJson validToken(String token) {
+    	Date expireTime = SessionTokenLoader.getInstance().getObjectByKey(token);
+    	return AjaxJson.returnJsonObj(BaseUtil.isEmpty(expireTime)?false:true, expireTime);
+    }
+    
+    public static void main(String[] args) {
+		System.out.println(StringTools.encodePassword("666666", "MD5"));
+	}
+}

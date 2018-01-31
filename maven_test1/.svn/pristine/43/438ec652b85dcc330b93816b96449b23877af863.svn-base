@@ -1,0 +1,187 @@
+package com.cisdi.business.controller;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.cisdi.base.common.constant.CommonConstant;
+import com.cisdi.base.common.enums.CommonEnumType.YesOrNo;
+import com.cisdi.base.common.json.AjaxJson;
+import com.cisdi.base.common.responseBean.LayGridReturn;
+import com.cisdi.base.controller.BaseController;
+import com.cisdi.base.util.BaseUtil;
+import com.cisdi.base.util.SqlUtil;
+import com.cisdi.business.common.annotation.SystemLog;
+import com.cisdi.business.entity.DepartInfo;
+import com.cisdi.business.entity.UserInfo;
+import com.cisdi.business.example.DepartInfoExample;
+import com.cisdi.business.requestBean.DataGrid;
+import com.cisdi.business.responseBean.DepartTree;
+import com.cisdi.business.responseBean.LayerTree;
+import com.cisdi.business.service.DepartInfoService;
+import com.cisdi.business.service.LocationInfoService;
+import com.cisdi.business.util.BusinessUtil;
+
+@Controller
+@RequestMapping(value="departInfoController")
+public class DepartInfoController extends BaseController {
+
+    @Autowired
+    private DepartInfoService departInfoService;
+    @Autowired
+    private LocationInfoService locationInfoService;
+    
+    @RequestMapping(value = "pageList")
+    public ModelAndView list(HttpServletRequest req, DepartInfo departInfo, DepartInfoExample departInfoExample) {
+        
+        ModelAndView mv = new ModelAndView();
+        mv.setViewName("DepartInfo/DepartInfoList");
+        return mv;
+    }
+    
+    @RequestMapping(value = "dataList")
+    @ResponseBody
+    public LayGridReturn dataList(HttpServletRequest req, DepartInfo departInfo, DepartInfoExample departInfoExample, DataGrid datagrid) {
+    	departInfoExample.setLimitStart(datagrid.getStartRow());
+    	departInfoExample.setLimitEnd(datagrid.getLimit());
+    	departInfoExample.setOrderByClause("order by id desc");
+    	departInfoExample.or().andDeleteflagEqualTo(YesOrNo.否.getValue());
+    	return departInfoService.selectDataGridByExample(departInfoExample);
+    	
+    }
+
+    @RequestMapping(value = "totalList")
+    @ResponseBody
+    public AjaxJson totalList(HttpServletRequest req, DepartInfo departInfo, DepartInfoExample departInfoExample, boolean restrain) {
+    	departInfoExample.setOrderByClause(" order by id ");
+    	try {
+    		UserInfo user = BusinessUtil.convertSessionUser(getSessionUser(req));
+    		//如果是按照数据权限加载
+    		if(restrain && !YesOrNo.是.getValue().equals(user.getIsSuperAdmin())){
+    			Integer rootId = user.getDepartId();
+    			//塞入数据权限条件
+    			departInfoExample.setOtherCondition(
+					SqlUtil.addDepartRestrain("departInfo.id", rootId)
+				);
+    		}
+    		departInfoExample.or().andDeleteflagEqualTo(YesOrNo.否.getValue())
+    								.andNameLike("%"+departInfo.getName()+"%");
+    		List<Map<String, Object>> resultList = departInfoService.selectByExample(departInfoExample);
+    		return AjaxJson.returnJsonObj(true, resultList);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return AjaxJson.returnJsonObj(false);
+		}
+    	
+    }
+    
+    @RequestMapping(value = "getDepartLayerTree")
+    @ResponseBody
+    public List<DepartTree> getDepartLayerTree(HttpServletRequest req, DepartInfo departInfo) {
+    	try {
+    		Map<String, Object> param = new HashMap<String, Object>();
+    		if(!BaseUtil.isEmpty(departInfo.getParentId())){
+    			//如果不为空，表示是前端联想后选择的
+    			param.put("rootId", departInfo.getParentId());
+    		}else{
+    			//如果为空，表示是点菜单后首次渲染的，这个时候如果不是超管，需要加上数据权限
+    			UserInfo user = BusinessUtil.convertSessionUser(getSessionUser(req));
+    			//如果是按照数据权限加载
+    			if(!YesOrNo.是.getValue().equals(user.getIsSuperAdmin())){
+    				param.put("rootId", user.getDepartId());
+    			}
+    		}
+    		List<DepartTree> ModuleList=departInfoService.getDepartList(param);
+    		return ModuleList;
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    		return null;
+    	}
+    }
+    
+    @RequestMapping(value = "goAddOrEdit")
+    public ModelAndView goAddOrEdit(HttpServletRequest req, DepartInfo departInfo, DepartInfoExample departInfoExample, boolean isCheckOnly) {
+        ModelAndView mv = new ModelAndView();
+        DepartInfo entity = departInfoService.selectByPrimaryKey(departInfo.getId());
+        mv.setViewName("DepartInfo/DepartInfoEdit");
+        mv.addObject("departInfo", entity);
+        mv.addObject("isCheckOnly", isCheckOnly);
+        mv.addObject("parentId", departInfo.getParentId());
+        //如果是编辑，则需要加载父级根地区，通过当前地区locId向上递归找父根
+        if(!BaseUtil.isEmpty(entity)){
+        	Map<String, Object> param = new HashMap<String, Object>();
+        	param.put("id", entity.getLocId());
+        	List<LayerTree> parentLocList = locationInfoService.getParentLocList(param);
+        	if(!BaseUtil.isEmpty(parentLocList)){
+        		mv.addObject("rootLocId", parentLocList.get(0).getId());
+        	}
+        }else{
+        	//如果是新增子机构，需要将当前的level+1传入页面
+        	if(!BaseUtil.isEmpty(departInfo.getLevel()))
+        		mv.addObject("level", departInfo.getLevel()+1);
+        }
+        return mv;
+    }
+    
+    @RequestMapping(value = "doSaveOrUpdate", method=RequestMethod.POST)
+    @ResponseBody
+    @SystemLog(module = CommonConstant.LOG_DEPART_INFO,description = "depart_info",businessType=CommonConstant.BUSINESS_ADDOREDIT)
+    public AjaxJson doSaveOrUpdate(HttpServletRequest req, DepartInfo departInfo) {
+    	AjaxJson j = null;
+        try {
+        	j = departInfoService.saveOrUpdate(departInfo);
+        	return j;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return AjaxJson.returnJsonObj(false);
+		}
+    } 
+    
+    /**
+     * 改变组织机构的实际层级关系
+     * @param req
+     * @param param
+     * @return
+     */
+    @RequestMapping(value = "changeClass", method=RequestMethod.POST)
+    @ResponseBody
+    @SystemLog(module = CommonConstant.LOG_DEPART_INFO,description = "改变单位层级",businessType=CommonConstant.BUSINESS_ADDOREDIT)
+    public AjaxJson changeClass(HttpServletRequest req, @RequestParam Map<String, Object> param) {
+    	AjaxJson j = null;
+    	try {
+    		j = departInfoService.changeClass(param);
+    		return j;
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    		return AjaxJson.returnJsonObj(false);
+    	}
+    } 
+    
+    @RequestMapping(value = "batchDelete", method=RequestMethod.POST)
+    @ResponseBody
+    @SystemLog(module = CommonConstant.LOG_DEPART_INFO,description = "depart_info",businessType=CommonConstant.BUSINESS_DEL)
+    public AjaxJson batchDelete(HttpServletRequest req, @RequestParam List<Integer> ids) {
+        DepartInfoExample departInfoExample = new DepartInfoExample();
+        departInfoExample.or().andIdIn(ids);
+        return departInfoService.deleteByExample(departInfoExample, ids);
+    }    
+    
+    @RequestMapping(value = "batchDeleteInLogic", method=RequestMethod.POST)
+    @ResponseBody
+    @SystemLog(module = CommonConstant.LOG_DEPART_INFO,description = "depart_info",businessType=CommonConstant.BUSINESS_DELINLOGIC)
+    public AjaxJson batchDeleteInLogic(HttpServletRequest req, @RequestParam List<Integer> ids) {
+        DepartInfoExample departInfoExample = new DepartInfoExample();
+        departInfoExample.or().andIdIn(ids);
+        return departInfoService.deleteByExampleInLogic(departInfoExample, ids);
+    }  
+}

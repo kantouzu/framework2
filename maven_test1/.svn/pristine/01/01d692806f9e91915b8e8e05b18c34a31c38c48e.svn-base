@@ -1,0 +1,53 @@
+$(function(){
+	layui.use('table', function(){
+	  var table = layui.table;
+	  
+	  //第一个实例
+	  table.render({
+		elem: '#datagrid'
+	    ,height: 470
+//		    ,even: true
+	    ,url: Utils.getRootPath() + "/userInfoController/dataList" //数据接口
+	    ,page: {
+	    	theme: '#22262e' 
+	    } //开启分页
+	    ,cols: [[ //表头
+	      {field: 'id', title: 'ID', width:'10%', sort: true, fixed: 'left'}
+	      ,{field: 'userName', title: '用户名', width:'20%'}
+	      ,{field: 'name', title: '性名', width:'20%', sort: true}
+	      ,{field: 'phone', title: '手机号', width:'20%'} 
+	      ,{field: 'email', title: '邮箱', width: '30%'}
+	      ,{fixed: 'right', width:150, align:'center', toolbar: '#toolbar'} //这里的toolbar值是模板元素的选择器
+	    ]]
+	  });
+	  
+	//监听工具条
+	  table.on('tool(datagrid)', function(obj){ //注：tool是工具条事件名，test是table原始容器的属性 lay-filter="对应的值"
+		  
+	    var data = obj.data; //获得当前行数据
+	    var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+	    var tr = obj.tr; //获得当前行 tr 的DOM对象
+	   
+	    if(layEvent === 'detail'){ //查看
+	      //do somehing
+	    } else if(layEvent === 'del'){ //删除
+	      layer.confirm('真的删除行么', function(index){
+	        obj.del(); //删除对应行（tr）的DOM结构，并更新缓存
+	        layer.close(index);
+	        //向服务端发送删除指令
+	      });
+	    } else if(layEvent === 'edit'){ //编辑
+	    	edit(data.id);
+	    }
+	  });
+	  
+	});
+		 
+})
+
+function add(){
+	Utils.createCommonWindow('新增用户',Utils.getRootPath() + "/userInfoController/goAddOrEdit", 900, 600);
+}
+function edit(id){
+	Utils.createCommonWindow('编辑用户',Utils.getRootPath() + "/userInfoController/goAddOrEdit?id="+id, 900, 600);
+}

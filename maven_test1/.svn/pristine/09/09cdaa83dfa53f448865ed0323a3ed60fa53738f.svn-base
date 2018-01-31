@@ -1,0 +1,44 @@
+package com.cisdi.business.service.impl;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.cisdi.base.common.json.AjaxJson;
+import com.cisdi.business.dao.McgHelperUserDao;
+import com.cisdi.business.entity.McgHelperUser;
+import com.cisdi.business.example.McgHelperUserExample;
+import com.cisdi.business.service.McgHelperUserService;
+
+@Service
+public class McgHelperUserServiceImpl implements McgHelperUserService {
+
+    @Autowired
+    private McgHelperUserDao mcgHelperUserDao;
+    
+    @Override
+    public List<McgHelperUser> selectByExample(McgHelperUserExample  record) {
+        List<McgHelperUser> result = mcgHelperUserDao.selectByExample(record);
+        return result;
+    }    
+
+    @Override
+    public AjaxJson insertSelective(McgHelperUser record) {
+         int resultKey = mcgHelperUserDao.insertSelective(record);
+         return AjaxJson.returnJsonObj(resultKey != 0?true:false);
+    }   
+    
+    @Override
+    public AjaxJson updateByPrimaryKeySelective(McgHelperUser record) {
+        int resultKey = mcgHelperUserDao.updateByPrimaryKeySelective(record);
+        return AjaxJson.returnJsonObj(resultKey != 0?true:false);
+    }    
+
+    @Override
+    public AjaxJson deleteByPrimaryKey(Integer id) {
+        int resultKey = mcgHelperUserDao.deleteByPrimaryKey(id);
+        return AjaxJson.returnJsonObj(resultKey != 0?true:false);
+    }
+    
+}

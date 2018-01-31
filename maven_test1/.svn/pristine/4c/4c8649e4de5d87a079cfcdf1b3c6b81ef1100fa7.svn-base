@@ -1,0 +1,59 @@
+$(function() {
+	
+	//自定义EasyUI.tree loadFilter的实现，可自定义id、name的字段名
+	$.fn.tree.defaults.loadFilter = function (data, parent) {
+	    var opt = $(this).data().tree.options;
+	    var idField, textField, parentField;
+	    if(opt.idField || opt.valueField || opt.textField || opt.parentField){
+	        idField = opt.idField || opt.valueField || 'id'; //idField和valueField可以混用
+	        textField = opt.textField || 'text';
+	        parentField = opt.parentField;
+	 
+	        return comboTreeFilter(data, idField, textField);
+	    }
+	    return data;
+	};
+	$.fn.combotree.defaults.loadFilter = $.fn.tree.defaults.loadFilter; //这里要加上，否则combotree不会生效
+	
+	if(!Utils.isEmpty(isCheckOnly)){
+		//查看详情页面，将所有空间置为disabled
+		$('input').attr('disabled','disabled');
+		$('select').attr('disabled','disabled');
+		$('textarea').attr('disabled','disabled');
+	}
+	
+	var parentId = $("#parentId").val();
+	$("#menus").combotree({
+		url: Utils.getRootPath() + "/menuController/getMenuLayerTree?parentId="+parentId,
+		idField:'id',
+		textField:'name',
+    	method:'post',
+    	checkbox:true,
+    	width:397,
+    	height:32,
+    	onSelect:function(d){
+    		if(d){
+    			var menuId = $("#id").val();
+    			if(d.id == menuId){
+    				Utils.showToastFail('不能选择自己为父级菜单');
+    				$('#menus').combotree('clear');
+    				$("#parentId").val('');
+    			}else{
+		    		$("#parentId").val(d.id);
+    			}
+    		}
+    	}
+	});
+})
+
+function comboTreeFilter(data, idField, textField){
+	$.each(data, function(index,obj){
+		data[index]['id'] = data[index][idField];
+        data[index]['text'] = data[index][textField];
+		if(!Utils.isEmpty(obj.children)){
+			var nextSelector = $('#menuTree_'+obj.id);
+			comboTreeFilter(obj.children, idField, textField)
+		}
+	});
+	return data;
+}

@@ -1,0 +1,73 @@
+package com.cisdi.business.entity;
+
+import java.util.Date;
+
+/* 读取表结构信息 */
+public class SessionToken {
+    
+	private static final long Serializable = 1L;
+	
+    public SessionToken() {
+
+    }
+    
+    /* 自增主键  */
+    private Integer id;
+    /* 用户id  */
+    private Integer userId;
+    /* token串  */
+    private String token;
+    /* token失效日期  */
+    private Date expireTime;
+    /* 注册时间  */
+    private Date createTime;
+    /* 更新时间  */
+    private Date updateTime;
+    /* 是否删除  */
+    private String deleteflag;
+    
+    public Integer getId() {
+        return this.id;
+    }
+    public Integer getUserId() {
+        return this.userId;
+    }
+    public String getToken() {
+        return this.token;
+    }
+    public Date getExpireTime() {
+        return this.expireTime;
+    }
+    public Date getCreateTime() {
+        return this.createTime;
+    }
+    public Date getUpdateTime() {
+        return this.updateTime;
+    }
+    public String getDeleteflag() {
+        return this.deleteflag;
+    }
+   
+    public void setId(Integer id) {
+        this.id = id;
+    }
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
+    public void setToken(String token) {
+        this.token = token;
+    }
+    public void setExpireTime(Date expireTime) {
+        this.expireTime = expireTime;
+    }
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
+    }
+    public void setDeleteflag(String deleteflag) {
+        this.deleteflag = deleteflag;
+    }
+  
+}

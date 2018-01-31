@@ -1,0 +1,30 @@
+package com.cisdi.business.dao;
+
+import java.util.List;
+import java.util.Map;
+
+import com.cisdi.business.entity.DepartInfo;
+import com.cisdi.business.example.DepartInfoExample;
+import com.cisdi.business.responseBean.DepartModule;
+
+public interface DepartInfoDao {
+
+    DepartInfo selectByPrimaryKey(Integer id);
+    
+    List<Map<String, Object>> selectByExample(DepartInfoExample example);
+
+    int insertSelective(DepartInfo entity);
+  
+    int deleteByPrimaryKey(Integer id);
+    
+    int deleteByExample(DepartInfoExample example);
+    
+    int deleteByExampleInLogic(DepartInfoExample example);
+    
+    Integer countByExample(DepartInfoExample example);
+    
+    int updateByPrimaryKeySelective(DepartInfo entity);
+    
+    List<DepartModule> selectTreeDepartByCondition(Map<String, Object> param);
+    
+}

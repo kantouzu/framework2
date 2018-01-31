@@ -1,0 +1,17 @@
+package com.cisdi.business.dao;
+
+import java.util.List;
+import com.cisdi.business.entity.McgHelperUser;
+import com.cisdi.business.example.McgHelperUserExample;
+
+public interface McgHelperUserDao {
+
+    List<McgHelperUser> selectByExample(McgHelperUserExample record);
+
+    int insertSelective(McgHelperUser record);
+  
+    int deleteByPrimaryKey(Integer id);
+    
+    int updateByPrimaryKeySelective(McgHelperUser record);
+    
+}

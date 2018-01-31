@@ -1,0 +1,65 @@
+<script src="${rc.contextPath}/resources/js/layout/index.js"></script>
+#*
+#if($!showStayCenter)
+<div class="col-lg-4">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <i class="fa fa-bell fa-fw"></i> <strong style="font-size:17px">待办中心</strong>
+        </div>
+        <!-- /.panel-heading -->
+        <div class="panel-body" style="font-size:16px">
+            <div class="">
+                <a href="${rc.contextPath}/auditBaseController/showAuditEnterpPage" class="list-group-item">
+                    ##<i class="fa fa-comment fa-fw"></i> 企业
+					<i class=""></i> 企业
+                    <span class="pull-right text-muted small"><em>(<span id="entrp"></span>)</em>
+                    </span>
+                </a>
+                <a href="${rc.contextPath}/engineeringClass/auditEngListPage" class="list-group-item">
+                    ##<i class="fa fa-twitter fa-fw"></i> 工程合同项目
+					<i class=""></i> 工程合同项目
+                    <span class="pull-right text-muted small"><em>(<span id="eng"></span>)</em>
+                    </span>
+                </a>
+				
+                <a href="${rc.contextPath}/CommercialAuditController/AduitHouse" class="list-group-item">
+                    ##<i class="fa fa-envelope fa-fw"></i> 房地产项目
+					<i class=""></i> 房地产项目
+                    <span class="pull-right text-muted small"><em>(<span id="house"></span>)</em>
+                    </span>
+                </a>
+                <a href="${rc.contextPath}/manufacturingEnterpriseController/auditManuBaseInfoPage" class="list-group-item">
+                    ##<i class="fa fa-tasks fa-fw"></i> 制造类项目
+					<i class=""></i> 制造类项目
+                    <span class="pull-right text-muted small"><em>(<span id="manenter"></span>)</em>
+                    </span>
+                </a>
+                <a href="${rc.contextPath}/resourceClass/auditResourcePage" class="list-group-item">
+                    ##<i class="fa fa-upload fa-fw"></i> 资源类项目
+					<i class=""></i> 资源类项目
+                    <span class="pull-right text-muted small"><em>(<span id="resource"></span>)</em>
+                    </span>
+                </a>
+                <a href="${rc.contextPath}/pppProjectController/auditPppPage" class="list-group-item">
+                    ##<i class="fa fa-bolt fa-fw"></i> PPP中标项目
+					<i class=""></i> PPP中标项目
+                    <span class="pull-right text-muted small"><em>(<span id="ppp"></span>)</em>
+                    </span>
+                </a>
+                <a href="${rc.contextPath}/otherproject/auditOtherPage" class="list-group-item">
+                    ##<i class="fa fa-warning fa-fw"></i> 其他项目
+					<i class=""></i> 其他项目
+                    <span class="pull-right text-muted small"><em>(<span id="other"></span>)</em>
+                    </span>
+                </a>
+            </div>
+            <!-- /.list-group -->
+        </div>
+        <!-- /.panel-body -->
+    </div>
+    <!-- /.panel -->
+</div>
+#end
+*#
+
+<iframe name="reportView" frameboder="0" width="100%" height="700" src="$!indexUrl&userEntrpCode=$!user.entrpCode&userId=$!user.id&showStayCenter=$!showStayCenter&isBranchComp=$!isBranchComp"></iframe>

@@ -1,0 +1,108 @@
+package com.cisdi.business.service.impl;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.cisdi.base.common.json.AjaxJson;
+import com.cisdi.base.common.responseBean.LayGridReturn;
+import com.cisdi.base.util.BaseUtil;
+import com.cisdi.base.util.MenuUtils;
+import com.cisdi.business.dao.LocationInfoDao;
+import com.cisdi.business.entity.LocationInfo;
+import com.cisdi.business.example.LocationInfoExample;
+import com.cisdi.business.responseBean.LayerTree;
+import com.cisdi.business.responseBean.MenuModule;
+import com.cisdi.business.service.LocationInfoService;
+
+@Service
+public class LocationInfoServiceImpl implements LocationInfoService {
+
+    @Autowired
+    private LocationInfoDao locationInfoDao;
+    
+    @Override
+    public LocationInfo selectByPrimaryKey(Integer id) {
+        LocationInfo result = locationInfoDao.selectByPrimaryKey(id);
+        return result;
+    }
+    
+    @Override
+    public List<Map<String, Object>> selectByExample(LocationInfoExample  record) {
+        List<Map<String, Object>> result = locationInfoDao.selectByExample(record);
+        return result;
+    }    
+
+    @Override
+    @Transactional
+    public AjaxJson insertSelective(LocationInfo record) {
+         int resultKey = locationInfoDao.insertSelective(record);
+         return AjaxJson.returnJsonObj(resultKey != 0?true:false);
+    }   
+    
+    @Override
+    @Transactional
+    public AjaxJson deleteByExample(LocationInfoExample  record) {
+        int resultKey = locationInfoDao.deleteByExample(record);
+        return AjaxJson.returnJsonObj(resultKey != 0?true:false);
+    }
+    
+    @Override
+    @Transactional
+    public AjaxJson deleteByExampleInLogic(LocationInfoExample  record) {
+        int resultKey = locationInfoDao.deleteByExampleInLogic(record);
+        return AjaxJson.returnJsonObj(resultKey != 0?true:false);
+    }
+
+    @Override
+    @Transactional
+    public AjaxJson deleteByPrimaryKey(Integer id) {
+        int resultKey = locationInfoDao.deleteByPrimaryKey(id);
+        return AjaxJson.returnJsonObj(resultKey != 0?true:false);
+    }
+    
+    @Override
+    public AjaxJson countByExample(LocationInfoExample example){
+        Integer count = locationInfoDao.countByExample(example);
+        return AjaxJson.returnJsonObj(true, count);
+    }
+    
+    @Override
+    @Transactional
+    public AjaxJson updateByPrimaryKeySelective(LocationInfo entity){
+        int resultKey = locationInfoDao.updateByPrimaryKeySelective(entity);
+        return AjaxJson.returnJsonObj(resultKey != 0?true:false);
+    }
+    
+    @Override
+	public LayGridReturn selectDataGridByExample(LocationInfoExample record) {
+		return new LayGridReturn(0, "", locationInfoDao.selectByExample(record), locationInfoDao.countByExample(record));
+	}
+	
+	@Override
+    @Transactional
+    public AjaxJson saveOrUpdate(LocationInfo entity){
+		Integer id = entity.getId();
+		if(BaseUtil.isEmpty(id)){
+			locationInfoDao.insertSelective(entity);
+		}else{
+			locationInfoDao.updateByPrimaryKeySelective(entity);
+		}
+        return AjaxJson.returnJsonObj(true);
+    }
+	
+	@Override
+	public List<LayerTree> getLocList(Map<String, Object> param) {
+		List<MenuModule> dicData = locationInfoDao.selectTreeLocByCondition(param);
+		List<LayerTree> menus = MenuUtils.drawMenuLayerTree(dicData, null);
+		if(menus == null){
+			menus = new ArrayList<LayerTree>();
+		}
+		return menus;
+	}
+    
+}

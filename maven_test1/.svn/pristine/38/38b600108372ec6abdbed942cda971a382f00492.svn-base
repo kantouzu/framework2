@@ -1,0 +1,62 @@
+$(function() {
+	//加载数据网格
+	loadDateGrid();
+})
+
+function loadDateGrid(){
+	Utils.layerDatagrid({
+		//这里是datagrid参数
+		url : Utils.getRootPath() + "/roleInfoController/dataList", 
+		fields : [{field : 'id',title : 'ID',width : '5%',sort : true,fixed : 'left'}
+                ,{field : 'roleName',title : '角色名称',width : '25%'}
+                ,{field : 'roleCode',title : '角色编码',width : '25%'}
+                ,{field : 'roleCodeName',title : '角色编码枚举值',width : '25%'}
+                ,{field : 'remark',title : '备注',width : '25%'}
+				,{fixed : 'right',width : 150,align : 'center',toolbar : '#toolbar'} // 这里的toolbar值是模板元素的选择器
+				]
+	}, 
+	//这里是tool工具栏方法
+	{
+		edit : edit, 
+		del : delInLogic,
+		detail : detail
+	});
+}
+
+//新增页面
+function add() {
+	Utils.createCommonWindow({
+		title : '新增信息', 
+		url : Utils.getRootPath() + "/roleInfoController/goAddOrEdit"
+	});
+}
+
+//编辑页面
+function edit(id) {
+	Utils.createCommonWindow({
+		title : '编辑信息', 
+		url : Utils.getRootPath() + "/roleInfoController/goAddOrEdit?id=" + id
+	});
+}
+
+//查询页面
+function detail(id) {
+	Utils.createWindowWithoutBtn({
+		title : '查询信息', 
+		url : Utils.getRootPath() + "/roleInfoController/goAddOrEdit?id=" + id + "&isCheckOnly=true"
+	});
+}
+
+//提交真删除
+function del(ids) {
+	Utils.commonAjaxHandler(Utils.getRootPath() + "/roleInfoController/batchDelete", {
+		ids : JSON.stringify(ids)
+	});
+}
+
+//提交逻辑删除
+function delInLogic(ids) {
+	Utils.commonAjaxHandler(Utils.getRootPath() + "/roleInfoController/batchDeleteInLogic", {
+		ids : JSON.stringify(ids)
+	});
+}

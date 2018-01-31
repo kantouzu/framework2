@@ -1,0 +1,60 @@
+package com.cisdi.base.example;
+
+import java.util.List;
+import java.util.Map;
+
+import com.cisdi.base.common.table.TableJoinBean;
+
+
+public class BaseExample {
+    public String orderByClause;
+
+    public boolean distinct;
+
+    public Integer limitStart;
+    
+    public Integer limitEnd;
+    
+    public List<TableJoinBean> tableJoin;
+
+    public void setOrderByClause(String orderByClause) {
+        this.orderByClause = orderByClause;
+    }
+
+    public String getOrderByClause() {
+        return orderByClause;
+    }
+
+    public void setDistinct(boolean distinct) {
+        this.distinct = distinct;
+    }
+
+    public boolean isDistinct() {
+        return distinct;
+    }
+
+    public Integer getLimitStart() {
+		return limitStart;
+	}
+
+	public void setLimitStart(Integer limitStart) {
+		this.limitStart = limitStart;
+	}
+
+	public Integer getLimitEnd() {
+		return limitEnd;
+	}
+
+	public void setLimitEnd(Integer limitEnd) {
+		this.limitEnd = limitEnd;
+	}
+
+	public List<TableJoinBean> getTableJoin() {
+		return tableJoin;
+	}
+
+	public void setTableJoin(List<TableJoinBean> tableJoin) {
+		this.tableJoin = tableJoin;
+	}
+
+}

@@ -1,0 +1,1167 @@
+package com.cisdi.base.common.enums;
+
+import com.cisdi.base.util.BaseUtil;
+
+
+/**
+ * 
+ * @功能说明：枚举定义{ }
+ * @作者：xiangjz
+ * @创建日期： 2016-11-20
+ */
+public class CommonEnumType {
+
+	private static SystemResourceUtil util = SystemResourceUtil.getInstance();
+
+	/**
+	 * 根据key获取名称
+	 * 
+	 * @param val
+	 * @return
+	 */
+	public static String getEnumNameByKey(String val, String keys) {
+
+		Object key = util.resourceAsMap("comEnum_" + val + "_map").get(keys);
+		if (BaseUtil.isEmpty(key))
+			return "";
+		return (String) key;
+	}
+
+	/**
+	 * 用户类型代码
+	 */
+	public enum UserTypeCode {
+		超级管理员("1000"), 普通管理员("2000"), 录入人员("3000"), 分公司录入人员("3001"), 股份_集团本部录入人员("3002"), 
+		一级审批人员("4001"), 二级审批人员("6002"), 初审人员("40021"), 复审人员("40022"), 终审人员("40023"), 
+		三级审批人员("4003"), 集团审批人员("5001"), 股份审批人员("7001"), 股份外审批人员("7002"), 本部查询人员("8001"), 分公司查询人员("8002");
+
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		UserTypeCode(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 审核状态:(13-草稿,1-待确认，2-初审中，3-复审中，4-终审中，5-集团审核中，6-通过，7-退回)
+	 */
+	public enum CheckStatue {
+        待确认("1"), 三级审核中("2"), 二级初审中("3"), 二级复审中("8"), 二级终审中("9"), 集团初审中("4"), 集团复审中("5"), 集团终审中("10"), 股份审核中("11"), 股份外审核中("12"), 通过("6"), 退回("7"),草稿("13");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		CheckStatue(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 审核结果:0--不通过,1--通过
+	 */
+	public enum AuditResult {
+		不通过("0"), 通过("1");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		AuditResult(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 比较运算枚举:大于("0"),小于("1"),等于("2");
+	 */
+	public enum CompareCalculate {
+		大于("0"), 小于("1"), 等于("2");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		CompareCalculate(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 账单缴费状态:0--未缴费,1--未缴清,2--已缴清
+	 */
+	public enum PaymentStatue {
+		未缴费("0"), 未缴清("1"), 已缴清("2");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		PaymentStatue(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 附件类型:
+	 */
+	public enum AttachType {
+		工程合同附件("1"), 房地产相关附件("2"), 消息附件("3");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		AttachType(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 未删除/已删除
+	 */
+	public enum DeleteFlag {
+		未删除("0"), 已删除("1");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		DeleteFlag(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 性别
+	 */
+	public enum GenderFlag {
+		女("f"), 男("m");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		GenderFlag(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 是/否
+	 */
+	public enum YesOrNo {
+		否("0"), 是("1");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		YesOrNo(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 单位规模
+	 */
+	public enum EntpScale {
+		大型("100"), 中型("200"), 小型("300"), 微型("400");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		EntpScale(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 单位规模
+	 */
+	public enum BusinessStatus {
+		营业("0"), 停业("1"), 筹建("2"), 当年关闭("3"), 当年破产("4"), 其他("5");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		BusinessStatus(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 审核对象类型
+	 */
+	public enum ObjectType {
+		法人单位("0"), 工程项目信息("1"), 工程类合同信息("2"), 商品房项目("3"), 保障性安居工程("4"), 一级土地开发("5"), 城市基础("6"), 其他房地产("7"), 资源类项目("8"), 水处理项目("9"), 贸易项目("10"), 其他项目("11"), 制造类("12"), ppp项目("13"), 报表相关("14"), 报表相关_仅自己("15"), 报表相关_下级_含自己("16"), 报表相关_下级_不含自己("17"), 报表相关_月报("18"), 报表相关_季报("19"), 报表相关_半年报("20"), 报表相关_年报("21");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		ObjectType(String value) {
+			this.value = value;
+		}
+	}
+	
+	/**
+	 * 接口专用，业务编码   共6位数字组成，1开头为数据字典，2开头为枚举，3开头为其它基础数据
+	 */
+	public enum DicBsnCode {
+		//数据字典
+		STANDINGBOOK_COIN_TYPE("100001"),
+		STANDINGBOOK_ENGNATURE_TYPE("102001"),STANDINGBOOK_CONTRACTMODE_TYPE("102002"),
+		//枚举
+		YesOrNo("200001"),CheckStatue("200002"),FinishSituationRecordType("200003"),
+		ExecuteStatue("202001"), ContractStatue("202002"),
+        OtherProjectStatus("207001"),WaterProjectType("207002"),OtherServiceType("207003"),
+		//其它基础数据
+		ChinaCityData("300001"),Enterprise("300002"),
+		EngSubDivide("302001"),BusinessOwnerInfo("302002"),PppProjectInfo("302003"),
+		
+		//工程相关
+		eng_save("401001"),eng_edit("401002"),eng_check("401003"),
+		eng_con_save("402001"),eng_con_edit("402002"),eng_con_check("402003"),
+		eng_mon_save("401004"),eng_mon_edit("401005"),eng_mon_check("401006"),
+		eng_exp_save("401007"),eng_exp_edit("401008"),eng_exp_check("401009"),
+		eng_anti_save("401010"),eng_anti_edit("401011"),eng_anti_check("401012"),
+		eng_inc_save("401013"),eng_inc_edit("401014"),eng_inc_check("401015"),
+		//水处理相关
+        wat_save("409001"),wat_edit("409002"),wat_check("409003"),
+        wat_dn_save("409004"),wat_dn_edit("409005"),wat_dn_check("409006"),
+        wat_ct_save("409007"),wat_ct_edit("409008"),wat_ct_check("409009"),
+        wat_dl_save("409010"),wat_dl_edit("409011"),wat_dl_check("409012"),
+        wat_ie_save("409013"),wat_ie_edit("409014"),wat_ie_check("409015"),
+        //贸易相关
+        tra_save("410001"),tra_edit("410002"),tra_check("410003"),
+        tra_dl_save("410004"),tra_dl_edit("410005"),tra_dl_check("410006"),
+        tra_ie_save("410007"),tra_ie_edit("410008"),tra_ie_check("410009"),
+        //其它相关
+        oth_save("411001"),oth_edit("411002"),oth_check("411003"),
+        oth_dl_save("411004"),oth_dl_edit("411005"),oth_dl_check("411006"),
+        oth_ie_save("411007"),oth_ie_edit("411008"),oth_ie_check("411009"),
+        //商品房项目相关
+        house_1_check("403001"),house_1_save("403002"),house_1_edit("403003"),
+		//商品房执行数相关
+        house_1_ContractCheck("403004"),house_1_ContractSave("403005"),house_1_ContractEdit("403006"),
+        house_1_InvestCheck("403007"),house_1_InvestSave("403008"),house_1_InvestEdit("403009"),
+        house_1_LandBuyCheck("403010"),house_1_LandBuySave("403011"),house_1_LandBuyEdit("403012"),
+        house_1_LandDevelopCheck("403013"),house_1_LandDevelopSave("403014"),house_1_LandDevelopEdit("403015"),
+        house_1_StarorfinishCheck("403016"),house_1_StarorfinishSave("403017"),house_1_StarorfinishEdit("403018"),
+        house_1_SaleCheck("403019"),house_1_SaleSave("403020"),house_1_SaleEdit("403021"),
+        house_1_UnSaleCheck("403022"),house_1_UnSaleSave("403023"),house_1_UnSaleEdit("403024"),
+        house_1_IncomeCheck("403025"),house_1_IncomeSave("403026"),house_1_IncomeEdit("403027"),
+		//保障房项目相关
+        house_2_check("404001"),house_2_save("404002"),house_2_edit("404003"),
+		//保障房执行数相关
+        house_2_ContractCheck("404004"),house_2_ContractSave("404005"),house_2_ContractEdit("404006"),
+        house_2_InvestCheck("404007"),house_2_InvestSave("404008"),house_2_InvestEdit("404009"),
+        house_2_LandBuyCheck("404010"),house_2_LandBuySave("404011"),house_2_LandBuyEdit("404012"),
+        house_2_LandDevelopCheck("404013"),house_2_LandDevelopSave("404014"),house_2_LandDevelopEdit("404015"),
+        house_2_StarorfinishCheck("404016"),house_2_StarorfinishSave("404017"),house_2_StarorfinishEdit("404018"),
+        house_2_IncomeCheck("404019"),house_2_IncomeSave("404020"),house_2_IncomeEdit("404021"),
+		//一级土地项目相关
+        house_3_check("405001"),house_3_save("405002"),house_3_edit("405003"),
+		//一级土执行数相关
+        house_3_ContractCheck("405004"),house_3_ContractSave("405005"),house_3_ContractEdit("405006"),
+        house_3_InvestCheck("405007"),house_3_InvestSave("405008"),house_3_InvestEdit("405009"),
+        house_3_LandBuyCheck("405010"),house_3_LandBuySave("405011"),house_3_LandBuyEdit("405012"),
+        house_3_LandDevelopCheck("405013"),house_3_LandDevelopSave("405014"),house_3_LandDevelopEdit("405015"),
+        house_3_IncomeCheck("405016"),house_3_IncomeSave("405017"),house_3_IncomeEdit("405018"),
+		//城市基础建设项目相关
+        house_4_check("406001"),house_4_save("406002"),house_4_edit("406003"),
+		//城市基础建设执行数相关
+        house_4_ContractCheck("406004"),house_4_ContractSave("406005"),house_4_ContractEdit("406006"),
+        house_4_InvestCheck("406007"),house_4_InvestSave("406008"),house_4_InvestEdit("406009"),
+        house_4_LandBuyCheck("406010"),house_4_LandBuySave("406011"),house_4_LandBuyEdit("406012"),
+        house_4_LandDevelopCheck("406013"),house_4_LandDevelopSave("406014"),house_4_LandDevelopEdit("406015"),
+        house_4_IncomeCheck("406016"),house_4_IncomeSave("406017"),house_4_IncomeEdit("406018"),
+		//其他房地产项目相关
+        house_5_check("407001"),house_5_save("407002"),house_5_edit("407003"),
+		//其他房地产执行数相关
+        house_5_ContractCheck("407004"),house_5_ContractSave("407005"),house_5_ContractEdit("407006"),
+        house_5_IncomeCheck("407007"),house_5_IncomeSave("407008"),house_5_IncomeEdit("407009"),
+        house_5_OtherLendCheck("407010"),house_5_OtherLendSave("407011"),house_5_OtherLendEdit("407012"),
+        //资源项目相关
+        resource_Check("408001"),resource_Save("408002"),resource_Edit("408003"),
+        //资源执行数相关
+        re_pro_Check("408004"),re_pro_Save("408005"),re_pro_Edit("408006"),
+        re_proDetail_Check("408007"),re_proDetail_Save("408008"),re_proDetail_Edit("408009"),
+        re_mon_Check("408010"),re_mon_Save("408011"),re_mon_Edit("408012"),
+        re_income_Check("408013"),re_income_Save("408014"),re_income_Edit("408015"),
+        //制造项目相关
+		man_Check("412001"),man_Save("412002"),man_Edit("412003"),
+		//制造执行数相关
+		man_mon_Check("412004"),man_mon_Save("412005"),man_mon_Edit("412006"),
+		man_weight_Check("412007"),man_weight_Save("412008"),man_weight_Edit("412009"),
+		man_income_Check("412010"),man_income_Save("412011"),man_income_Edit("412012");
+		
+
+		private String value;
+		
+		public String getValue() {
+			return value;
+		}
+		
+		DicBsnCode(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 最低查看角色权限代码，审核等级:100-初审，200-复审，300-终审，400-集团审
+	 */
+	public enum AuditLevel {
+		三级审("4003"), 二级初审("40021"), 二级复审("40022"), 二级终审("40023"), 终审("4001"), 集团初审("5001"), 集团复审("50012"), 集团终审("50013"), 股份审核("7001"), 股份外审核("7002");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		AuditLevel(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 国民经济行业分类代码:c-门类，b-大类，m-中类，s-小类
+	 */
+	public enum CatoryType {
+		门类("c"), 大类("b"), 中类("m"), 小类("s");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		CatoryType(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 商品房资质等级:1-一级，2-二级，3-三级，4-四级，5-暂定级，6-申请中，7-无资质
+	 */
+	public enum QualificationType {
+		一级("1"), 二级("2"), 三级("3"), 四级("4"), 暂定级("5"), 申请中("6"), 无资质("7");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		QualificationType(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 商品房项目性质:1-普通住宅，2-商业营业住房，3-办公楼，4-别墅，5-高档公寓
+	 */
+	public enum ProjectType {
+		普通住宅("1"), 商业营业用房("2"), 办公楼或写字楼("3"), 别墅("4"), 高档公寓("5");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		ProjectType(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 商品房项目状态:1-前期，2-在线，3-转让，4-竣工，5-售罄 ，6-暂停
+	 */
+	public enum ProjectStatusType {
+		前期("1"), 在建("2"), 竣工("4"), 售罄("5"), 暂停("6"), 转让("3");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		ProjectStatusType(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 城市类别
+	 */
+	public enum CityType {
+		一线("1"), 二线("2"), 三线及以下("3");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		CityType(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 入库进展情况
+	 */
+	public enum WarehouseSituation {
+		已入财政部库("1"), 已入省库("2"), 已入市库("3"), 未入库但承诺入财政部库("4"), 未入库但承诺入省库("5"), 未入库但承诺入市库("6"), 明确不入库("7");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		WarehouseSituation(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 纳入地方政府中长期财政预算进展情况
+	 */
+	public enum InFinancialBudget {
+		已纳入("1"), 拟纳入("2"), 不纳入("3");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		InFinancialBudget(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 基金类型
+	 */
+	public enum FundType {
+		有限合伙("1"), 契约型("2"), 信托计划("3");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		FundType(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 付费机制
+	 */
+	public enum PayType {
+		纯政府付费("1"), 使用者付费_可行性缺口补贴("2"), 纯使用者付费("3");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		PayType(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 执行状态:未开工("0"),执行中("1"),停缓建("2"),已完工已结算("3"),已撤销("4"),已完工未结算("5")
+	 */
+	public enum ExecuteStatue {
+		未开工("0"), 执行中("1"), 已完工已结算("3"), 已完工未结算("5"), 停缓建("2"), 已撤销("4");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		ExecuteStatue(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 基金认购等级
+	 */
+	public enum FundPurchaseLevel {
+		优先级("0"), 中间级("1"), 劣后级("2");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		FundPurchaseLevel(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 合同签订后未开工时间:签订3个月后未开工("0"),签订6个月后未开工("1")
+	 */
+	public enum UnStartCycle {
+		签订3个月后未开工("0"), 签订6个月后未开工("1");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		UnStartCycle(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 金额单位:元("0")
+	 */
+	public enum MoneyUnit {
+		元("0");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		MoneyUnit(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 合同撤销类型:填错("0"),项目撤销("1")
+	 */
+	public enum ContractCancelType {
+		填错("0"), 项目撤销("1");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		ContractCancelType(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 工期单位:月("0"),年("1")
+	 */
+	public enum TimeUnit {
+		月("0"), 年("1");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		TimeUnit(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 增减量单位:增加("0"),减少("1")
+	 */
+	public enum IncrementType {
+		增加("0"), 减少("1"), 不变("2");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		IncrementType(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 合同完成情况明细记录类型:月报("0"),半年报("1"),年报("2"),季报("3")
+	 */
+	public enum FinishSituationRecordType {
+		月报("0"), 半年报("1"), 年报("2"), 季报("3");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		FinishSituationRecordType(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 商品房投资类型：建安工程投资("0"),土地开发投资("1"),土地购置费("2"),其他投资("3")
+	 */
+	public enum InvestmentType {
+		建安工程投资("0"), 土地开发投资("1"), 土地购置费("2"), 其他投资("3");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		InvestmentType(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 一级土地投资类型：土地开发投资("1"),土地购置费("2"),其他投资("3")
+	 */
+	public enum OneLevelInvestmentType {
+		土地开发投资("1"), 土地购置费("2"), 其他投资("3");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		OneLevelInvestmentType(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 一级土地房项目性质:1-一级土地开发
+	 */
+	public enum oneProjectType {
+		一级土地开发("1");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		oneProjectType(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 其他房项目性质:
+	 */
+	public enum otherProjectType {
+		物业管理("0"), 出租收入("1"), 其他("2");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		otherProjectType(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 其他房项目状态:
+	 */
+	public enum OtherProjectStatusType {
+		正在经营("2"), 暂停经营("1"), 撤销("3"), 转让("0");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		OtherProjectStatusType(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 发起审核企业等级：3-三级，2-二级，1-集团
+	 */
+	public enum EnterpLevel {
+		三级("3"), 二级("2"), 股份("4"), 集团("1");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		EnterpLevel(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 房地产类型：商品房("1"),保障性安居工程建设("2"),一级土地开发("3"),城市基础设施投资("4"),其他房地产经营业务("5")
+	 */
+	public enum HouseType {
+		商品房("1"), 保障性安居工程("2"), 一级土地开发("3"), 城市基础设施投资("4"), 其他房地产("5");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		HouseType(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 分包项目送审之前，总包方确认状态
+	 */
+	public enum EngInfomationStatue {
+		待确认("0"), 确认通过("1"), 确认不通过("2");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		EngInfomationStatue(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 保障性安居工程项目性质：保障性住房("1"),棚户区改造("2"),农村保障性安居工程("3")
+	 */
+	public enum HomeProjectType {
+		保障性住房("000"), 廉租住房("0"), 公共租赁住房("1"), 经济适用住房和限价商品住房("2"), 棚户区改造("000"), 城市棚户区改造("3"), 国有工矿棚户区改造("4"), 国有林区棚户区和国有林场危旧房改造("5"), 国有垦区危房改造("6"), 中央下放地方煤矿棚户区改造("7"), 农村保障性安居工程("000"), 农村危房改造("8"), 游牧民定居工程("9");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		HomeProjectType(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 城市基础设施建设项目性质：城市基础设施投资建设
+	 */
+	public enum cityProjectType {
+		城市基础设施投资("0");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		cityProjectType(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 保障性安居工程模式：委托开发("1"),委托代建("2")
+	 */
+	public enum ModeType {
+		委托开发("1"), 委托代建("2");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		ModeType(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 保障性安居，一级土地，城市基础设施建设项目状态：前期("0"),在建("1"),转让("2"),竣工("3"),交付("4"),暂停("5")
+	 */
+	public enum HomeProjectStatus {
+		前期("1"), 在建("2"), 竣工("4"), 交付("5"), 暂停("6"), 转让("3");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		HomeProjectStatus(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 商品房业务类型：商品房开发（“0”）
+	 */
+	public enum serviceType {
+		商品房("0");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		serviceType(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 保障性安居工程建设业务类型：保障性安居工程建设（“0”）
+	 */
+	public enum HomeServiceType {
+		保障性安居工程("0");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		HomeServiceType(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 城市基础设施投资建设业务类型：城市基础设施投资建设（“0”）
+	 */
+	public enum CityServiceType {
+		城市基础设施投资建设("0");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		CityServiceType(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 
+	 * 一级土地房业务类型：一级土地（“0”）
+	 */
+	public enum oneType {
+		一级土地开发("0");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		oneType(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 其他业务类型：其他房地产（“0”）
+	 */
+	public enum otherType {
+		其他房地产("0");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		otherType(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 房地产土地购置类型：生地/熟地
+	 */
+	public enum LandBuyType {
+		生地("0"), 熟地("1");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		LandBuyType(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 制造基地设立方式:子公司/分支结构
+	 */
+	public enum ManuBase {
+		子公司("0"), 分支机构("1");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		ManuBase(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 其他项目业务类型:医疗("1"),教育("2"),住宿餐饮("3"),文体娱乐("4"),居民服务("5"),出租车运营("6"),运输及物流(
+	 * "7"),其他("8")
+	 */
+	public enum OtherServiceType {
+		医疗("1"), 教育("2"), 住宿餐饮("3"), 文体娱乐("4"), 居民服务("5"), 出租车运营("6"), 运输及物流("7"), 其他("8");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		OtherServiceType(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 水处理项目类型:污水处理("0"),再生水("1"),自来水项目("2"),其他("3")
+	 */
+	public enum WaterProjectType {
+		污水处理("0"), 再生水("1"), 自来水项目("2"), 其他("3");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		WaterProjectType(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 其他--项目状态:正在经营("0"),暂停经营("1"),转让("2"),撤销("3")
+	 */
+	public enum OtherProjectStatus {
+		正在经营("0"), 暂停经营("1"), 撤销("3"), 转让("2");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		OtherProjectStatus(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 报表种类:月报("0"),季报("1"),年报("2")
+	 */
+	public enum ExcelReportType {
+		月报("0"), 季报("1"), 年报("2"), 半年报("3");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		ExcelReportType(String value) {
+			this.value = value;
+		}
+	}
+	
+	/**
+	 * 报表种类:未通过("0"), 通过("1"), 无合同("2");
+	 */
+	public enum ContractStatue {
+		未通过("0"), 通过("1"), 无合同("2");
+		private String value;
+		
+		public String getValue() {
+			return value;
+		}
+		
+		ContractStatue(String value) {
+			this.value = value;
+		}
+	}
+	
+	/**
+	 * 业务类型:新增("0"), 修改("1"), 删除("2"), 查询("3");
+	 */
+	public enum IntBusinessType {
+		新增("0"), 修改("1"), 删除("2"), 查询("3");
+		private String value;
+		
+		public String getValue() {
+			return value;
+		}
+		
+		IntBusinessType(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 房地产加入方式:新设("0"),收购("1")
+	 */
+	public enum JoinWay {
+		新设("0"), 收购("1");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		JoinWay(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 审核记录操作状态:新增记录("0"),修改记录("1")
+	 */
+	public enum AuditOperateStatue {
+		新增记录("0"), 修改记录("1");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		AuditOperateStatue(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 报表类型：仅自己("0"),下级_含自己("1"),下级_不含自己("2");
+	 */
+	public enum ExcelType {
+		仅自己("0"), 下级_含自己("1"), 下级_不含自己("2");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		ExcelType(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 报表类型名称
+	 */
+	public enum ExcelNameType {
+		第二章国资委经营月报_月报("0"), 房地产开发企业经营情况_季报("1"), 国外经济合作报表表式及枚举_季报("2"), 大型项目签约和执行情况报表表式及枚举_季报("3"), 中冶集团装备制造统计月度报表_季报("4"), 第一章建筑业企业统计报表_季报("5"), 房地产开发企业经营情况_半年报("6"), 国外经济合作报表表式及枚举_半年报("7"), 大型项目签约和执行情况报表表式及枚举_半年报("8"), 中冶集团装备制造统计月度报表_半年报("9"), 第一章建筑业企业统计报表_半年报("10"), 年末统计人员情况_年报("11"), 房地产开发企业经营情况_年报("12"), 国外经济合作报表表式及枚举_年报("13"), 大型项目签约和执行情况报表表式及枚举_年报("14"), 法人单位基本情况表_年报("15"), 中冶集团装备制造统计月度报表_5优化_年报("16"), 第四章ENR排名表表式_年报("17"), 第一章建筑业企业统计报表_年报("18");
+//		集团经营月报("0"), 房地产表_季报("1"), 国外经济合作表_季报("2"), 工程大型项目表_季报("3"), 制造情况表_季报("4"), 国统局建筑业表_季报("5"), 房地产表_半年报("6"), 国外经济合作表_半年报("7"), 工程大型项目表_半年报("8"), 制造情况表_半年报("9"), 国统局建筑业表_半年报("10"), 年末统计人员情况_年报("11"), 房地产表_年报("12"),国外经济合作表_年报("13"), 工程大型项目表_年报("14"), 法人单位基本情况表_年报("15"),  制造情况表_年报("16"), ENR排名表_年报("17"), 国统局建筑业表_年报("18");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		ExcelNameType(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 报表详细类型名称
+	 */
+	public enum excelDetailNameType {
+		建设项目签约和完成情况表_半年报("0"), 企业基本情况表_半年报("1"), 建设项目签约和完成情况表_季报("2"), 建设项目签约和完成情况表_年报("3");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		excelDetailNameType(String value) {
+			this.value = value;
+		}
+	}
+
+    /**
+     * 成功或失败
+     */
+    public enum SuccessOrFail {
+        失败("0"), 成功("1");
+        private String value;
+
+        public String getValue() {
+            return value;
+        }
+
+        SuccessOrFail(String value) {
+            this.value = value;
+        }
+    }
+
+
+	/**
+	 * 日志记录模块名称
+	 */
+	public enum LogModuleType {
+		用户登录("0"),其他_水处理项目("1"),其他_贸易项目("2"),其他_其他项目("3"),建筑业_建筑业企业经营情况("4"),建筑业_总产值在外省完成情况("5"),建筑业_建筑企业房屋竣工情况("6"),
+        企业信息("7"),工程项目("8"),房地产_商品房项目("9"),房地产_保障安居项目("10"),房地产_一级土地项目("11"),房地产_城市建设项目("12"),房地产_其他房地产项目("13"),
+        资源项目("14"),制造类项目("15"),PPP项目("16"),年末统计人员情况("17"),分公司绑定("18")/*,个人信息("19")*/,用户管理("20"),菜单管理("21"),角色管理("22"),数据字典("23"),
+        数据流水("24"),消息相关("25"),报表相关("26"),基地信息("27"),其他("28"),附件("29");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		LogModuleType(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 经营状态:正在经营("0"),暂停经营("1"),转让("2"),撤销("2")
+	 */
+	public enum RunStatue {
+		正在经营("0"), 暂停经营("1"), 撤销("3"), 转让("2");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		RunStatue(String value) {
+			this.value = value;
+		}
+	}
+
+	/**
+	 * 基地类型:装备制造基地("1"),钢结构生产基地("2"),其他(("3")
+	 */
+	public enum BaseType {
+		装备制造基地("1"), 钢结构生产基地("2"), 其他("3");
+		private String value;
+
+		public String getValue() {
+			return value;
+		}
+
+		BaseType(String value) {
+			this.value = value;
+		}
+	}
+}

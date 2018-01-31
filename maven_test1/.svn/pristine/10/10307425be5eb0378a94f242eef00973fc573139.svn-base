@@ -1,0 +1,38 @@
+#parse("layout/resource.vm")
+<!-- BEGIN CONTAINER -->
+  <!-- BEGIN PAGE CONTAINER-->
+<div class="panel-body" >
+	<form class="animated fadeIn validate" id="formSubmit" action="${rc.contextPath}/userInfoController/doSaveOrUpdate" METHOD="POST" enctype="application/x-www-form-urlencoded" >
+		<input id="id" name="id" type="hidden" value="$!{userInfo.id}">
+        <div class="row form-row m-l-20 m-r-20 xs-m-l-10 xs-m-r-10">
+          <div class="col-md-6 col-sm-6">
+            <input class="form-control" id="userName" name="userName" placeholder="用户名" type="text" value="$!{userInfo.userName}" required>
+          </div>
+          <div class="col-md-6 col-sm-6">
+            <input class="form-control" id="pwd" name="pwd" placeholder="密码" type="password" value="$!{userInfo.pwd}" required>
+          </div>
+        </div>
+        <div class="row form-row m-l-20 m-r-20 xs-m-l-10 xs-m-r-10">
+          <div class="col-md-12">
+            <input class="form-control" id="departNo" name="departno" placeholder="选择所属单位" type="text" value="$!{userInfo.departno}">
+          </div>
+        </div>
+        <div class="row form-row m-l-20 m-r-20 xs-m-l-10 xs-m-r-10">
+          <div class="col-md-12">
+            <input class="form-control" id="name" name="name" placeholder="姓名" type="text" value="$!{userInfo.name}" required>
+          </div>
+        </div>
+        <div class="row form-row m-l-20 m-r-20 xs-m-l-10 xs-m-r-10">
+          <div class="col-md-12">
+            <input class="form-control" id="phone" name="phone" placeholder="手机号" type="tel" value="$!{userInfo.phone}" required>
+          </div>
+        </div>
+        <div class="row form-row m-l-20 m-r-20 xs-m-l-10 xs-m-r-10">
+          <div class="col-md-12">
+            <input class="form-control" id="email" name="email" placeholder="邮箱" type="email" value="$!{userInfo.email}" required>
+          </div>
+        </div>
+      </form>
+  </div>
+  <!-- END TAG INPUTS / FILE UPLOADER CONTROLS-->
+  <!-- END PAGE -->

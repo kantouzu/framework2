@@ -1,0 +1,94 @@
+package com.cisdi.business.service.impl;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.cisdi.base.common.json.AjaxJson;
+import com.cisdi.base.common.responseBean.LayGridReturn;
+import com.cisdi.base.util.BaseUtil;
+import com.cisdi.business.dao.UserInfoDao;
+import com.cisdi.business.entity.UserInfo;
+import com.cisdi.business.example.UserInfoExample;
+import com.cisdi.business.service.UserInfoService;
+
+@Service
+public class UserInfoServiceImpl implements UserInfoService {
+
+    @Autowired
+    private UserInfoDao userInfoDao;
+    
+    @Override
+    public UserInfo selectByPrimaryKey(Integer id) {
+        UserInfo result = userInfoDao.selectByPrimaryKey(id);
+        return result;
+    }
+    
+    @Override
+    public List<Map<String, Object>> selectByExample(UserInfoExample  record) {
+        List<Map<String, Object>> result = userInfoDao.selectByExample(record);
+        return result;
+    }    
+
+    @Override
+    @Transactional
+    public AjaxJson insertSelective(UserInfo record) {
+         int resultKey = userInfoDao.insertSelective(record);
+         return AjaxJson.returnJsonObj(resultKey != 0?true:false);
+    }   
+    
+    @Override
+    @Transactional
+    public AjaxJson deleteByExample(UserInfoExample  record) {
+        int resultKey = userInfoDao.deleteByExample(record);
+        return AjaxJson.returnJsonObj(resultKey != 0?true:false);
+    }
+    
+    @Override
+    @Transactional
+    public AjaxJson deleteByExampleInLogic(UserInfoExample  record) {
+    	int resultKey = userInfoDao.deleteByExampleInLogic(record);
+    	return AjaxJson.returnJsonObj(resultKey != 0?true:false);
+    }
+
+    @Override
+    @Transactional
+    public AjaxJson deleteByPrimaryKey(Integer id) {
+        int resultKey = userInfoDao.deleteByPrimaryKey(id);
+        return AjaxJson.returnJsonObj(resultKey != 0?true:false);
+    }
+    
+    @Override
+    public AjaxJson countByExample(UserInfoExample example){
+        Integer count = userInfoDao.countByExample(example);
+        return AjaxJson.returnJsonObj(true, count);
+    }
+    
+    @Override
+    @Transactional
+    public AjaxJson updateByPrimaryKeySelective(UserInfo entity){
+        int resultKey = userInfoDao.updateByPrimaryKeySelective(entity);
+        return AjaxJson.returnJsonObj(resultKey != 0?true:false);
+    }
+
+	@Override
+	public LayGridReturn selectDataGridByExample(UserInfoExample record) {
+		return new LayGridReturn(0, "", userInfoDao.selectByExample(record), userInfoDao.countByExample(record));
+	}
+	
+	@Override
+    @Transactional
+    public AjaxJson saveOrUpdate(UserInfo entity){
+		Integer id = entity.getId();
+		if(BaseUtil.isEmpty(id)){
+			userInfoDao.insertSelective(entity);
+		}else{
+			userInfoDao.updateByPrimaryKeySelective(entity);
+		}
+        return AjaxJson.returnJsonObj(true);
+    }
+    
+}

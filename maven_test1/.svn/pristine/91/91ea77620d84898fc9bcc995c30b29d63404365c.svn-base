@@ -1,0 +1,63 @@
+package com.cisdi.business.entity;
+
+import java.util.Date;
+
+/* 读取表结构信息 */
+public class McgHelperUser {
+    
+    public McgHelperUser() {
+
+    }
+    
+    /* 自增主键  */
+    private Integer id;
+    /* 用户名  */
+    private String userName;
+    /* 密码  */
+    private String userPwd;
+    /* 年龄  */
+    private Integer age;
+    /* 注册时间  */
+    private Date regTime;
+    /* 更新时间  */
+    private Date updateTime;
+    
+    public Integer getId() {
+        return this.id;
+    }
+    public String getUserName() {
+        return this.userName;
+    }
+    public String getUserPwd() {
+        return this.userPwd;
+    }
+    public Integer getAge() {
+        return this.age;
+    }
+    public Date getRegTime() {
+        return this.regTime;
+    }
+    public Date getUpdateTime() {
+        return this.updateTime;
+    }
+   
+    public void setId(Integer id) {
+        this.id = id;
+    }
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+    public void setUserPwd(String userPwd) {
+        this.userPwd = userPwd;
+    }
+    public void setAge(Integer age) {
+        this.age = age;
+    }
+    public void setRegTime(Date regTime) {
+        this.regTime = regTime;
+    }
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
+    }
+  
+}

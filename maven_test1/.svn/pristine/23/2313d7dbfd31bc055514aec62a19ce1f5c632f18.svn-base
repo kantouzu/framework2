@@ -1,0 +1,42 @@
+package com.cisdi.business.service;
+
+import java.util.List;
+import java.util.Map;
+
+import com.cisdi.base.common.json.AjaxJson;
+import com.cisdi.base.common.responseBean.LayGridReturn;
+import com.cisdi.base.service.BaseService;
+import com.cisdi.business.entity.Dictionary;
+import com.cisdi.business.example.DictionaryExample;
+import com.cisdi.business.responseBean.LayerTree;
+
+public interface DictionaryService extends BaseService {
+    
+    Dictionary selectByPrimaryKey(Integer id);
+
+    List<Map<String, Object>> selectByExample(DictionaryExample record);
+
+    AjaxJson insertSelective(Dictionary record);
+    
+    AjaxJson deleteByPrimaryKey(Integer id);
+    
+    AjaxJson deleteByExample(DictionaryExample example);
+    
+    AjaxJson deleteByExampleInLogic(DictionaryExample example);
+    
+    AjaxJson countByExample(DictionaryExample example);
+    
+    AjaxJson updateByPrimaryKeySelective(Dictionary entity);
+    
+    LayGridReturn selectDataGridByExample(DictionaryExample record);
+    
+    AjaxJson saveOrUpdate(Dictionary entity);
+    
+    /**
+     * 获取数据字典信息列表数据
+     * @param parentId
+     * @param rootId
+     * @return
+     */
+	List<LayerTree> getMenuList(Map<String, Object> param);
+}

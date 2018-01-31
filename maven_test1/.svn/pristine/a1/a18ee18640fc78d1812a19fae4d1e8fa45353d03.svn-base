@@ -1,0 +1,38 @@
+#parse("layout/resource.vm")
+<script src="${rc.contextPath}/resources/js/Dictionary/DictionaryEdit.js" type="text/javascript"></script>
+<script>
+	var isCheckOnly = $!isCheckOnly;
+</script>
+<!-- BEGIN CONTAINER -->
+<!-- BEGIN PAGE CONTAINER-->
+<div class="panel-body" >
+  <form class="animated fadeIn validate" id="formSubmit" action="${rc.contextPath}/dictionaryController/doSaveOrUpdate" METHOD="POST" enctype="application/x-www-form-urlencoded" >
+	        <input id="id" name="id" type="hidden" value="$!{dictionary.id}">
+	        <div class="row form-row m-l-20 m-r-20 xs-m-l-10 xs-m-r-10">
+              <div class="col-md-12">
+    			<label class="form-label">字典code</label>
+                <input class="form-control" id="code" name="code" placeholder="填写字典code" type="text" value="$!{dictionary.code}"/>
+              </div>
+            </div>
+	        <div class="row form-row m-l-20 m-r-20 xs-m-l-10 xs-m-r-10">
+              <div class="col-md-12">
+    			<label class="form-label">字典父级code</label>
+                <input class="form-control" id="parentCode" name="parentCode" placeholder="填写字典父级code" type="text" value="$!{dictionary.parentCode}"/>
+              </div>
+            </div>
+            <div class="row form-row m-l-20 m-r-20 xs-m-l-10 xs-m-r-10">
+              <div class="col-md-12">
+    			<label class="form-label">DicType</label>
+                <select class="wb" id="dicType" enumType="DicType" enumValue="$!{dictionary.dicType}" name="dicType" placeholder="选择DicType" type="text" value="$!{dictionary.dicType}"></select>
+              </div>
+            </div>
+	        <div class="row form-row m-l-20 m-r-20 xs-m-l-10 xs-m-r-10">
+              <div class="col-md-12">
+    			<label class="form-label">备注</label>
+                <input class="form-control" id="remark" name="remark" placeholder="填写备注" type="text" value="$!{dictionary.remark}"/>
+              </div>
+            </div>
+  </form>
+</div>
+<!-- END TAG INPUTS / FILE UPLOADER CONTROLS-->
+<!-- END PAGE -->

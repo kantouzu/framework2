@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+    <meta charset="utf-8" />
+    <title>欢迎登录XXX管理系统</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta content="" name="description" />
+    <meta content="" name="author" />
+	#parse("${resource_path}")
+	<script src="${rc.contextPath}/resources/js/layout/login.js" type="text/javascript"></script>
+  </head>
+  <!-- END HEAD -->
+  <!-- BEGIN BODY -->
+  <body class="error-body no-top lazy" data-original="assets/img/work.jpg" style="background-image: url('assets/img/work.jpg')">
+    <div class="container">
+      <div class="row login-container animated fadeInUp">
+        <div class="col-md-7 col-md-offset-2 tiles white no-padding">
+          <div class="p-t-30 p-l-40 p-b-20 xs-p-t-10 xs-p-l-10 xs-p-b-10">
+            <h2 class="normal">
+          应该是logo标语
+        </h2>
+            <p>
+              这应该是一段简介
+              <br>
+            </p>
+            <p class="p-b-20">
+              这应该还是一段简介..
+            </p>
+            <div role="tablist">
+              <a href="#tab_login" class="btn btn-primary btn-cons" role="tab" data-toggle="tab">选择登录</a> 或者&nbsp;&nbsp;
+              <a href="#tab_register" class="btn btn-info btn-cons" role="tab" data-toggle="tab">创建一个账户</a>
+            </div>
+          </div>
+          <div class="tiles grey p-t-20 p-b-20 no-margin text-black tab-content">
+            <div role="tabpanel" class="tab-pane active" id="tab_login">
+              <form class="" id="loginForm" action="">
+                <div class="row form-row m-l-20 m-r-20 xs-m-l-10 xs-m-r-10 flex">
+                  <div class="col-md-6 col-sm-6">
+                    <input class="form-control" id="login_username" placeholder="用户名" required>
+                  </div>
+                  <div class="col-md-6 col-sm-6">
+                    <input class="form-control" id="login_pass" placeholder="密码" type="password" required>
+                  </div>
+				  <div class="col-md-6 col-sm-6">
+					<a href="javascript:userLogin()" class="btn btn-success btn-demo-space">登录</a>
+					##<button class="btn btn-success btn-demo-space">登录
+                    ##</button>
+				  </div>
+                </div>
+                <div class="row p-t-10 m-l-20 m-r-20 xs-m-l-10 xs-m-r-10">
+                  <div class="control-group col-md-10">
+                    <div class="checkbox checkbox check-success">
+                      <a href="#">登录出现问题?</a>&nbsp;&nbsp;
+                      <input id="checkbox1" type="checkbox" value="1">
+                      <label for="checkbox1">记住我</label>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+            <div role="tabpanel" class="tab-pane" id="tab_register">
+              <form class="animated fadeIn validate" id="" name="">
+                <div class="row form-row m-l-20 m-r-20 xs-m-l-10 xs-m-r-10">
+                  <div class="col-md-6 col-sm-6">
+                    <input class="form-control" id="reg_username" name="reg_username" placeholder="用户名" type="text" required>
+                  </div>
+                  <div class="col-md-6 col-sm-6">
+                    <input class="form-control" id="reg_pass" name="reg_pass" placeholder="密码" type="password" required>
+                  </div>
+                </div>
+                <div class="row form-row m-l-20 m-r-20 xs-m-l-10 xs-m-r-10">
+                  <div class="col-md-12">
+                    <input class="form-control" id="reg_mail" name="reg_mail" placeholder="联系地址" type="email" required>
+                  </div>
+                </div>
+                <div class="row form-row m-l-20 m-r-20 xs-m-l-10 xs-m-r-10">
+                  <div class="col-md-6 col-sm-6">
+                    <input class="form-control" id="reg_first_Name" name="reg_first_Name" placeholder="姓" type="text" required>
+                  </div>
+                  <div class="col-md-6 col-sm-6">
+                    <input class="form-control" id="reg_first_Name" name="reg_first_Name" placeholder="名" type="text" required>
+                  </div>
+                </div>
+                <div class="row form-row m-l-20 m-r-20 xs-m-l-10 xs-m-r-10">
+                  <div class="col-md-12">
+                    <input class="form-control" id="reg_email" name="reg_email" placeholder="电子邮件" type="email" required>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

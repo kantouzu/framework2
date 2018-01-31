@@ -1,0 +1,385 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cisdi.business.dao.MenuDao">
+
+  <resultMap id="treeMenu" type="com.cisdi.business.responseBean.MenuModule">
+  		<id column="id" property="id" />
+		<result column="menu_name" property="menuName" />
+		<result column="url" property="url" />
+		<result column="parent_id" property="parentId" />
+		<result column="order_num" property="orderNum" />
+		<result column="icon" property="icon" />
+		<result column="is_ignore_pre" property="isIgnorePre" />
+		<result column="pre_handle_url" property="preHandleUrl" />
+		<result column="remark" property="remark" />
+		<result column="create_time" property="createTime" />
+		<result column="update_time" property="updateTime" />
+		<result column="deleteflag" property="deleteflag" />
+		<result column="is_root" property="isRoot" />
+  </resultMap>
+
+  <resultMap id="BaseResultMap" type="com.cisdi.business.entity.Menu">
+		<id column="id" property="id" />
+		<result column="menu_name" property="menuName" />
+		<result column="url" property="url" />
+		<result column="parent_id" property="parentId" />
+		<result column="order_num" property="orderNum" />
+		<result column="icon" property="icon" />
+		<result column="is_ignore_pre" property="isIgnorePre" />
+		<result column="pre_handle_url" property="preHandleUrl" />
+		<result column="remark" property="remark" />
+		<result column="create_time" property="createTime" />
+		<result column="update_time" property="updateTime" />
+		<result column="deleteflag" property="deleteflag" />
+		<result column="is_root" property="isRoot" />
+  </resultMap>
+  
+  <resultMap id="mapResultMap" type="java.util.HashMap">
+		<id column="id" property="id" />
+		<result column="menu_name" property="menuName" />
+		<result column="url" property="url" />
+		<result column="parent_id" property="parentId" />
+		<result column="order_num" property="orderNum" />
+		<result column="icon" property="icon" />
+		<result column="is_ignore_pre" property="isIgnorePre" />
+		<result column="pre_handle_url" property="preHandleUrl" />
+		<result column="remark" property="remark" />
+		<result column="create_time" property="createTime" />
+		<result column="update_time" property="updateTime" />
+		<result column="deleteflag" property="deleteflag" />
+		<result column="is_root" property="isRoot" />
+  </resultMap>
+  
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+#{listItem}                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+#{listItem}                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  
+  <sql id="Base_Column_List">
+		id,
+		menu_name,
+		url,
+		parent_id,
+		order_num,
+		icon,
+		is_ignore_pre,
+		pre_handle_url,
+		remark,
+		create_time,
+		update_time,
+		deleteflag,
+		is_root
+  </sql>  
+  
+  <select id="selectByExample" parameterType="com.cisdi.business.example.MenuExample" resultMap="mapResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    'true' as QUERYID,
+		${@com.cisdi.base.util.BaseUtil@transEnumValueToName("is_ignore_pre", "YesOrNo")} isIgnorePreName,
+		${@com.cisdi.base.util.BaseUtil@transEnumValueToName("deleteflag", "YesOrNo")} deleteflagName,
+		${@com.cisdi.base.util.BaseUtil@transEnumValueToName("is_root", "YesOrNo")} isRootName,
+    <include refid="Base_Column_List" />
+    from menu
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+${orderByClause}    </if>
+    <if test="limitStart != null">
+      limit ${limitStart} , ${limitEnd}
+    </if>
+  </select>   
+  
+  <select id="selectTreeMenuByCondition" parameterType="java.util.HashMap" resultMap="treeMenu">
+    select
+    <include refid="Base_Column_List" />,
+    (select count(id) from menu where parent_id = m.id) childrenNum
+    from menu m where deleteflag = 0
+    and FIND_IN_SET(m.id, getChildLst(
+    		<if test="rootId != null">
+    			#{rootId}
+    		</if>
+    		<if test="rootId == null">
+	    		(select min(id) from menu where deleteflag = 0)
+    		</if>
+    	)
+   	)
+   	and m.id in (
+   		select m.id from menu m
+   		left join role_rel_menu rel on rel.menu_id = m.id
+   		left join role_info r on r.role_code = rel.role_code
+   		left join user_rel_role urr on urr.role_code = r.role_code
+   		where m.deleteflag = '0'
+	    <if test="userId != null">
+	      and urr.user_id = #{userId}
+	    </if>
+   	)
+   	<if test="parentId != null">
+    and FIND_IN_SET(m.id, getChildLst(#{parentId}))
+   	or m.id in ((select min(id) from menu where deleteflag = 0))
+    </if>
+    <!-- and (m.is_root is null or m.is_root = '0') -->
+    order by order_num 
+  </select>  
+  
+  <select id="selectBusinessTreeMenuByCondition" parameterType="java.util.HashMap" resultMap="treeMenu">
+    select
+    <include refid="Base_Column_List" />,
+    (select count(id) from menu where parent_id = m.id) childrenNum
+    from menu m where deleteflag = 0
+    and FIND_IN_SET(m.id, getChildLst(
+    		<if test="rootId != null">
+    			#{rootId}
+    		</if>
+    		<if test="rootId == null">
+	    		(select min(id) from menu where deleteflag = 0)
+    		</if>
+    	)
+   	)
+   	and m.id in (
+   		select m.id from menu m
+   		left join role_rel_menu rel on rel.menu_id = m.id
+   		left join userdepart_rel_role urr on urr.role_code = rel.role_code
+   		left join user_rel_depart urd on urd.id = urr.userdepart_id
+   		where m.deleteflag = '0'
+	    <if test="userId != null">
+	      and urd.user_id = #{userId}
+	    </if>
+	    <if test="departId != null">
+	      and urd.depart_id = #{departId}
+	    </if>
+   	)
+   	<if test="parentId != null">
+    and FIND_IN_SET(m.id, getChildLst(#{parentId}))
+   	or m.id in ((select min(id) from menu where deleteflag = 0))
+    </if>
+    <!-- and (m.is_root is null or m.is_root = '0') -->
+    order by order_num 
+  </select>  
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from menu m
+    where id = #{id}
+  </select>
+  
+ <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from menu
+    where id = #{id}
+  </delete>   
+  
+  <delete id="deleteByExample" parameterType="com.cisdi.business.example.MenuExample" >
+    delete from menu
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  
+  <delete id="deleteByExampleInLogic" parameterType="com.cisdi.business.example.MenuExample" >
+    update menu set deleteflag = '1'
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  
+  <insert id="insertSelective" useGeneratedKeys="true" keyProperty="id" parameterType="com.cisdi.business.entity.Menu">
+    insert into menu
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+		  <if test="id != null">
+			id,
+		  </if>		
+		  <if test="menuName != null">
+			menu_name,
+		  </if>		
+		  <if test="url != null">
+			url,
+		  </if>		
+		  <if test="parentId != null">
+			parent_id,
+		  </if>		
+		  <if test="orderNum != null">
+			order_num,
+		  </if>		
+		  <if test="icon != null">
+			icon,
+		  </if>		
+		  <if test="isIgnorePre != null">
+			is_ignore_pre,
+		  </if>		
+		  <if test="preHandleUrl != null">
+			pre_handle_url,
+		  </if>		
+		  <if test="remark != null">
+			remark,
+		  </if>		
+		  <if test="updateTime != null">
+			update_time,
+		  </if>		
+		  <if test="isRoot != null">
+			is_root,
+		  </if>		
+			deleteflag,
+			create_time,
+    </trim>  
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id},
+			</if>
+			<if test="menuName != null">
+				#{menuName},
+			</if>
+			<if test="url != null">
+				#{url},
+			</if>
+			<if test="parentId != null">
+				#{parentId},
+			</if>
+			<if test="orderNum != null">
+				#{orderNum},
+			</if>
+			<if test="icon != null">
+				#{icon},
+			</if>
+			<if test="isIgnorePre != null">
+				#{isIgnorePre},
+			</if>
+			<if test="preHandleUrl != null">
+				#{preHandleUrl},
+			</if>
+			<if test="remark != null">
+				#{remark},
+			</if>
+			<if test="updateTime != null">
+				#{updateTime},
+			</if>
+			<if test="isRoot != null">
+				#{isRoot},
+			</if>
+			<if test="deleteflag != null">
+				#{deleteflag},
+			</if>
+			<if test="deleteflag == null">
+    			'0',
+    		</if>
+			<if test="createTime != null">
+    			#{createTime}, 
+    		</if>
+    		<if test="createTime == null">
+    			sysdate(),
+    		</if>
+    </trim>
+  </insert>
+  
+  <select id="countByExample" parameterType="com.cisdi.business.example.MenuExample" resultType="java.lang.Integer" >
+    select count(1) from menu
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  
+  <update id="updateByPrimaryKeySelective" parameterType="com.cisdi.business.entity.Menu">
+    update menu 
+    <set>
+			<if test="id != null">
+				id = #{id},
+			</if>
+			<if test="menuName != null">
+				menu_name = #{menuName},
+			</if>
+			<if test="url != null">
+				url = #{url},
+			</if>
+			<if test="parentId != null">
+				parent_id = #{parentId},
+			</if>
+			<if test="orderNum != null">
+				order_num = #{orderNum},
+			</if>
+			<if test="icon != null">
+				icon = #{icon},
+			</if>
+			<if test="isIgnorePre != null">
+				is_ignore_pre = #{isIgnorePre},
+			</if>
+			<if test="preHandleUrl != null">
+				pre_handle_url = #{preHandleUrl},
+			</if>
+			<if test="remark != null">
+				remark = #{remark},
+			</if>
+			<if test="createTime != null">
+				create_time = #{createTime},
+			</if>
+			<if test="updateTime != null">
+				update_time = #{updateTime},
+			</if>
+			<if test="deleteflag != null">
+				deleteflag = #{deleteflag},
+			</if>
+			<if test="isRoot != null">
+				is_root = #{isRoot},
+			</if>
+		<if test="updateTime == null">
+			update_time = sysdate(),
+		</if>
+   
+    </set>
+    where id = #{id}
+  </update>   
+  
+</mapper>
